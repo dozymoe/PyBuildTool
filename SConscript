@@ -1,5 +1,6 @@
 from os import environ, getcwd, path
 from PyBuildTool.utils.common import get_config_filename, read_config
+from SCons.Node.FS import FS
 
 
 Import('env ROOT_DIR BUILD_DIR')
@@ -64,43 +65,49 @@ for tool_name in config:
     env.Tool(tool_name)
 
     tool = getattr(env, tool_name)
-    tool_actions = []
+    tool_nodes = []
 
     for group_name in config[tool_name]:
         group = config[tool_name][group_name]
 
-        group_actions = []
+        group_nodes = []
         group_alias = '%s:%s' % (tool_name, group_name)
         group_dependencies = group.get('depends', [])
         group_options = group.get('options', {})
 
         for item in group['files']:
             # reconstruct files into list
-            if not isinstance(item['dest'], list):
-                item['dest'] = [item['dest']]
-            if not isinstance(item['src'], list):
-                item['src'] = [item['src']]
+            target_raw = item.get('dest', [])
+            if not isinstance(target_raw, list):
+                target_raw = [target_raw]
 
-            # files are either relative to build dir, or relative
-            # to ROOT_DIR.
-            # ROOT_DIR is where SConsfile.yml lies.
-            if group_options.get('_target_sandboxed_', True):
-                item['dest'] = [path.join(prefix, dest)
-                                for dest in item['dest']]
+            source_raw = item.get('src', [])
+            if not isinstance(source_raw, list):
+                source_raw = [source_raw]
+
+            if tool.builder.target_factory is None or \
+               tool.builder.target_factory.im_self.__class__ is FS:
+                # files are either relative to build dir, or relative
+                # to ROOT_DIR.
+                # ROOT_DIR is where SConsfile.yml lies.
+                if group_options.get('_target_sandboxed_', True):
+                    target = [path.join(prefix, dest)
+                              for dest in target_raw if dest]
+                else:
+                    target = [path.join(ROOT_DIR, dest)
+                              for dest in target_raw if dest]
             else:
-                item['dest'] = [path.join(ROOT_DIR, dest)
-                                for dest in item['dest']]
+                target = target_raw
 
-            item['src'] = [path.join(prefix, src)
-                           for src in item['src']]
+            if tool.builder.source_factory is None or \
+               tool.builder.source_factory.im_self.__class__ is FS:
+                source = [path.join(prefix, src)
+                          for src in source_raw if src]
+            else:
+                source = source_raw
 
-            action = tool(item['dest'], item['src'],
-                          TOOLCFG=Value(group_options))
-            group_actions.append(action)
-            tool_actions.append(action)
+            nodes = tool(target, source, TOOLCFG=Value(group_options))
 
-        env.Alias(group_alias, group_actions)
-        if 'depends' in group:
-            env.Depends(group_alias,
-                        [Alias(depend) for depend in group_dependencies])
-    env.Alias(tool_name, tool_actions)
+            group_nodes.extend(nodes)
+        tool_nodes.extend(env.Alias(group_alias, group_nodes))
+    env.Alias(tool_name, tool_nodes)

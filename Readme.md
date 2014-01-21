@@ -46,8 +46,6 @@ Example content of **SConsfile.yml**:
                         - src/file3.in
                     dest: result/file4.out
         group_name_2:
-            depends:
-                - "tool_name:group_name"
             options:
                 _target_sandboxed_: false
             files:
@@ -63,12 +61,6 @@ your tool python-module, the module will be loaded on demand using SCons
 `group_name` can be anything valid as YAML key, it is used to group files,
 and tool configuration for those files. You can later target this group
 during scons invocation, using `scons tool_name:group_name`.
-
-You can specify the build dependencies of each target, per group, using
-`depends`.
-It is expected to be a list in the form of "tool_name" or
-"tool_name:group_name", the same format you would use to specifically build
-that target.
 
 `options` will be passed to the tool's module as python dict. Some keys have
 special meaning.
