@@ -1,0 +1,34 @@
+concat:
+    group_main_css:
+        files:
+            -
+                src:
+                    - src/css/heading.css
+                    - src/css/default.css
+                dest: css/style.css
+    group_main_js:
+        files:
+            -
+                src:
+                    - src/javascript/underscore.js
+                    - src/javascript/default.js
+                dest: javascript/script.js
+copy:
+    group_main_css:
+        depends:
+            - concat:group_main_css
+        options:
+            _target_sandboxed_: false
+        files:
+            -
+                src: css/style.css
+                dest: htdocs/css/style.css
+    group_main_js:
+        depends:
+            - concat:group_main_js
+        options:
+            _target_sandboxed_: false
+        files:
+            -
+                src: javascript/script.js
+                dest: htdocs/js/script.js
