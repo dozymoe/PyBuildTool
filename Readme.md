@@ -1,6 +1,10 @@
 PyBuildTool
 ===========
 
+* License      : MIT
+* Project URL  : [PyBuildTool][3]
+* Project Wiki : [Wiki at PyBuildTool][4]
+
 Summary
 -------
 
@@ -9,7 +13,7 @@ its foundation.
 
 There is demo project here [PyBuildToolExamples][2].
 
-Basically you take some files, run a process that transform it into
+Basically you take some files, run a process that transform them into
 different files or file types, using tools.
 
 There are builtin tools, but you can make your own, see the modules in
@@ -62,11 +66,16 @@ during scons invocation, using `scons tool_name:group_name`.
 
 You can specify the build dependencies of each target, per group, using
 `depends`.
-It is expected to be a list in the form of "tool_name:group_name", the same
-format you would used to specifically build that target.
+It is expected to be a list in the form of "tool_name" or
+"tool_name:group_name", the same format you would use to specifically build
+that target.
 
 `options` will be passed to the tool's module as python dict. Some keys have
 special meaning.
+
+`_source_sandboxed_` is used by `scons --watch`.
+Or used by any other tools that need to differentiate between transition files
+and real source files which the user modified.
 
 `_target_sandboxed_` is used by PyBuildTool.
 The file results of each tool are by default sandboxed in a directory. Use
@@ -76,8 +85,8 @@ this option if you want to take it out into your own project directory.
 supplied to the actual file processor as unmodified arguments.
 
 
-Instruction
------------
+Install
+-------
 
 Clone this repository under the root directory of your project.
 
@@ -91,7 +100,7 @@ If you keep **SConstruct** file as is, a **BUILD** directory will be created
 as the sandbox.
 
 Install "scons" using `pip install --egg SCons`, and other requirements that
-each tool will needs, read their module file for more information.
+each tool will need, read their module file for more information.
 
 **PyYAML** will also be needed to read the **SConsfile.yml**.
 
@@ -99,3 +108,5 @@ each tool will needs, read their module file for more information.
 
 [1]: http://www.scons.org
 [2]: http://github.com/dozymoe/PyBuildToolExamples
+[3]: http://github.com/dozymoe/PyBuildTool
+[4]: http://github.com/dozymoe/PyBuildTool/wiki

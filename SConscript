@@ -1,26 +1,5 @@
-from copy import deepcopy
 from os import environ, getcwd, path
-
-
-def get_config_filename(root, stage, filetype):
-    """ oh my, there are several possibilities for our main
-        configuration filename. """
-
-    possible_types = ('py', 'yml') if filetype == 'auto' \
-                     else (filetype,)
-    possible_stage = ('.default', '') if stage == 'default' \
-                     else ('.%s' % stage,)
-    possible_confs = (('SConsfile%s' % p_stage, p_type) \
-                      for p_stage in possible_stage \
-                      for p_type in possible_types)
-
-    for p_conf in possible_confs:
-        if path.lexists(path.join(root, '.'.join(p_conf))):
-            return p_conf
-
-    raise Exception('Missing configuration file (SConsfile.STAGE.EXT)')
-
-
+from PyBuildTool.utils.common import get_config_filename, read_config
 
 
 Import('env ROOT_DIR BUILD_DIR')
@@ -35,11 +14,15 @@ env['ENV']['STAGE'] = GetOption('stage')
 
 
 # support different type of configuration files (py and yml).
-AddOption('--config-filetype', dest='filetype', type='string',
-          action='store', default='auto',
+AddOption('--filetype', dest='filetype', 
+          action='store', default='auto', choices=['auto', 'py', 'yml'],
           help='File type or file extension of main configuration file,'\
                ' for example SConsfile.yml with yml as the value.')
 
+# support watch command.
+AddOption('--watch', dest='watch', action='store_true', default=False,
+          help='Watch file changes and automatically invoke scons build' \
+               ' per group.')
 
 # populate scons' shell-environment-variable $PATH with system's $PATH.
 for p in environ['PATH'].split(':'):
@@ -57,30 +40,25 @@ prefix = path.join(BUILD_DIR, env['ENV']['STAGE'])
 env.VariantDir(prefix, ROOT_DIR)
 
 
+# if `watch` argument specified, exit stage left.
+if GetOption('watch'):
+    from PyBuildTool.utils.watch import Watch
+
+    watch = Watch(env=env, root_dir=ROOT_DIR,
+                  stage=env['ENV']['STAGE'],
+                  filetype=GetOption('filetype'))
+    watch.run()
+    exit(0)
+
+
 # read build-configuration (files to process).
 config_file = get_config_filename(root=ROOT_DIR,
                                   stage=env['ENV']['STAGE'],
                                   filetype=GetOption('filetype'))
-if config_file[1] == 'py':
-    # our config dictionary would be the module level variable `build_config`
-    # inside SConsfile.STAGE.py
-
-    from  importlib import import_module
-    myconfig = import_module(config_file[0])
-
-    initfunc = getattr(myconfig, 'init', None)
-    if initfunc is not None:
-        initfunc(env)
-    mybuildconfig = getattr(myconfig, 'build_config')
-    
-    config = deepcopy(mybuildconfig)
-elif config_file[1] == 'yml':
-    # our config dictionary would be the whole contents of SConsfile.STAGE.yml
-    
-    from yaml import safe_load as yaml_load
-    config = yaml_load(open(path.join(ROOT_DIR, '.'.join(config_file))))
+config = read_config(basefilename=config_file[0],
+                     filetype=config_file[1],
+                     env=env, root_dir=ROOT_DIR)
                                   
-
 # main function, process build config into tasks.
 for tool_name in config:
     env.Tool(tool_name)
@@ -112,6 +90,9 @@ for tool_name in config:
             else:
                 item['dest'] = [path.join(ROOT_DIR, dest)
                                 for dest in item['dest']]
+
+            item['src'] = [path.join(prefix, src)
+                           for src in item['src']]
 
             action = tool(item['dest'], item['src'],
                           TOOLCFG=Value(group_options))

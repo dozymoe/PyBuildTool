@@ -1,6 +1,9 @@
 build_config = {
     'concat': {
         'group_main_css': {
+            'options': {
+                '_source_sandboxed_': False,
+            },
             'files': [{
                 'src': [
                     'src/css/heading.css',
@@ -10,6 +13,9 @@ build_config = {
             }],
         },
         'group_main_js': {
+            'options': {
+                '_source_sandboxed_': False,
+            },
             'files': [{
                 'src': [
                     'src/javascript/underscore.js',
@@ -49,4 +55,7 @@ build_config = {
 
 
 def init(env):
+    """ This function will be called by PyBuildTool to let you setup the
+        content of `build_config` variable above """
+
     pass
