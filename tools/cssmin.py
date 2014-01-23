@@ -5,6 +5,13 @@ Options:
 
     * charset    : str, None, charset of the source file
     * line-width : int, None, maximum characters per line
+
+Requirements:
+
+    * yuicompressor
+      to install, run `pip install yuicompressor`
+    * java
+
 """
 
 from PyBuildTool.tools.warnings import ThereCanBeOnlyOne

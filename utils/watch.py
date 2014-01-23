@@ -1,37 +1,39 @@
 from os import path
+from pickle import loads as pickle_load, dumps as pickle_dump
 from PyBuildTool.utils.common import get_config_filename, read_config
-from pyinotify import (ALL_EVENTS, IN_MODIFY, Notifier, ProcessEvent,
+from pyinotify import (ALL_EVENTS, IN_MODIFY, ThreadedNotifier, ProcessEvent,
                        WatchManager)
 from subprocess import call as subprocess_call
-from time import time
+from time import time, sleep
+
+
+build_state = {}
+
+
+def process_build_files(stage, filetype, cwd, alias=''):
+    subprocess_call(['scons',
+                     '--stage=%s' % stage,
+                     '--filetype=%s' % filetype,
+                    alias],
+                    cwd=cwd, shell=True)
 
 
 class OnWriteHandler(ProcessEvent):
-    class Meta:
-        lastfired = {}
-
-    def my_init(self, cwd, stage, filetype, alias):
+    def my_init(self, stage, filetype, alias):
         self.alias = alias
-        self.cwd = cwd
         self.filetype = filetype
         self.stage = stage
 
     def process_IN_MODIFY(self, event):
-        lastfired = self.Meta.lastfired.get(self.alias, 0)
-        if time() - lastfired < 1:
-            return
-        self.Meta.lastfired[self.alias] = time()
+        key = pickle_dump((self.stage, self.filetype, self.alias))
+        build_state[key] = True
 
-        subprocess_call(['scons',
-                         '--stage=%s' % self.stage,
-                         '--filetype=%s' % self.filetype,
-                         self.alias],
-                        cwd=self.cwd, shell=True)
 
 
 class Watch(object):
-    class Meta:
-        lastfired = 0
+    wm = WatchManager()
+    notifier = ThreadedNotifier(wm)
+
 
     def __init__(self, env, root_dir, stage, filetype):
         self.env = env
@@ -39,21 +41,13 @@ class Watch(object):
         self.stage = stage
         self.filetype = filetype
 
-        self.wm = WatchManager()
-        self.notifier = Notifier(self.wm)
-
     def main_config_modified(self, event):
-        if time() - self.Meta.lastfired < 1:
-            return
-        self.Meta.lastfired = time()
-
         for wd in self.wm.watches.keys():
             self.wm.del_watch(wd)
-        subprocess_call(['scons',
-                         '--stage=%s' % self.stage,
-                         '--filetype=%s' % self.filetype],
-                        cwd=self.root_dir, shell=True)
+
         self.setup()
+        key = pickle_dump((self.stage, self.filetype, ''))
+        build_state[key] = True
 
     def setup(self):
         config_file = get_config_filename(root=self.root_dir,
@@ -72,8 +66,7 @@ class Watch(object):
                 group = config[tool_name][group_name]
 
                 group_alias = '%s:%s' % (tool_name, group_name)
-                handler = OnWriteHandler(cwd=self.root_dir,
-                                         stage=self.stage,
+                handler = OnWriteHandler(stage=self.stage,
                                          filetype=self.filetype,
                                          alias=group_alias)
                 
@@ -95,7 +88,25 @@ class Watch(object):
                                           do_glob=True, rec=True,
                                           auto_add=True)
 
+
+    def perform_build(self):
+        for key in build_state:
+            if not build_state[key]:
+                continue
+            build_state[key] = False
+            stage, filetype, alias = pickle_load(key)
+            process_build_files(stage, filetype, self.root_dir, alias)
+
+
     def run(self):
+        process_build_files(self.stage, self.filetype, self.root_dir)
         print('We are WATCHING your every moves ...')
         self.setup()
-        self.notifier.loop()
+        self.notifier.start()
+        while True:
+            try:
+                sleep(2)
+                self.perform_build()
+            except:
+                self.notifier.stop()
+                break

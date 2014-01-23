@@ -22,7 +22,8 @@ file_processor = 'jshint'
 
 
 def tool_str(target, source, env):
-    return env.subst('JS-lint $TARGETS', target=target)
+    return env.subst('%s passed $TARGETS' % file_processor,
+                     target=target)
 
 
 def tool_generator(source, target, env, for_signature):

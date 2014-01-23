@@ -8,6 +8,13 @@ Options:
     * obfuscate   : bool, True,  munge variable names
     * preserve-semicolons: bool, False
     * optimize    : bool, True
+
+Requirements:
+
+    * yuicompressor
+      to install, run `pip install yuicompressor`
+    * java
+
 """
 
 from PyBuildTool.tools.warnings import ThereCanBeOnlyOne

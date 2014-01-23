@@ -1,4 +1,4 @@
-from os import environ, getcwd, path
+from os import environ, getcwd, path, sep
 from PyBuildTool.utils.common import get_config_filename, read_config
 from SCons.Node.FS import FS
 
@@ -91,18 +91,39 @@ for tool_name in config:
                 # to ROOT_DIR.
                 # ROOT_DIR is where SConsfile.yml lies.
                 if group_options.get('_target_sandboxed_', True):
-                    target = [path.join(prefix, dest)
-                              for dest in target_raw if dest]
+                    target_prefix = (path.join(prefix, dest)
+                                     for dest in target_raw if dest)
                 else:
-                    target = [path.join(ROOT_DIR, dest)
-                              for dest in target_raw if dest]
+                    target_prefix = (path.join(ROOT_DIR, dest)
+                                     for dest in target_raw if dest)
+
+                # assume target ended with `os.sep` as directory
+                target = []
+                for dest in target_prefix:
+                    if dest.endswith(sep):
+                        target.append(Dir(dest))
+                    else:
+                        target.append(File(dest))
             else:
                 target = target_raw
 
             if tool.builder.source_factory is None or \
                tool.builder.source_factory.im_self.__class__ is FS:
-                source = [path.join(prefix, src)
-                          for src in source_raw if src]
+                source_prefix = (path.join(prefix, src)
+                                 for src in source_raw if src)
+                # assume target ended with `os.sep` as directory
+                # and containing `*` as wildcard
+                source = []
+                for src in source_prefix:
+                    if src.endswith(sep):
+                        d = Dir(src)
+                        d.set_always_build()
+                        source.append(d)
+                    elif '*' in src:
+                        source.append(Glob(src))
+                    else:
+                        source.append(File(src))
+
             else:
                 source = source_raw
 
