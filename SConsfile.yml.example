@@ -2,37 +2,33 @@ concat:
     group_main_css:
         options:
             _source_sandboxed_: false
-        files:
+        items:
             -
-                src:
+                file-in:
                     - src/css/heading.css
                     - src/css/default.css
-                dest: css/style.css
+                file-out: css/style.css
     group_main_js:
         options:
             _source_sandboxed_: false
-        files:
+        items:
             -
-                src:
+                file-in:
                     - src/javascript/underscore.js
                     - src/javascript/default.js
-                dest: javascript/script.js
+                file-out: javascript/script.js
 copy:
     group_main_css:
-        depends:
-            - concat:group_main_css
         options:
             _target_sandboxed_: false
-        files:
+        items:
             -
-                src: css/style.css
-                dest: htdocs/css/style.css
+                file-in: css/style.css
+                file-out: htdocs/css/style.css
     group_main_js:
-        depends:
-            - concat:group_main_js
         options:
             _target_sandboxed_: false
-        files:
+        items:
             -
-                src: javascript/script.js
-                dest: htdocs/js/script.js
+                file-in: javascript/script.js
+                file-out: htdocs/js/script.js

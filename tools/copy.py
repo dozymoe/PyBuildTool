@@ -1,9 +1,9 @@
 """ Copy files. """
 
-from os import makedirs, path
+from os import makedirs, path, sep
+from PyBuildTool.utils.common import update_shadow_jutsu
 from SCons.Action import Action
 from SCons.Defaults import copy_func
-from SCons.Node.FS import Dir
 from SCons.Builder import Builder
 
 
@@ -11,16 +11,22 @@ tool_name = 'copy'
 
 
 def tool_func(target, source, env):
+    update_shadow_jutsu(target=target, source=source, env=env)
+
     if len(source) == 1:
-        src = str(source[0])
+        src = source[0].attributes.ActualName
     else:
-        src = [str(s) for s in source]
-    for dest in target:
-        dest_str = str(dest)
-        if isinstance(dest, Dir):
-            if not path.exists(dest_str):
-                makedirs(dest_str)
-        copy_func(dest_str, src)
+        src = [s.attributes.ActualName for s in source]
+
+    for t in target:
+        dest = t.attributes.ActualName
+
+        # `copy_func()` requires that the target directory exists
+        # before copying, odd.
+        if dest.endswith(sep) and not path.exists(dest):
+            makedirs(dest)
+
+        copy_func(dest, src)
 
 
 def tool_str(target, source, env):

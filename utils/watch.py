@@ -4,18 +4,20 @@ from PyBuildTool.utils.common import get_config_filename, read_config
 from pyinotify import (ALL_EVENTS, IN_MODIFY, ThreadedNotifier, ProcessEvent,
                        WatchManager)
 from subprocess import call as subprocess_call
-from time import time, sleep
+from time import sleep
 
 
 build_state = {}
 
 
 def process_build_files(stage, filetype, cwd, alias=''):
-    subprocess_call(['scons',
-                     '--stage=%s' % stage,
-                     '--filetype=%s' % filetype,
-                    alias],
-                    cwd=cwd, shell=True)
+    cmd = ' '.join([
+        'scons',
+        '--stage=%s' % stage,
+        '--filetype=%s' % filetype,
+        alias,
+    ])
+    subprocess_call(cmd, cwd=cwd, shell=True)
 
 
 class OnWriteHandler(ProcessEvent):
@@ -70,7 +72,7 @@ class Watch(object):
                                          filetype=self.filetype,
                                          alias=group_alias)
                 
-                for item in group['files']:
+                for item in group['items']:
                     # only monitor files marked with _source_sandboxed_==False
                     if 'options' not in group:
                         continue
@@ -78,11 +80,11 @@ class Watch(object):
                         continue
 
                     # reconstruct files into list
-                    if not isinstance(item['src'], list):
-                        item['src'] = [item['src']]
+                    if not isinstance(item['file-in'], list):
+                        item['file-in'] = [item['file-in']]
 
                     for src_file in (path.join(self.root_dir, src)
-                                     for src in item['src']):
+                                     for src in item['file-in']):
                         self.wm.add_watch(src_file, ALL_EVENTS,
                                           proc_fun=handler,
                                           do_glob=True, rec=True,

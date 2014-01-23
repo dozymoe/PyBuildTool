@@ -36,22 +36,22 @@ Example content of **SConsfile.yml**:
                 _raw_:
                     - "--tool_parameter_3=On"
                     - "--without_tool_parameter_1"
-            files:
+            items:
                 -
-                    src: src/file1.in
-                    dest: result/file1.out
+                    file-in: src/file1.in
+                    file-out: result/file1.out
                 -
-                    src:
+                    file-in:
                         - src/file2.in
                         - src/file3.in
-                    dest: result/file4.out
+                    file-out: result/file4.out
         group_name_2:
             options:
                 _target_sandboxed_: false
-            files:
+            items:
                 -
-                    src: result/file1.out
-                    dest: completed/file5.out
+                    file-in: result/file1.out
+                    file-out: completed/file5.out
 
 
 `tool_name` will be the name of the tool, this is actually the name of

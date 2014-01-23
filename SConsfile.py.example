@@ -4,50 +4,44 @@ build_config = {
             'options': {
                 '_source_sandboxed_': False,
             },
-            'files': [{
-                'src': [
+            'items': [{
+                'file-in': [
                     'src/css/heading.css',
                     'src/css/default.css',
                 ],
-                'dest': 'css/style.css',
+                'file-out': 'css/style.css',
             }],
         },
         'group_main_js': {
             'options': {
                 '_source_sandboxed_': False,
             },
-            'files': [{
-                'src': [
+            'items': [{
+                'file-in': [
                     'src/javascript/underscore.js',
                     'src/javascript/default.js',
                 ],
-                'dest': 'javascript/script.js',
+                'file-out': 'javascript/script.js',
             }],
         },
     },
     'copy': {
         'group_main_css': {
-            'depends': [
-                'concat:group_main_css',
-            ],
             'options': {
                 '_target_sandboxed_': False,
             },
-            'files': [{
-                'src': 'css/style.css',
-                'dest': 'htdocs/css/style.css',
+            'items': [{
+                'file-in': 'css/style.css',
+                'file-out': 'htdocs/css/style.css',
             }],
         },
         'group_main_js': {
-            'depends': [
-                'concat:group_main_js',
-            ],
             'options': {
                 '_target_sandboxed_': False,
             },
-            'files': [{
-                'src': 'javascript/script.js',
-                'dest': 'htdocs/js/script.js',
+            'items': [{
+                'file-in': 'javascript/script.js',
+                'file-out': 'htdocs/js/script.js',
             }]
         },
     },

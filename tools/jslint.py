@@ -9,12 +9,10 @@ Options:
     * ignore-list-file : str, None, jshintignore file
 """
 
-from PyBuildTool.tools.warnings import ThereCanBeOnlyOne
+from PyBuildTool.utils.common import update_shadow_jutsu
 from SCons.Action import Action
 from SCons.Builder import Builder
 from SCons.Defaults import Copy
-from SCons.Errors import StopError
-from SCons.Node.Python import Value
 
 
 tool_name = 'jslint'
@@ -27,18 +25,12 @@ def tool_str(target, source, env):
 
 
 def tool_generator(source, target, env, for_signature):
-    if len(source) != 1:
-        raise StopError(ThereCanBeOnlyOne,
-                        '%s only take one source' % tool_name)
-    if len(target) != 1:
-        raise StopError(ThereCanBeOnlyOne,
-                        '%s only build one target' % tool_name)
-
+    update_shadow_jutsu(target=target, source=source, env=env)
+ 
     env['%s_BIN' % tool_name.upper()] = file_processor
 
     args = []
-    cfg = env.get('TOOLCFG', {})
-    if isinstance(cfg, Value): cfg = cfg.read()
+    cfg = env['TOOLCFG'].read()
 
     # Custom configuration file
     if cfg.get('config-file', None):
@@ -63,19 +55,22 @@ def tool_generator(source, target, env, for_signature):
 
     env['%s_ARGS' % tool_name.upper()] = ' '.join(args)
 
-    copy = Copy("$TARGET", "$SOURCE")
-    copy.strfunction = None
+    cp = Copy(str(target[0]), str(source[0]))
+    cp.strfunction = None
 
-    return [Action('${t}_BIN ${t}_ARGS $SOURCES'.format(t=tool_name.upper()),
-                   tool_str),
-            copy]
+    return [
+        Action('${t}_BIN ${t}_ARGS $SOURCES'.format(t=tool_name.upper()),
+               tool_str,
+        ),
+        cp
+    ]
 
 
 def generate(env):
     """ Add builders and construction variables to the Environment. """
 
     env['BUILDERS'][tool_name] = Builder(generator=tool_generator,
-                                         src_suffix='.js', suffix='.js',
+                                         src_suffix='.js',
                                          single_source=True)
 
 
