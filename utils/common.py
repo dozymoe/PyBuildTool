@@ -3,13 +3,14 @@ from SCons import Node
 from time import time
 
 
-def get_shadow_name_jutsu(name, nodetype, prefix):
+def prepare_shadow_jutsu(name, nodetype, prefix):
     """
     out of the box we cannot have directory as target.
     so we hack around pretending to target a `.scons` file
     inside the directory.
     update the file so as to change its MD5 signature.
     """
+
     if nodetype is Node.FS.Dir:
         return path.join(
             prefix,
@@ -31,8 +32,14 @@ def get_shadow_name_jutsu(name, nodetype, prefix):
     return name
 
 
-def update_shadow_jutsu(target, source, env, remove_source=True,
+def perform_shadow_jutsu(target, source, env, remove_source=True,
                         remove_target=False):
+    """
+    out of the box we cannot have directory as target.
+    so we hack around pretending to target a `.scons` file
+    inside the directory.
+    update the file so as to change its MD5 signature.
+    """
 
     shadow = env['SHADOWLIST'].read()
     
@@ -57,20 +64,12 @@ def update_shadow_jutsu(target, source, env, remove_source=True,
     for t in target:
         t_name = path.join(env['ROOT_DIR'], str(t))
         if t_name in shadow:
-            #t.set_precious()
+            t.set_precious()
             t.attributes.ActualName = shadow[t_name]
             t.attributes.HasShadow = True
             # treat directory special
             if not shadow[t_name].endswith(sep):
                 kill_list.append(t)
-
-            # change the shadow file's MD5 signature.
-            dirname = path.dirname(str(t))
-            if not path.exists(dirname):
-                makedirs(dirname)
-            #import pdb; pdb.set_trace()
-            with open(str(t), 'w') as f:
-                f.write(str(time()))
         else:
             t.attributes.ActualName = t_name
             t.attributes.HasShadow = False
@@ -80,41 +79,25 @@ def update_shadow_jutsu(target, source, env, remove_source=True,
             target.remove(k)
 
 
-def from_source_node_get_original(node):
+def finalize_shadow_jutsu(target, source, env):
     """
     out of the box we cannot have directory as target.
     so we hack around pretending to target a `.scons` file
     inside the directory.
     update the file so as to change its MD5 signature.
     """
-    if not hasattr(node.attributes, 'ActualName'):
-        node.attributes.ActualName = str(node)
-        return node
 
-    node_ori = node.attributes.ActualFactory(node.attributes.ActualName)
-    return node_ori
+    shadow = env['SHADOWLIST'].read()
 
-
-def from_target_node_get_original(node):
-    """
-    out of the box we cannot have directory as target.
-    so we hack around pretending to target a `.scons` file
-    inside the directory.
-    update the file so as to change its MD5 signature.
-    """
-    node_ori = from_source_node_get_original(node)
-
-    node_str = str(node)
-    node_ori_str = str(node_ori)
-   
-    if node_str != node_ori_str:
-        dirname = path.dirname(node_str)
-        if not path.exists(dirname):
-            makedirs(dirname)
-        with open(node_str, 'w') as f:
-            f.write(str(time()))
-
-    return node_ori
+    for t in target:
+        t_name = path.join(env['ROOT_DIR'], str(t))
+        if t_name in shadow:
+            # change the shadow file's MD5 signature.
+            dirname = path.dirname(t_name)
+            if not path.exists(dirname):
+                makedirs(dirname)
+            with open(t_name, 'w') as f:
+                f.write(str(time()))
 
 
 def get_config_filename(root, stage, filetype):
@@ -133,7 +116,7 @@ def get_config_filename(root, stage, filetype):
         if path.lexists(path.join(root, '.'.join(p_conf))):
             return p_conf
 
-    raise Exception('Missing configuration file (SConsfile.STAGE.EXT)')
+    raise Exception('Missing configuration file (SConsfile_STAGE.EXT)')
 
 
 def read_config(basefilename, filetype, env, root_dir):

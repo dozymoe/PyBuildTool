@@ -1,7 +1,7 @@
 from os import environ, getcwd, path, sep
 from PyBuildTool.utils.common import (get_config_filename,
                                       read_config,
-                                      get_shadow_name_jutsu)
+                                      prepare_shadow_jutsu)
 from SCons import Node
 
 
@@ -64,8 +64,6 @@ config = read_config(basefilename=config_file[0],
                      filetype=config_file[1],
                      env=env, root_dir=ROOT_DIR)
                                   
-all_nodes = []
-
 # main function, process build config into tasks.
 for tool_name in config:
     env.Tool(tool_name)
@@ -108,7 +106,7 @@ for tool_name in config:
 
             for src in source_file_in:
                 if src.endswith(sep):
-                    src_shadow = get_shadow_name_jutsu(
+                    src_shadow = prepare_shadow_jutsu(
                         src,
                         Node.FS.Dir,
                         prefix,
@@ -130,7 +128,7 @@ for tool_name in config:
                 source_alias_in = [source_alias_in]
                 
             for alias in source_alias_in:
-                alias_shadow = get_shadow_name_jutsu(
+                alias_shadow = prepare_shadow_jutsu(
                     alias,
                     Node.Alias.Alias,
                     prefix,
@@ -144,7 +142,7 @@ for tool_name in config:
                 source_value_in = [source_value_in]
 
             for value in source_value_in:
-                value_shadow = get_shadow_name_jutsu(
+                value_shadow = prepare_shadow_jutsu(
                     value,
                     Node.Python.Value,
                     prefix,
@@ -164,7 +162,7 @@ for tool_name in config:
 
             for dest in target_file_out:
                 if dest.endswith(sep):
-                    dest_shadow = get_shadow_name_jutsu(
+                    dest_shadow = prepare_shadow_jutsu(
                         dest,
                         Node.FS.Dir,
                         prefix,
@@ -190,7 +188,7 @@ for tool_name in config:
                 target_alias_out = [target_alias_out]
                 
             for alias in target_alias_out:
-                alias_shadow = get_shadow_name_jutsu(
+                alias_shadow = prepare_shadow_jutsu(
                     alias,
                     Node.Alias.Alias,
                     prefix,
@@ -204,7 +202,7 @@ for tool_name in config:
                 target_value_out = [target_value_out]
 
             for value in target_value_out:
-                value_shadow = get_shadow_name_jutsu(
+                value_shadow = prepare_shadow_jutsu(
                     value,
                     Node.Python.Value,
                     prefix,
@@ -222,10 +220,5 @@ for tool_name in config:
             )
 
             group_nodes.extend(nodes)
-        
-        Depends(group_alias, Alias(group.get('depends', [])))
-
         tool_nodes.extend(Alias(group_alias, group_nodes))
-    all_nodes.extend(Alias(tool_name, tool_nodes))
-
-Default(Alias('all', all_nodes))
+    Alias(tool_name, tool_nodes)

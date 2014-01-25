@@ -1,7 +1,8 @@
 """ Copy files. """
 
 from os import makedirs, path, sep
-from PyBuildTool.utils.common import update_shadow_jutsu
+from PyBuildTool.utils.common import (perform_shadow_jutsu,
+                                      finalize_shadow_jutsu)
 from SCons.Action import Action
 from SCons.Defaults import copy_func
 from SCons.Builder import Builder
@@ -11,7 +12,8 @@ tool_name = 'copy'
 
 
 def tool_func(target, source, env):
-    update_shadow_jutsu(target=target, source=source, env=env)
+    perform_shadow_jutsu(target, source, env)
+    finalize_shadow_jutsu(target, source, env)
 
     if len(source) == 1:
         src = source[0].attributes.ActualName

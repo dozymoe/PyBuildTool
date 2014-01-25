@@ -14,7 +14,7 @@ Requirements:
 
 """
 
-from PyBuildTool.tools.warnings import ThereCanBeOnlyOne
+from PyBuildTool.utils.warnings import ThereCanBeOnlyOne
 from SCons.Action import Action
 from SCons.Builder import Builder
 from SCons.Errors import StopError

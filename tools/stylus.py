@@ -14,7 +14,7 @@ Options:
     * resolve-url   : bool, True,  resolve relative urls inside imports
 """
 
-from PyBuildTool.tools.warnings import ThereCanBeOnlyOne
+from PyBuildTool.utils.warnings import ThereCanBeOnlyOne
 from SCons.Action import Action
 from SCons.Builder import Builder
 from SCons.Node.Python import Value

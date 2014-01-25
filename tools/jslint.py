@@ -9,10 +9,10 @@ Options:
     * ignore-list-file : str, None, jshintignore file
 """
 
-from PyBuildTool.utils.common import update_shadow_jutsu
+from PyBuildTool.utils.common import (perform_shadow_jutsu,
+                                      finalize_shadow_jutsu)
 from SCons.Action import Action
 from SCons.Builder import Builder
-from SCons.Defaults import Copy
 
 
 tool_name = 'jslint'
@@ -25,7 +25,7 @@ def tool_str(target, source, env):
 
 
 def tool_generator(source, target, env, for_signature):
-    update_shadow_jutsu(target=target, source=source, env=env)
+    perform_shadow_jutsu(target=target, source=source, env=env)
  
     env['%s_BIN' % tool_name.upper()] = file_processor
 
@@ -55,14 +55,11 @@ def tool_generator(source, target, env, for_signature):
 
     env['%s_ARGS' % tool_name.upper()] = ' '.join(args)
 
-    cp = Copy(str(target[0]), str(source[0]))
-    cp.strfunction = None
-
     return [
         Action('${t}_BIN ${t}_ARGS $SOURCES'.format(t=tool_name.upper()),
                tool_str,
         ),
-        cp
+        Action(finalize_shadow_jutsu),
     ]
 
 
