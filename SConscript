@@ -8,8 +8,7 @@ from SCons import Node
 Import('env ROOT_DIR BUILD_DIR')
 
 
-#env.Decider('MD5-timestamp')
-#env.Decider('timestamp-match')
+env.Decider('MD5-timestamp')
 
 # support different build stages (development, production, etc.).
 AddOption('--stage', dest='stage', type='string',
@@ -65,6 +64,8 @@ config = read_config(basefilename=config_file[0],
                      filetype=config_file[1],
                      env=env, root_dir=ROOT_DIR)
                                   
+all_nodes = []
+
 # main function, process build config into tasks.
 for tool_name in config:
     env.Tool(tool_name)
@@ -224,5 +225,7 @@ for tool_name in config:
         
         Depends(group_alias, Alias(group.get('depends', [])))
 
-        tool_nodes.extend(env.Alias(group_alias, group_nodes))
-    env.Alias(tool_name, tool_nodes)
+        tool_nodes.extend(Alias(group_alias, group_nodes))
+    all_nodes.extend(Alias(tool_name, tool_nodes))
+
+Default(Alias('all', all_nodes))

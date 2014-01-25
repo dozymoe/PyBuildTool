@@ -24,7 +24,7 @@ simplest would be to create directory **site_scons/site_tools** at where the
 As a user, the only file you need to regularly maintain is **SConsfile.yml**.
 
 If you specify **stage** parameter like so `scons --stage=development`, then
-the name of your config file would be **SConsfile.development.yml**.
+the name of your config file would be **SConsfile_development.yml**.
 
 Example content of **SConsfile.yml**:
 
@@ -52,6 +52,18 @@ Example content of **SConsfile.yml**:
                 -
                     file-in: result/file1.out
                     file-out: completed/file5.out
+        group_name_3:
+            options:
+                _source_sandboxed_: false
+                _target_sandboxed_: false
+            items:
+                -
+                    file-in:
+                        - resources/images/*.jpg
+                        - resources/images/*.png
+                    file-out:
+                        - mymodule/static/images/
+                        - htdocs/images/
 
 
 `tool_name` will be the name of the tool, this is actually the name of

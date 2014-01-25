@@ -16,6 +16,8 @@ concat:
                 file-in:
                     - src/javascript/underscore.js
                     - src/javascript/default.js
+                value-in:
+                    - 'jslint:js_default'
                 file-out: javascript/script.js
 copy:
     group_main_css:
@@ -32,3 +34,10 @@ copy:
             -
                 file-in: javascript/script.js
                 file-out: htdocs/js/script.js
+jslint:
+    group_main_js:
+        items:
+            -
+                file-in: src/javascript/default.js
+                value-out: 'jslint:js_default'
+

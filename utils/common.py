@@ -31,7 +31,7 @@ def get_shadow_name_jutsu(name, nodetype, prefix):
     return name
 
 
-def update_shadow_jutsu(target, source, env, remove_source=False,
+def update_shadow_jutsu(target, source, env, remove_source=True,
                         remove_target=False):
 
     shadow = env['SHADOWLIST'].read()
@@ -57,6 +57,7 @@ def update_shadow_jutsu(target, source, env, remove_source=False,
     for t in target:
         t_name = path.join(env['ROOT_DIR'], str(t))
         if t_name in shadow:
+            #t.set_precious()
             t.attributes.ActualName = shadow[t_name]
             t.attributes.HasShadow = True
             # treat directory special
@@ -67,6 +68,7 @@ def update_shadow_jutsu(target, source, env, remove_source=False,
             dirname = path.dirname(str(t))
             if not path.exists(dirname):
                 makedirs(dirname)
+            #import pdb; pdb.set_trace()
             with open(str(t), 'w') as f:
                 f.write(str(time()))
         else:

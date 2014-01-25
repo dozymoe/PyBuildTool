@@ -10,6 +10,7 @@ tool_name = 'concat'
 
 def tool_func(target, source, env):
     update_shadow_jutsu(target=target, source=source, env=env)
+    #import pdb; pdb.set_trace()
 
     for dest in target:
         with open(dest.attributes.ActualName, 'w') as fout:
