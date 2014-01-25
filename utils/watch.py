@@ -11,11 +11,14 @@ build_state = {}
 
 
 def process_build_files(stage, filetype, cwd, alias=''):
+    # TODO: with alias set, we only build the targets under that alias,
+    # um, forgot to also update targets which depends on this alias
+    # target, this needs much better management of dependencies.
     cmd = ' '.join([
         'scons',
         '--stage=%s' % stage,
         '--filetype=%s' % filetype,
-        alias,
+        #alias,
     ])
     subprocess_call(cmd, cwd=cwd, shell=True)
 
