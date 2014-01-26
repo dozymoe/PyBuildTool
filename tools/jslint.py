@@ -68,8 +68,7 @@ def generate(env):
     """ Add builders and construction variables to the Environment. """
 
     env['BUILDERS'][tool_name] = Builder(generator=tool_generator,
-                                         src_suffix='.js',
-                                         single_source=True)
+                                         src_suffix='.js')
 
 
 def exists(env):

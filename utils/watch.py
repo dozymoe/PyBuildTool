@@ -78,7 +78,11 @@ class Watch(object):
 
                 group_alias = '%s:%s' % (tool_name, group_name)
                 
-                for item in group['items']:
+                items = group.get('items', [])
+                if not isinstance(items, list):
+                    items = [items]
+
+                for item in items:
                     # only monitor files marked with _source_sandboxed_==False
                     if 'options' not in group:
                         continue
