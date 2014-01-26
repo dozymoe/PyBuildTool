@@ -2,7 +2,6 @@ from os import environ, getcwd, path, sep
 from PyBuildTool.utils.common import (get_config_filename,
                                       read_config,
                                       prepare_shadow_jutsu)
-from SCons import Node
 
 
 Import('env ROOT_DIR BUILD_DIR')
@@ -81,7 +80,11 @@ for tool_name in config:
 
         target_sandboxed = group_options.get('_target_sandboxed_', True)
 
-        for item in group['items']:
+        items = group.get('items', [])
+        if not isinstance(items, list):
+            items = [items]
+
+        for item in items:
             shadow = {}
             source = []
             target = []
@@ -108,7 +111,7 @@ for tool_name in config:
                 if src.endswith(sep):
                     src_shadow = prepare_shadow_jutsu(
                         src,
-                        Node.FS.Dir,
+                        'dir',
                         prefix,
                     )
                     src_resolved = path.join(prefix, src)
@@ -122,34 +125,19 @@ for tool_name in config:
                         src_final = src_resolved
                 source.append(src_final)
 
-            # parse Alias sources.
-            source_alias_in = item.get('alias-in', [])
-            if not isinstance(source_alias_in, list):
-                source_alias_in = [source_alias_in]
+            # parse token sources.
+            source_token_in = item.get('token-in', [])
+            if not isinstance(source_token_in, list):
+                source_token_in = [source_token_in]
                 
-            for alias in source_alias_in:
-                alias_shadow = prepare_shadow_jutsu(
-                    alias,
-                    Node.Alias.Alias,
+            for token in source_token_in:
+                token_shadow = prepare_shadow_jutsu(
+                    token,
+                    'token',
                     prefix,
                 )
-                shadow[alias_shadow] = alias
-                source.append(alias_shadow)
-
-            # parse Value sources.
-            source_value_in = item.get('value-in', [])
-            if not isinstance(source_value_in, list):
-                source_value_in = [source_value_in]
-
-            for value in source_value_in:
-                value_shadow = prepare_shadow_jutsu(
-                    value,
-                    Node.Python.Value,
-                    prefix,
-                )
-                shadow[value_shadow] = value
-                source.append(value_shadow)
-
+                shadow[token_shadow] = token
+                source.append(token_shadow)
 
             # files are either relative to build dir, or relative
             # to ROOT_DIR.
@@ -164,7 +152,7 @@ for tool_name in config:
                 if dest.endswith(sep):
                     dest_shadow = prepare_shadow_jutsu(
                         dest,
-                        Node.FS.Dir,
+                        'dir',
                         prefix,
                     )
                     if target_sandboxed:
@@ -182,34 +170,19 @@ for tool_name in config:
                     dest_final = dest_resolved
                 target.append(dest_final)
 
-            # parse Alias targets.
-            target_alias_out = item.get('alias-out', [])
-            if not isinstance(target_alias_out, list):
-                target_alias_out = [target_alias_out]
+            # parse token targets.
+            target_token_out = item.get('token-out', [])
+            if not isinstance(target_token_out, list):
+                target_token_out = [target_token_out]
                 
-            for alias in target_alias_out:
-                alias_shadow = prepare_shadow_jutsu(
-                    alias,
-                    Node.Alias.Alias,
+            for token in target_token_out:
+                token_shadow = prepare_shadow_jutsu(
+                    token,
+                    'token',
                     prefix,
                 )
-                shadow[alias_shadow] = alias
-                target.append(alias_shadow)
-
-            # parse Value sources.
-            target_value_out = item.get('value-out', [])
-            if not isinstance(target_value_out, list):
-                target_value_out = [target_value_out]
-
-            for value in target_value_out:
-                value_shadow = prepare_shadow_jutsu(
-                    value,
-                    Node.Python.Value,
-                    prefix,
-                )
-                shadow[value_shadow] = value
-                target.append(value_shadow)
-
+                shadow[token_shadow] = token
+                target.append(token_shadow)
 
             nodes = tool(
                 target,

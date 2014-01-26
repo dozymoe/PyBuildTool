@@ -10,7 +10,8 @@ Options:
 """
 
 from PyBuildTool.utils.common import (perform_shadow_jutsu,
-                                      finalize_shadow_jutsu)
+                                      finalize_shadow_jutsu,
+                                      silent_str_function)
 from SCons.Action import Action
 from SCons.Builder import Builder
 
@@ -59,7 +60,7 @@ def tool_generator(source, target, env, for_signature):
         Action('${t}_BIN ${t}_ARGS $SOURCES'.format(t=tool_name.upper()),
                tool_str,
         ),
-        Action(finalize_shadow_jutsu),
+        Action(finalize_shadow_jutsu, silent_str_function),
     ]
 
 

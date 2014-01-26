@@ -29,7 +29,7 @@ the name of your config file would be **SConsfile_development.yml**.
 Example content of **SConsfile.yml**:
 
     tool_name:
-        group_name:
+        group_name_1:
             options:
                 tool_parameter_1: "On"
                 tool_parameter_2: "Off"
@@ -50,7 +50,7 @@ Example content of **SConsfile.yml**:
                 _target_sandboxed_: false
             items:
                 -
-                    file-in: result/file1.out
+                    file-in: result/file1.out  # output of 'tool_name:group_name_1'
                     file-out: completed/file5.out
         group_name_3:
             options:
@@ -106,7 +106,10 @@ as the sandbox.
 Install "scons" using `pip install --egg SCons`, and other requirements that
 each tool will need, read their module file for more information.
 
-**PyYAML** will also be needed to read the **SConsfile.yml**.
+**PyYAML** is needed to read the **SConsfile.yml**.
+
+**watchdog** is needed for the `scons --watch` command, can be used to monitor
+file changes and trigger build process.
 
 
 

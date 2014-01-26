@@ -16,7 +16,7 @@ concat:
                 file-in:
                     - src/javascript/underscore.js
                     - src/javascript/default.js
-                value-in:
+                token-in:
                     - 'jslint:js_default'
                 file-out: javascript/script.js
 copy:
@@ -39,5 +39,4 @@ jslint:
         items:
             -
                 file-in: src/javascript/default.js
-                value-out: 'jslint:js_default'
-
+                token-out: 'jslint:js_default'

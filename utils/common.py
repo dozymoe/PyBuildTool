@@ -1,7 +1,9 @@
 from os import makedirs, path, sep
-from SCons import Node
 from time import time
 
+
+def silent_str_function(target, source, env):
+    pass
 
 def prepare_shadow_jutsu(name, nodetype, prefix):
     """
@@ -11,22 +13,16 @@ def prepare_shadow_jutsu(name, nodetype, prefix):
     update the file so as to change its MD5 signature.
     """
 
-    if nodetype is Node.FS.Dir:
+    if nodetype == 'dir':
         return path.join(
             prefix,
             '.scons_flags_dir',
             name.rstrip(sep),
         )
-    elif nodetype is Node.Alias.Alias:
+    elif nodetype == 'token':
         return path.join(
             prefix, 
             '.scons_flags_alias',
-            name.replace(':', '__'),
-        )
-    elif nodetype is Node.Python.Value:
-        return path.join(
-            prefix,
-            '.scons_flags_value',
             name.replace(':', '__'),
         )
     return name

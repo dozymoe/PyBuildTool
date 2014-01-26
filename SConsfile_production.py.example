@@ -8,4 +8,4 @@ build_config = yaml_load(open(path.join(ROOT_DIR, 'SConsfile.yml')))
 
 def init(env):
     build_config.pop('jslint')
-    build_config['concat']['group_main_js']['items'][0].pop('value-in')
+    build_config['concat']['group_main_js']['items'][0].pop('token-in')

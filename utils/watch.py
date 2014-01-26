@@ -1,13 +1,15 @@
 from os import path
 from pickle import loads as pickle_load, dumps as pickle_dump
 from PyBuildTool.utils.common import get_config_filename, read_config
-from pyinotify import (ALL_EVENTS, IN_MODIFY, ThreadedNotifier, ProcessEvent,
-                       WatchManager)
 from subprocess import call as subprocess_call
 from time import sleep
+from watchdog.events import PatternMatchingEventHandler
+from watchdog.observers import Observer
 
 
-build_state = {}
+build_state = {
+    'reset': False,
+}
 
 
 def process_build_files(stage, filetype, cwd, alias=''):
@@ -23,21 +25,23 @@ def process_build_files(stage, filetype, cwd, alias=''):
     subprocess_call(cmd, cwd=cwd, shell=True)
 
 
-class OnWriteHandler(ProcessEvent):
-    def my_init(self, stage, filetype, alias):
+class OnFileModifiedHandler(PatternMatchingEventHandler):
+    def __init__(self, stage, filetype, alias, patterns, reset=False):
         self.alias = alias
         self.filetype = filetype
         self.stage = stage
+        self.reset = reset
+        super(OnFileModifiedHandler, self).__init__(patterns=patterns)
 
-    def process_IN_MODIFY(self, event):
+    def on_modified(self, event):
+        if self.reset:
+            build_state['reset'] = True
         key = pickle_dump((self.stage, self.filetype, self.alias))
         build_state[key] = True
 
 
-
 class Watch(object):
-    wm = WatchManager()
-    notifier = ThreadedNotifier(wm)
+    notifier = Observer()
 
 
     def __init__(self, env, root_dir, stage, filetype):
@@ -46,13 +50,9 @@ class Watch(object):
         self.stage = stage
         self.filetype = filetype
 
-    def main_config_modified(self, event):
-        for wd in self.wm.watches.keys():
-            self.wm.del_watch(wd)
-
+    def main_config_modified(self):
+        self.notifier.unschedule_all()
         self.setup()
-        key = pickle_dump((self.stage, self.filetype, ''))
-        build_state[key] = True
 
     def setup(self):
         config_file = get_config_filename(root=self.root_dir,
@@ -62,18 +62,21 @@ class Watch(object):
                              filetype=config_file[1],
                              env=self.env, root_dir=self.root_dir)
 
-        self.wm.add_watch(path.join(self.root_dir, '.'.join(config_file)),
-                          IN_MODIFY,
-                          proc_fun=self.main_config_modified)
-
+        self.notifier.schedule(
+            OnFileModifiedHandler(
+                stage=self.stage,
+                filetype=self.filetype,
+                alias='',
+                patterns=[path.join(self.root_dir, '.'.join(config_file))],
+                reset=True,
+            ),
+            self.root_dir,
+        )
         for tool_name in config:
             for group_name in config[tool_name]:
                 group = config[tool_name][group_name]
 
                 group_alias = '%s:%s' % (tool_name, group_name)
-                handler = OnWriteHandler(stage=self.stage,
-                                         filetype=self.filetype,
-                                         alias=group_alias)
                 
                 for item in group['items']:
                     # only monitor files marked with _source_sandboxed_==False
@@ -88,10 +91,15 @@ class Watch(object):
 
                     for src_file in (path.join(self.root_dir, src)
                                      for src in item['file-in']):
-                        self.wm.add_watch(src_file, ALL_EVENTS,
-                                          proc_fun=handler,
-                                          do_glob=True, rec=True,
-                                          auto_add=True)
+                        self.notifier.schedule(
+                            OnFileModifiedHandler(
+                                stage=self.stage,
+                                filetype=self.filetype,
+                                alias=group_alias,
+                                patterns=[src_file],
+                            ),
+                            path.dirname(src_file),
+                        )
 
 
     def perform_build(self):
@@ -99,6 +107,9 @@ class Watch(object):
             if not build_state[key]:
                 continue
             build_state[key] = False
+            if key == 'reset':
+                self.main_config_modified()
+                continue
             stage, filetype, alias = pickle_load(key)
             process_build_files(stage, filetype, self.root_dir, alias)
 
@@ -115,3 +126,4 @@ class Watch(object):
             except:
                 self.notifier.stop()
                 break
+        self.notifier.join()
