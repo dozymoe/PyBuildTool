@@ -1,3 +1,4 @@
+from hashlib import md5
 from os import makedirs, path, sep
 from time import time
 
@@ -14,10 +15,15 @@ def prepare_shadow_jutsu(name, nodetype, prefix):
     """
 
     if nodetype == 'dir':
+        hash_value = md5(name).hexdigest()
+        # take the first 4 characters as directory name.
+        flag_dir_name = hash_value[:4]
+        flag_file_name = hash_value[4:]
         return path.join(
             prefix,
             '.scons_flags_dir',
-            name.rstrip(sep),
+            flag_dir_name,
+            flag_file_name,
         )
     elif nodetype == 'token':
         return path.join(

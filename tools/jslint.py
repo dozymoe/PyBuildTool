@@ -21,7 +21,8 @@ file_processor = 'jshint'
 
 
 def tool_str(target, source, env):
-    return env.subst('%s passed $TARGETS' % file_processor,
+    perform_shadow_jutsu(target=target, source=source, env=env)
+    return env.subst('%s passed $TARGETS.attributes.ActualName' % file_processor,
                      target=target)
 
 
