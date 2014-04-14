@@ -1,17 +1,16 @@
 """
-Validate javascript files.
+Validate python files.
 
 Requirements:
 
-    * jshint (javascript library)
-    * jshint executable in shell PATH
+    * pylint (python library)
 
 Options:
 
-    * config-file      : str, None, jshint configuration file
-    * reporter         : str, None, custom reporter
-    * ignore-files     : list, [],  excludes files matching pattern
-    * ignore-list-file : str, None, jshintignore file
+    * error-only       : bool, True, only check for errors
+    * config-file      : str,  None, pylint configuration file
+    * reporter         : str, colorize,  custom reporter
+    * full-report      : bool, False, full report or only the messages
 """
 
 from PyBuildTool.utils.common import (perform_shadow_jutsu,
@@ -21,8 +20,8 @@ from SCons.Action import Action
 from SCons.Builder import Builder
 
 
-tool_name = 'jslint'
-file_processor = 'jshint'
+tool_name = 'pylint'
+file_processor = 'pylint'
 
 
 def tool_str(target, source, env):
@@ -39,26 +38,29 @@ def tool_generator(source, target, env, for_signature):
     args = []
     cfg = env['TOOLCFG'].read()
 
-    # Custom configuration file
+    # Specify a configuration file
     if cfg.get('config-file', None):
-        args.append('--config=%s' % cfg['config-file'])
+        args.append('--rcfile=%s' % cfg['config-file'])
 
-    # Custom reporter (<PATH>|jslint|checkstyle)
+    # Set the output format. Available formats are text,
+    # parseable, colorized, msvs (visual studio) and html.
+    # You can also give a reporter class, eg
+    # mypackage.mymodule.MyReporterClass. [current: text]
     if cfg.get('reporter', None):
-        args.append('--reporter=%s' % cfg['reporter'])
+        args.append('--output-format=%s' % cfg['reporter'])
 
-    # Exclude files matching the given filename pattern
-    # (same as .jshintignore)
-    exclude_files = cfg.get('ignore-files', [])
-    if not isinstance(exclude_files, list):
-        exclude_files = [exclude_files]
-    for exclude_file in exclude_files:
-        args.append('--exclude=%s' % exclude_file)
+    # In error mode, checkers without error messages are
+    # disabled and for others, only the ERROR messages are
+    # displayed, and no reports are done by default
+    if cfg.get('error-only', True):
+        args.append('--errors-only')
 
-    # Pass in custom jshintignore file path
-    if cfg.get('ignore-list-file', None):
-        args.append('--exclude-path=%s' % cfg['ignore-list-file'])
-
+    # Tells whether to display a full report or only the
+    # messages [current: yes]
+    if cfg.get('full-report', False):
+        args.append('--reports=y')
+    else:
+        args.append('--reports=n')
 
     env['%s_ARGS' % tool_name.upper()] = ' '.join(args)
 
