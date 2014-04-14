@@ -65,7 +65,7 @@ def tool_generator(source, target, env, for_signature):
 
     # Plugins
     plugins = cfg.get('plugins', [])
-    if not plugins is list:
+    if not isinstance(plugins, list):
         plugins = [plugins]
     if plugins:
         args.append('--load-plugins=%s' % ','.join(plugins))
