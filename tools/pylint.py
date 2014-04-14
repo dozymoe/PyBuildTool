@@ -7,10 +7,11 @@ Requirements:
 
 Options:
 
-    * error-only       : bool, True, only check for errors
-    * config-file      : str,  None, pylint configuration file
-    * reporter         : str, colorize,  custom reporter
-    * full-report      : bool, False, full report or only the messages
+    * error-only       : bool,     True,  only check for errors
+    * config-file      : str,      None,  pylint configuration file
+    * plugins          : list:str, [] ,   plugins to load (ex. pylint_django)
+    * reporter         : str,      None,  custom reporter
+    * full-report      : bool,     False, full report or only the messages
 """
 
 from PyBuildTool.utils.common import (perform_shadow_jutsu,
@@ -61,6 +62,13 @@ def tool_generator(source, target, env, for_signature):
         args.append('--reports=y')
     else:
         args.append('--reports=n')
+
+    # Plugins
+    plugins = cfg.get('plugins', [])
+    if not plugins is list:
+        plugins = [plugins]
+    if plugins:
+        args.append('--load-plugins=%s' % ','.join(plugins))
 
     env['%s_ARGS' % tool_name.upper()] = ' '.join(args)
 
