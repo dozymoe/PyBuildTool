@@ -1,3 +1,4 @@
+from glob import glob
 from hashlib import md5
 from os import makedirs, path, sep
 from time import time
@@ -14,22 +15,22 @@ def prepare_shadow_jutsu(name, nodetype, prefix):
     update the file so as to change its MD5 signature.
     """
 
-    if nodetype == 'dir':
+    if nodetype == 'token':
+        return path.join(
+            prefix, 
+            '.scons_flags_token',
+            name.replace(':', '__'),
+        )
+    elif nodetype in ('dir', 'glob'):
         hash_value = md5(name).hexdigest()
         # take the first 4 characters as directory name.
         flag_dir_name = hash_value[:4]
         flag_file_name = hash_value[4:]
         return path.join(
             prefix,
-            '.scons_flags_dir',
+            '.scons_flags_%s' % nodetype,
             flag_dir_name,
             flag_file_name,
-        )
-    elif nodetype == 'token':
-        return path.join(
-            prefix, 
-            '.scons_flags_alias',
-            name.replace(':', '__'),
         )
     return name
 
@@ -54,6 +55,14 @@ def perform_shadow_jutsu(target, source, env, remove_source=True,
             # treat directory special.
             if not shadow[s_name].endswith(sep):
                 kill_list.append(s)
+            # expand glob
+            if '*' in shadow[s_name]:
+                glob_files = glob(shadow[s_name])
+                for g in glob_files:
+                    f = env.File(g)
+                    f.attributes.ActualName = str(f)
+                    f.attributes.HasShadow = False
+                    source.append(env.File(f))
         else:
             s.attributes.ActualName = s_name
             s.attributes.HasShadow = False
@@ -62,6 +71,7 @@ def perform_shadow_jutsu(target, source, env, remove_source=True,
         for k in kill_list:
             source.remove(k)
 
+    append_list = []
     kill_list = []
     for t in target:
         t_name = path.join(env['ROOT_DIR'], str(t))
@@ -72,12 +82,30 @@ def perform_shadow_jutsu(target, source, env, remove_source=True,
             # treat directory special
             if not shadow[t_name].endswith(sep):
                 kill_list.append(t)
+            # replace glob with its dirname
+            if '*' in shadow[t_name]:
+                dirname = path.dirname(shadow[t_name])
+                if not path.exists(dirname):  makedirs(dirname)
+
+                d = env.Dir(dirname)
+                d.attributes.ActualName = dirname
+                d.attributes.HasShadow = False
+                append_list.append(d)
         else:
             t.attributes.ActualName = t_name
             t.attributes.HasShadow = False
 
+    for a in append_list:
+        target.append(a)
     if remove_target:
         for k in kill_list:
+            k_name = path.join(env['ROOT_DIR'], str(k))
+            # change the shadow file's MD5 signature.
+            dirname = path.dirname(k_name)
+            if not path.exists(dirname):
+                makedirs(dirname)
+            with open(k_name, 'w') as f:
+                f.write(str(time()))
             target.remove(k)
 
 

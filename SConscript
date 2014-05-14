@@ -89,18 +89,6 @@ for tool_name in config:
             source = []
             target = []
             
-            source_in = item.get('in', [])
-            if isinstance(source_in, list):
-                source += source_in
-            else:
-                source.append(source_in)
-
-            target_out = item.get('out', [])
-            if isinstance(target_out, list):
-                target += target_out
-            else:
-                target.append(target_out)
-
             # assume target ended with `os.sep` as directory
             # and containing `*` as wildcard
             source_file_in = item.get('file-in', [])
@@ -138,6 +126,20 @@ for tool_name in config:
                 )
                 shadow[token_shadow] = token
                 source.append(token_shadow)
+
+            # parse glob sources (like token but expand into source files).
+            source_glob_in = item.get('glob-in', [])
+            if not isinstance(source_glob_in, list):
+                source_glob_in = [source_glob_in]
+                
+            for glob in source_glob_in:
+                glob_shadow = prepare_shadow_jutsu(
+                    glob,
+                    'glob',
+                    prefix,
+                )
+                shadow[glob_shadow] = path.join(prefix, glob)
+                source.append(glob_shadow)
 
             # files are either relative to build dir, or relative
             # to ROOT_DIR.
@@ -183,6 +185,21 @@ for tool_name in config:
                 )
                 shadow[token_shadow] = token
                 target.append(token_shadow)
+
+            # parse glob targets.
+            target_glob_out = item.get('glob-out', [])
+            if not isinstance(target_glob_out, list):
+                target_glob_out = [target_glob_out]
+                
+            for glob in target_glob_out:
+                glob_shadow = prepare_shadow_jutsu(
+                    glob,
+                    'glob',
+                    prefix,
+                )
+                shadow[glob_shadow] = path.join(prefix, glob)
+                target.append(glob_shadow)
+
 
             nodes = tool(
                 target,

@@ -28,51 +28,47 @@ the name of your config file would be **SConsfile_development.yml**.
 
 Example content of **SConsfile.yml**:
 
-    tool_name:
-        group_name_1:
-            options:
-                tool_parameter_1: "On"
-                tool_parameter_2: "Off"
-                _raw_:
-                    - "--tool_parameter_3=On"
-                    - "--without_tool_parameter_1"
-            items:
-                -
-                    file-in: src/file1.in
-                    file-out: result/file1.out
-                -
-                    file-in:
-                        - src/file2.in
-                        - src/file3.in
-                    file-out: result/file4.out
-        group_name_2:
-            options:
-                _target_sandboxed_: false
-            items:
-                -
-                    file-in: result/file1.out  # output of 'tool_name:group_name_1'
-                    file-out: completed/file5.out
-        group_name_3:
+    jshint:
+        project_scripts:
             options:
                 _source_sandboxed_: false
-                _target_sandboxed_: false
+            items:
+                file-in:
+                    - src/scripts/base.js
+                    - src/scripts/main.js
+                token-out: 'jshint:project_scripts'
+    copy:
+        project_scripts:
+            options:
+                _source_sandboxed_: false
             items:
                 -
+                    file-in: node_modules/jquery/dist/jquery-2.0.js
+                    file-out: src/js/jquery.js
+                    token-out: dont_forget_jquery
+                -
                     file-in:
-                        - resources/images/*.jpg
-                        - resources/images/*.png
-                    file-out:
-                        - mymodule/static/images/
-                        - htdocs/images/
+                        - src/scripts/vendor/*.js
+                        - src/scripts/base.js
+                        - src/scripts/main.js
+                    token-in: 'jshint:project_scripts'
+                    glob-out: src/js/*.js
+        project_scripts_final:
+            options:
+                _target_sandboxed_: false
+            items:
+                glob-in: src/js/*.js
+                token-in: dont_forget_jquery
+                file-out: src/js/
+                
 
-
-`tool_name` will be the name of the tool, this is actually the name of
+`jshint`, `copy` will be the name of the tool, this is actually the name of
 your tool python-module, the module will be loaded on demand using SCons
 `env.Tool(tool_name)`.
 
-`group_name` can be anything valid as YAML key, it is used to group files,
-and tool configuration for those files. You can later target this group
-during scons invocation, using `scons tool_name:group_name`.
+`project_scripts`, `project_scripts_final` can be anything valid as YAML key,
+it is used to group files, and tool configuration for those files. You can
+later target this group during scons invocation, using `scons tool_name:group_name`.
 
 `options` will be passed to the tool's module as python dict. Some keys have
 special meaning.

@@ -25,8 +25,12 @@ def tool_func(target, source, env):
 
         # `copy_func()` requires that the target directory exists
         # before copying, odd.
-        if dest.endswith(sep) and not path.exists(dest):
-            makedirs(dest)
+        if dest.endswith(sep):
+            dest_dir = dest
+        else:
+            dest_dir = path.dirname(dest)
+        if not path.exists(dest_dir):
+            makedirs(dest_dir)
 
         copy_func(dest, src)
 
