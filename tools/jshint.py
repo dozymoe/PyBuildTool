@@ -4,7 +4,7 @@ Validate javascript files.
 Requirements:
 
     * jshint (javascript library)
-    * jshint executable in shell PATH
+    * jshint executable in node_modules directoryi where scons executed
 
 Options:
 
@@ -21,13 +21,13 @@ from SCons.Action import Action
 from SCons.Builder import Builder
 
 
-tool_name = 'jslint'
-file_processor = 'jshint'
+tool_name = 'jshint'
+file_processor = 'node_modules/jshint/bin/jshint'
 
 
 def tool_str(target, source, env):
     perform_shadow_jutsu(target=target, source=source, env=env)
-    return env.subst('%s passed $TARGETS.attributes.ActualName' % file_processor,
+    return env.subst('%s passed $TARGETS.attributes.ActualName' % tool_name,
                      target=target)
 
 

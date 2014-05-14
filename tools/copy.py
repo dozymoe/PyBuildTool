@@ -12,7 +12,7 @@ tool_name = 'copy'
 
 
 def tool_func(target, source, env):
-    perform_shadow_jutsu(target, source, env)
+    perform_shadow_jutsu(target, source, env, remove_target=True)
     finalize_shadow_jutsu(target, source, env)
 
     if len(source) == 1:
