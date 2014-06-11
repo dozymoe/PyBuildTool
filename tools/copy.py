@@ -12,7 +12,7 @@ tool_name = 'copy'
 
 
 def tool_func(target, source, env):
-    perform_shadow_jutsu(target, source, env, remove_target=True)
+    perform_shadow_jutsu(target, source, env)
     finalize_shadow_jutsu(target, source, env)
 
     src = [s.attributes.RealName for s in source if s.attributes.RealName]
