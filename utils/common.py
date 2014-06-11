@@ -35,8 +35,7 @@ def prepare_shadow_jutsu(name, nodetype, prefix):
     return name
 
 
-def perform_shadow_jutsu(target, source, env, remove_source=True,
-                        remove_target=False):
+def perform_shadow_jutsu(target, source, env):
     """
     out of the box we cannot have directory as target.
     so we hack around pretending to target a `.scons` file
@@ -46,67 +45,59 @@ def perform_shadow_jutsu(target, source, env, remove_source=True,
 
     shadow = env['SHADOWLIST'].read()
     
-    kill_list = []
     for s in source:
         s_name = path.join(env['ROOT_DIR'], str(s))
         if s_name in shadow:
-            s.attributes.ActualName = shadow[s_name]
+            s.attributes.ItemName = shadow[s_name]
             s.attributes.HasShadow = True
             # treat directory special.
             if not shadow[s_name].endswith(sep):
-                kill_list.append(s)
+                s.attributes.RealName = ''
+            else:
+                s.attributes.RealName = shadow[s_name]
             # expand glob
             if '*' in shadow[s_name]:
                 glob_files = glob(shadow[s_name])
                 for g in glob_files:
                     f = env.File(g)
-                    f.attributes.ActualName = str(f)
+                    f.attributes.ItemName = str(f)
+                    f.attributes.RealName = str(f)
                     f.attributes.HasShadow = False
                     source.append(env.File(f))
         else:
-            s.attributes.ActualName = s_name
+            s.attributes.ItemName = s_name
+            s.attributes.RealName = s_name
             s.attributes.HasShadow = False
 
-    if remove_source:
-        for k in kill_list:
-            source.remove(k)
-
     append_list = []
-    kill_list = []
     for t in target:
         t_name = path.join(env['ROOT_DIR'], str(t))
         if t_name in shadow:
             t.set_precious()
-            t.attributes.ActualName = shadow[t_name]
+            t.attributes.ItemName = shadow[t_name]
             t.attributes.HasShadow = True
             # treat directory special
             if not shadow[t_name].endswith(sep):
-                kill_list.append(t)
+                t.attributes.RealName = ''
+            else:
+                t.attributes.RealName = shadow[t_name]
             # replace glob with its dirname
             if '*' in shadow[t_name]:
                 dirname = path.dirname(shadow[t_name])
                 if not path.exists(dirname):  makedirs(dirname)
 
                 d = env.Dir(dirname)
-                d.attributes.ActualName = dirname
+                d.attributes.ItemName = dirname
+                d.attributes.RealName = dirname
                 d.attributes.HasShadow = False
                 append_list.append(d)
         else:
-            t.attributes.ActualName = t_name
+            t.attributes.ItemName = t_name
+            t.attributes.RealName = t_name
             t.attributes.HasShadow = False
 
     for a in append_list:
         target.append(a)
-    if remove_target:
-        for k in kill_list:
-            k_name = path.join(env['ROOT_DIR'], str(k))
-            # change the shadow file's MD5 signature.
-            dirname = path.dirname(k_name)
-            if not path.exists(dirname):
-                makedirs(dirname)
-            with open(k_name, 'w') as f:
-                f.write(str(time()))
-            target.remove(k)
 
 
 def finalize_shadow_jutsu(target, source, env):

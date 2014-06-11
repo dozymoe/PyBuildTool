@@ -12,30 +12,46 @@ Options:
     * import-files  : bool, [],    always import selected stylus files
     * include-css   : bool, True,  pull in CSS files with @import
     * resolve-url   : bool, True,  resolve relative urls inside imports
+
+Requirements:
+
+    * stylus
+      to install, edit package.json, run `npm install`
+    * node.js
+
 """
 
-from PyBuildTool.utils.warnings import ThereCanBeOnlyOne
+from PyBuildTool.utils.common import (
+    perform_shadow_jutsu,
+    finalize_shadow_jutsu,
+    silent_str_function,
+)
+#from PyBuildTool.utils.warnings import ThereCanBeOnlyOne
 from SCons.Action import Action
 from SCons.Builder import Builder
 from SCons.Node.Python import Value
-from SCons.Errors import StopError
+#from SCons.Errors import StopError
 
 
 tool_name = 'stylus'
-file_processor = 'stylus'
+file_processor = 'node_modules/stylus/bin/stylus'
 
 
 def tool_str(target, source, env):
-    return env.subst('CSS preprocessed $TARGET', target=target)
+    perform_shadow_jutsu(target=target, source=source, env=env)
+    return env.subst('%s preprocessed $TARGETS.attributes.ItemName' % tool_name,
+                     target=target)
 
 
 def tool_generator(source, target, env, for_signature):
-    if len(source) != 1:
-        raise StopError(ThereCanBeOnlyOne, 
-                        '%s only build one source' % tool_name)
-    if len(target) != 1:
-        raise StopError(ThereCanBeOnlyOne,
-                        '%s only build one target' % tool_name)
+    perform_shadow_jutsu(target=target, source=source, env=env)
+
+    #if len(source) != 1:
+    #    raise StopError(ThereCanBeOnlyOne, 
+    #                    '%s only build one source' % tool_name)
+    #if len(target) != 1:
+    #    raise StopError(ThereCanBeOnlyOne,
+    #                    '%s only build one target' % tool_name)
 
     env['%s_BIN' % tool_name.upper()] = file_processor
 
@@ -91,15 +107,21 @@ def tool_generator(source, target, env, for_signature):
         args.append('--resolve-url')
 
     env['%s_ARGS' % tool_name.upper()] = ' '.join(args)
-    return Action('${t}_BIN ${t}_ARGS < $SOURCE > $TARGET'.format(t=tool_name.upper()),
-                  tool_str)
+
+    return [
+        Action(finalize_shadow_jutsu, silent_str_function),
+        Action(
+            '${t}_BIN ${t}_ARGS < $SOURCES.attributes.RealName '
+            '> $TARGETS.attributes.RealName'.format(t=tool_name.upper()),
+             tool_str,
+        ),
+    ]
 
 
 def generate(env):
     """ Add builders and construction variables to the Environment. """
 
-    env['BUILDERS'][tool_name] = Builder(generator=tool_generator,
-                                        src_suffix='.styl', suffix='.css')
+    env['BUILDERS'][tool_name] = Builder(generator=tool_generator)
 
 
 def exists(env):

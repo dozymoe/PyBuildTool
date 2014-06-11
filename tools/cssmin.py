@@ -14,6 +14,11 @@ Requirements:
 
 """
 
+from PyBuildTool.utils.common import (
+    perform_shadow_jutsu,
+    finalize_shadow_jutsu,
+    silent_str_function,
+)
 from PyBuildTool.utils.warnings import ThereCanBeOnlyOne
 from SCons.Action import Action
 from SCons.Builder import Builder
@@ -26,9 +31,13 @@ file_processor = 'yuicompressor'
 
 
 def tool_str(target, source, env):
-    return env.subst('CSS minified $TARGETS', target=target)
+    perform_shadow_jutsu(target=target, source=source, env=env)
+    return env.subst('%s minified $TARGETS.attributes.RealName' % tool_name,
+                     target=target)
 
 def tool_generator(source, target, env, for_signature):
+    perform_shadow_jutsu(target=target, source=source, env=env)
+
     if len(source) != 1:
         raise StopError(ThereCanBeOnlyOne,
                         '%s only take one source' % tool_name)
@@ -52,15 +61,20 @@ def tool_generator(source, target, env, for_signature):
 
     env['%s_ARGS' % tool_name.upper()] = ' '.join(args)
 
-    return Action('${t}_BIN ${t}_ARGS -o $TARGET $SOURCE'.format(t=tool_name.upper()),
-                  tool_str)
+    return [
+        Action(finalize_shadow_jutsu, silent_str_function),
+        Action(
+            '${t}_BIN ${t}_ARGS -o $TARGETS.attributes.RealName '
+            '$SOURCES.attributes.RealName'.format(t=tool_name.upper()),
+            tool_str,
+        ),
+    ]
 
 
 def generate(env):
     """ Add builders and construction variables to the Environment. """
 
-    env['BUILDERS'][tool_name] = Builder(generator=tool_generator,
-                                         src_suffix='.css', suffix='.css')
+    env['BUILDERS'][tool_name] = Builder(generator=tool_generator)
 
 
 def exists(env):

@@ -13,16 +13,20 @@ def tool_func(target, source, env):
     perform_shadow_jutsu(target, source, env)
     finalize_shadow_jutsu(target, source, env=env)
 
-    for dest in target:
-        with open(dest.attributes.ActualName, 'w') as fout:
-            for src in source:
-                with open(src.attributes.ActualName) as fin:
+    srcs = (s.attributes.RealName for s in source if s.attributes.RealName)
+    tgts = (t.attributes.RealName for t in target if t.attributes.RealName)
+
+    for dest in tgts:
+        with open(dest, 'w') as fout:
+            for src in srcs:
+                with open(src) as fin:
                     for line in fin:
                         fout.write(line)
                 
 
 def tool_str(target, source, env):
-    return env.subst('Merged file $TARGETS',
+    perform_shadow_jutsu(target, source, env)
+    return env.subst('Merged file $TARGETS.attributes.RealName',
                      target=target)
 
 

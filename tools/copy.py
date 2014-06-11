@@ -15,14 +15,10 @@ def tool_func(target, source, env):
     perform_shadow_jutsu(target, source, env, remove_target=True)
     finalize_shadow_jutsu(target, source, env)
 
-    if len(source) == 1:
-        src = source[0].attributes.ActualName
-    else:
-        src = [s.attributes.ActualName for s in source]
+    src = [s.attributes.RealName for s in source if s.attributes.RealName]
+    tgt = [t.attributes.RealName for t in target if t.attributes.RealName]
 
-    for t in target:
-        dest = t.attributes.ActualName
-
+    for dest in tgt:
         # `copy_func()` requires that the target directory exists
         # before copying, odd.
         if dest.endswith(sep):
@@ -32,12 +28,12 @@ def tool_func(target, source, env):
         if not path.exists(dest_dir):
             makedirs(dest_dir)
 
-        copy_func(dest, src)
+        for s in src:  copy_func(dest, s)
 
 
 def tool_str(target, source, env):
     perform_shadow_jutsu(target, source, env)
-    return env.subst('Copied file $TARGETS.attributes.ActualName', target=target)
+    return env.subst('Copied file $TARGETS.attributes.ItemName', target=target)
 
 
 def generate(env):

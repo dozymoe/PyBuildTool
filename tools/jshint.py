@@ -14,9 +14,11 @@ Options:
     * ignore-list-file : str, None, jshintignore file
 """
 
-from PyBuildTool.utils.common import (perform_shadow_jutsu,
-                                      finalize_shadow_jutsu,
-                                      silent_str_function)
+from PyBuildTool.utils.common import (
+    perform_shadow_jutsu,
+    finalize_shadow_jutsu,
+    silent_str_function,
+)
 from SCons.Action import Action
 from SCons.Builder import Builder
 
@@ -27,7 +29,7 @@ file_processor = 'node_modules/jshint/bin/jshint'
 
 def tool_str(target, source, env):
     perform_shadow_jutsu(target=target, source=source, env=env)
-    return env.subst('%s passed $TARGETS.attributes.ActualName' % tool_name,
+    return env.subst('%s passed $TARGETS.attributes.RealName' % tool_name,
                      target=target)
 
 
@@ -63,18 +65,18 @@ def tool_generator(source, target, env, for_signature):
     env['%s_ARGS' % tool_name.upper()] = ' '.join(args)
 
     return [
-        Action('${t}_BIN ${t}_ARGS $SOURCES'.format(t=tool_name.upper()),
-               tool_str,
-        ),
         Action(finalize_shadow_jutsu, silent_str_function),
+        Action(
+            '${t}_BIN ${t}_ARGS $SOURCES.attributes.RealName'.format(t=tool_name.upper()),
+            tool_str,
+        ),
     ]
 
 
 def generate(env):
     """ Add builders and construction variables to the Environment. """
 
-    env['BUILDERS'][tool_name] = Builder(generator=tool_generator,
-                                         src_suffix='.js')
+    env['BUILDERS'][tool_name] = Builder(generator=tool_generator)
 
 
 def exists(env):
