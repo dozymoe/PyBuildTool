@@ -53,12 +53,15 @@ def tool_str(target, source, env):
 def tool_generator(source, target, env, for_signature):
     perform_shadow_jutsu(target=target, source=source, env=env)
 
-    #if len(source) != 1:
-    #    raise StopError(ThereCanBeOnlyOne,
-    #                    '%s only take one source' % tool_name)
-    #if len(target) != 1:
-    #    raise StopError(ThereCanBeOnlyOne,
-    #                    '%s only build one target' % tool_name)
+    src = [s.attributes.RealName for s in source if s.attributes.RealName]
+    tgt = [t.attributes.RealName for t in target if t.attributes.RealName]
+
+    if len(src) != 1:
+        raise StopError(ThereCanBeOnlyOne,
+                        '%s only take one source' % tool_name)
+    if len(tgt) != 1:
+        raise StopError(ThereCanBeOnlyOne,
+                        '%s only build one target' % tool_name)
 
     env['%s_BIN' % tool_name.upper()] = file_processor
 

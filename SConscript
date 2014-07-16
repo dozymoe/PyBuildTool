@@ -78,6 +78,7 @@ for tool_name in config:
         group_dependencies = group.get('depends', [])
         group_options = group.get('options', {})
 
+        source_sandboxed = group_options.get('_source_sandboxed_', True)
         target_sandboxed = group_options.get('_target_sandboxed_', True)
 
         items = group.get('items', [])
@@ -102,11 +103,17 @@ for tool_name in config:
                         'dir',
                         prefix,
                     )
-                    src_resolved = path.join(prefix, src)
+                    if source_sandboxed:
+                        src_resolved = path.join(prefix, src)
+                    else:
+                        src_resolved = path.join(ROOT_DIR, src)
                     shadow[src_shadow] = src_resolved
                     src_final = src_shadow
                 else:
-                    src_resolved = path.join(prefix, src)
+                    if source_sandboxed:
+                        src_resolved = path.join(prefix, src)
+                    else:
+                        src_resolved = path.join(ROOT_DIR, src)
                     if '*' in src_resolved:
                         src_final = Glob(src_resolved)
                     else:
@@ -126,20 +133,6 @@ for tool_name in config:
                 )
                 shadow[token_shadow] = token
                 source.append(token_shadow)
-
-            # parse glob sources (like token but expand into source files).
-            source_glob_in = item.get('glob-in', [])
-            if not isinstance(source_glob_in, list):
-                source_glob_in = [source_glob_in]
-                
-            for glob in source_glob_in:
-                glob_shadow = prepare_shadow_jutsu(
-                    glob,
-                    'glob',
-                    prefix,
-                )
-                shadow[glob_shadow] = path.join(prefix, glob)
-                source.append(glob_shadow)
 
             # files are either relative to build dir, or relative
             # to ROOT_DIR.
@@ -185,20 +178,6 @@ for tool_name in config:
                 )
                 shadow[token_shadow] = token
                 target.append(token_shadow)
-
-            # parse glob targets.
-            target_glob_out = item.get('glob-out', [])
-            if not isinstance(target_glob_out, list):
-                target_glob_out = [target_glob_out]
-                
-            for glob in target_glob_out:
-                glob_shadow = prepare_shadow_jutsu(
-                    glob,
-                    'glob',
-                    prefix,
-                )
-                shadow[glob_shadow] = path.join(prefix, glob)
-                target.append(glob_shadow)
 
 
             nodes = tool(

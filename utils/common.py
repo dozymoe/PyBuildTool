@@ -21,7 +21,7 @@ def prepare_shadow_jutsu(name, nodetype, prefix):
             '.scons_flags_token',
             name.replace(':', '__'),
         )
-    elif nodetype in ('dir', 'glob'):
+    elif nodetype in ('dir',):
         hash_value = md5(name).hexdigest()
         # take the first 4 characters as directory name.
         flag_dir_name = hash_value[:4]

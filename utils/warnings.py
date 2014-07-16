@@ -1,4 +1,4 @@
 from SCons.Warnings import Warning
 
-class ThereCanBeOnlyOne(Warning):
-    pass
+class InvalidOptions(Warning): pass
+class ThereCanBeOnlyOne(Warning): pass
