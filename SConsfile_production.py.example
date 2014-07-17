@@ -75,3 +75,9 @@ copy_main_js = rules.Copy(
     file_in = concat_main_js.files,
     file_out = 'htdocs/js/',
 )
+
+
+
+#import yaml
+#with open('rules.yml', 'w') as f:
+#    f.write(yaml.safe_dump(build_config))
