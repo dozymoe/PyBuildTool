@@ -1,4 +1,4 @@
-from PyBuildTool.utils import rules import
+from PyBuildTool.utils import rules
 
 build_config = {}
 

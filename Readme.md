@@ -45,20 +45,21 @@ Example content of **SConsfile.yml**:
                 -
                     file-in: node_modules/jquery/dist/jquery-2.0.js
                     file-out: src/js/jquery.js
-                    token-out: dont_forget_jquery
                 -
-                    file-in:
-                        - src/scripts/vendor/*.js
-                        - src/scripts/base.js
-                        - src/scripts/main.js
-                    token-in: 'jshint:project_scripts'
-                    glob-out: src/js/*.js
+                    file-in: src/scripts/base.js
+                    file-out: src/js/base.js
+                -
+                    file-in: src/scripts/main.js
+                    file-out: src/js/main.js
         project_scripts_final:
             options:
                 _target_sandboxed_: false
             items:
-                glob-in: src/js/*.js
-                token-in: dont_forget_jquery
+                file-in:
+                    - src/js/jquery.js
+                    - src/js/base.js
+                    - src/js/main.js
+                token-in: 'jshint:project_scripts'
                 file-out: src/js/
                 
 
