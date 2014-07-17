@@ -1,3 +1,5 @@
+import re
+import types
 from glob import glob
 from hashlib import md5
 from os import makedirs, path, sep
@@ -164,3 +166,168 @@ def read_config(basefilename, filetype, env, root_dir):
         return yaml_load(open(path.join(root_dir,
                                         '.'.join((basefilename,
                                                  filetype)))))
+
+                                        
+# see http://stackoverflow.com/a/15836901
+def data_merge(a, b):
+    """merges b into a and return merged result
+
+    NOTE: tuples and arbitrary objects are not handled as it is totally ambiguous what should happen"""
+    key = None
+    # ## debug output
+    # sys.stderr.write("DEBUG: %s to %s\n" %(b,a))
+    try:
+        if a is None or isinstance(a, str) or isinstance(a, unicode) or isinstance(a, int) or isinstance(a, long) or isinstance(a, float):
+            # border case for first run or if a is a primitive
+            a = b
+        elif isinstance(a, list):
+            # lists can be only appended
+            if isinstance(b, list):
+                # merge lists
+                a.extend(b)
+            else:
+                # append to list
+                a.append(b)
+        elif isinstance(a, dict):
+            # dicts must be merged
+            if isinstance(b, dict):
+                for key in b:
+                    if key in a:
+                        a[key] = data_merge(a[key], b[key])
+                    else:
+                        a[key] = b[key]
+            else:
+                raise Exception('Cannot merge non-dict "%s" into dict "%s"' % (b, a))
+        else:
+            raise Exception('NOT IMPLEMENTED "%s" into "%s"' % (b, a))
+    except TypeError, e:
+        raise Exception('TypeError "%s" in key "%s" when merging "%s" into "%s"' % (e, key, b, a))
+    return a
+
+
+def is_non_string_iterable(data):
+    try:
+        iter(data) # this should raise TypeError if not
+        return not isinstance(data, types.StringTypes)
+    except TypeError:  pass
+    return False
+
+
+class Rule(object):
+    group_file_in = False
+
+    def __init__(self, rules, group, file_in, file_out=None, token_in=None,
+                 token_out=None, replace_patterns=None):
+        for o in group:
+            setattr(self, o, group[o])
+        self.file_in = file_in
+        if not file_out is None:
+            self.file_out = file_out
+        if not token_in is None:
+            self.token_in = token_in
+        if not token_out is None:
+            self.token_out = token_out
+        if not replace_patterns is None:
+            self.replace_patterns = replace_patterns
+
+        data_merge(rules, self.rules)
+
+    @property
+    def files(self):
+        # returns the output files after being processed by this tool
+        if not hasattr(self, 'file_out'):
+            return ()
+        if is_non_string_iterable(self.file_in):
+            file_ins = self.file_in
+        else:
+            file_ins = [self.file_in]
+        if is_non_string_iterable(self.file_out):
+            file_outs = self.file_out
+        else:
+            file_outs = [self.file_out]
+
+        result = []
+        for fo in file_outs:
+            if fo.endswith(sep):
+                for fi in file_ins:
+                    b = path.basename(fi)
+                    if hasattr(self, 'replace_patterns'):
+                        for (pat, rep) in self.replace_patterns:
+                            b = re.sub(pat, rep, b)
+                    result.append(path.join(fo, b))
+            else:
+                result.append(fo)
+        return result
+
+    @property
+    def tokens(self): return getattr(self, 'token_out')
+
+    @property
+    def tool_name(self):  return type(self).__name__.lower()
+
+    @property
+    def rules(self):
+        # returns build rules
+        t = self.tool_name
+        result = {}
+        result[t] = {}
+        result[t][self.name] = {'items':[]}
+        if hasattr(self, 'options'):
+            result[t][self.name]['options'] = self.options
+
+        if is_non_string_iterable(self.file_in):
+            file_ins = self.file_in
+        else:
+            file_ins = [self.file_in]
+        if not hasattr(self, 'file_out'):
+            file_outs = ()
+        elif is_non_string_iterable(self.file_out):
+            file_outs = self.file_out
+        else:
+            file_outs = [self.file_out]
+        if not hasattr(self, 'token_out'):
+            token_outs = ()
+        elif is_non_string_iterable(self.token_out):
+            token_outs = self.token_out
+        else:
+            token_outs = [self.token_out]
+
+        for fo in file_outs:
+            if self.group_file_in:
+                rule = {
+                    'file-in': file_ins,
+                    'file-out': fo,
+                }
+                if hasattr(self, 'token_in'):
+                    rule['token-in'] = self.token_in
+                result[t][self.name]['items'].append(rule)
+            else:
+                for fi in file_ins:
+                    if fo.endswith(sep):
+                        b = path.basename(fi)
+                        if hasattr(self, 'replace_patterns'):
+                            for (pat, rep) in self.replace_patterns:
+                                b = re.sub(pat, rep, b)
+                        rule = {
+                            'file-in': fi,
+                            'file-out': path.join(fo, b),
+                        }
+                    else:
+                        rule = {
+                            'file-in': fi,
+                            'file-out': fo,
+                        }
+                    if hasattr(self, 'token_in'):
+                        rule['token-in'] = self.token_in
+                    result[t][self.name]['items'].append(rule)
+        for to in token_outs:
+            rule = {
+                'file-in': file_ins,
+                'token-out': to,
+            }
+            if hasattr(self, 'token_in'):
+                rule['token-in'] = self.token_in
+            result[t][self.name]['items'].append(rule)
+
+        return result
+
