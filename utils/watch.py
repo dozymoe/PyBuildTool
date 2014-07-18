@@ -127,7 +127,8 @@ class Watch(object):
             try:
                 sleep(2)
                 self.perform_build()
-            except:
-                self.notifier.stop()
-                break
+            except Exception as e:
+                #self.notifier.stop()
+                print(e)
+                #break
         self.notifier.join()

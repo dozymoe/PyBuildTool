@@ -250,10 +250,12 @@ class Rule(object):
         for fo in file_outs:
             if fo.endswith(sep):
                 for fi in file_ins:
-                    b = path.basename(fi)
                     if hasattr(self, 'replace_patterns'):
+                        b = fi
                         for (pat, rep) in self.replace_patterns:
                             b = re.sub(pat, rep, b)
+                    else:
+                        b = path.basename(fi)
                     result.append(path.join(fo, b))
             else:
                 result.append(fo)
@@ -304,10 +306,12 @@ class Rule(object):
             else:
                 for fi in file_ins:
                     if fo.endswith(sep):
-                        b = path.basename(fi)
                         if hasattr(self, 'replace_patterns'):
+                            b = fi
                             for (pat, rep) in self.replace_patterns:
                                 b = re.sub(pat, rep, b)
+                        else:
+                            b = path.basename(fi)
                         rule = {
                             'file-in': fi,
                             'file-out': path.join(fo, b),
