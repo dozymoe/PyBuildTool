@@ -33,7 +33,7 @@ def tool_func(target, source, env):
 
 def tool_str(target, source, env):
     perform_shadow_jutsu(target, source, env)
-    return env.subst('Copied file $TARGETS.attributes.ItemName', target=target)
+    return env.subst('Copied file $TARGETS.attributes.RealName', target=target)
 
 
 def generate(env):

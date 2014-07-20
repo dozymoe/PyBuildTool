@@ -20,6 +20,9 @@ class Jshint(Rule):
 class Patch(Rule):
     pass
 
+class Pylint(Rule):
+    pass
+
 class Stylus(Rule): 
     replace_patterns = ((r'\.styl$', '.css'),)
 

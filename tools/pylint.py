@@ -7,13 +7,16 @@ Requirements:
 
 Options:
 
-    * error-only       : bool,     True,  only check for errors
+    * work-dir         : str,      None,  change current directory before
+                                          running pylint
+    * error-only       : bool,     None,  only check for errors
     * config-file      : str,      None,  pylint configuration file
     * plugins          : list:str, [] ,   plugins to load (ex. pylint_django)
     * reporter         : str,      None,  custom reporter
     * full-report      : bool,     False, full report or only the messages
 """
 
+import os
 from PyBuildTool.utils.common import (
     perform_shadow_jutsu,
     finalize_shadow_jutsu,
@@ -29,8 +32,8 @@ file_processor = 'pylint'
 
 def tool_str(target, source, env):
     perform_shadow_jutsu(target=target, source=source, env=env)
-    return env.subst('%s passed $TARGETS.attributes.RealName' % tool_name,
-                     target=target)
+    return env.subst('%s passed $SOURCES.attributes.RealName' % tool_name,
+                     source=source,target=target)
 
 
 def tool_generator(source, target, env, for_signature):
@@ -41,9 +44,14 @@ def tool_generator(source, target, env, for_signature):
     args = []
     cfg = env['TOOLCFG'].read()
 
+    # Change current directory, before running pylint, helps module imports
+    if cfg.get('work-dir', None):
+        env['WORK_DIR'] = cfg['work-dir']
+
     # Specify a configuration file
     if cfg.get('config-file', None):
-        args.append('--rcfile=%s' % cfg['config-file'])
+        args.append('--rcfile=' + os.path.join(env['ROOT_DIR'],
+                                               cfg['config-file']))
 
     # Set the output format. Available formats are text,
     # parseable, colorized, msvs (visual studio) and html.
@@ -55,7 +63,7 @@ def tool_generator(source, target, env, for_signature):
     # In error mode, checkers without error messages are
     # disabled and for others, only the ERROR messages are
     # displayed, and no reports are done by default
-    if cfg.get('error-only', True):
+    if cfg.get('error-only', None):
         args.append('--errors-only')
 
     # Tells whether to display a full report or only the
@@ -77,7 +85,8 @@ def tool_generator(source, target, env, for_signature):
     return [
         Action(finalize_shadow_jutsu, silent_str_function),
         Action(
-            '${t}_BIN ${t}_ARGS $SOURCES.attributes.RealName'.format(t=tool_name.upper()),
+            'cd $WORK_DIR; ${t}_BIN ${t}_ARGS '
+            '$SOURCES.attributes.RealName'.format(t=tool_name.upper()),
             tool_str,
         ),
     ]

@@ -262,7 +262,14 @@ class Rule(object):
         return result
 
     @property
-    def tokens(self): return getattr(self, 'token_out')
+    def tokens(self):
+        value = getattr(self, 'token_out', None)
+        if not value:
+            return []
+        if is_non_string_iterable(value):
+            return value
+        else:
+            return [value]
 
     @property
     def tool_name(self):  return type(self).__name__.lower()
@@ -287,12 +294,6 @@ class Rule(object):
             file_outs = self.file_out
         else:
             file_outs = [self.file_out]
-        if not hasattr(self, 'token_out'):
-            token_outs = ()
-        elif is_non_string_iterable(self.token_out):
-            token_outs = self.token_out
-        else:
-            token_outs = [self.token_out]
 
         for fo in file_outs:
             if self.group_file_in:
@@ -323,11 +324,13 @@ class Rule(object):
                         }
                     if hasattr(self, 'token_in'):
                         rule['token-in'] = self.token_in
+                    if hasattr(self, 'token_out'):
+                        rule['token-out'] = self.token_out
                     result[t][self.name]['items'].append(rule)
-        for to in token_outs:
+        if len(file_outs) == 0 and hasattr(self, 'token_out'):
             rule = {
                 'file-in': file_ins,
-                'token-out': to,
+                'token-out': self.token_out,
             }
             if hasattr(self, 'token_in'):
                 rule['token-in'] = self.token_in
