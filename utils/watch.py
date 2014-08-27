@@ -1,16 +1,34 @@
+import signal
 from os import path
 from pickle import loads as pickle_load, dumps as pickle_dump
 from PyBuildTool.utils.common import get_config_filename, read_config
 from subprocess import call as subprocess_call
+from threading import Thread, Lock
 from time import sleep
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
 
 
-build_state = {
-    'reset': False,
+storage = {
+    'build_state': {
+        'rebuild': True,
+        'reset': False,
+    },
+    'build_state_lock': Lock(),
+    'process_running': True,
 }
 
+
+def signal_handler(signum, frame):
+    global storage
+    storage['process_running'] = False
+
+def run_build_thread_callback(self):
+    global storage
+    while storage['process_running']:
+        if storage['build_state']['rebuild']:
+            self.perform_build()
+        sleep(5)
 
 def process_build_files(stage, filetype, cwd, alias=''):
     # TODO: with alias set, we only build the targets under that alias,
@@ -34,10 +52,13 @@ class OnFileModifiedHandler(PatternMatchingEventHandler):
         super(OnFileModifiedHandler, self).__init__(patterns=patterns)
 
     def on_modified(self, event):
-        if self.reset:
-            build_state['reset'] = True
-        key = pickle_dump((self.stage, self.filetype, self.alias))
-        build_state[key] = True
+        global storage
+        with storage['build_state_lock']:
+            if self.reset:
+                storage['build_state']['reset'] = True
+            key = pickle_dump((self.stage, self.filetype, self.alias))
+            storage['build_state'][key] = True
+            storage['build_state']['rebuild'] = True
 
 
 class Watch(object):
@@ -107,28 +128,37 @@ class Watch(object):
 
 
     def perform_build(self):
-        for key in build_state:
-            if not build_state[key]:
-                continue
-            build_state[key] = False
-            if key == 'reset':
-                self.main_config_modified()
-                continue
-            stage, filetype, alias = pickle_load(key)
-            process_build_files(stage, filetype, self.root_dir, alias)
-
+        global storage
+        with storage['build_state_lock']:
+            for key in storage['build_state']:
+                if not storage['build_state'][key]:
+                    continue
+                storage['build_state'][key] = False
+                if key == 'reset':
+                    self.main_config_modified()
+                    continue
+                elif key == 'rebuild':
+                    continue
+                stage, filetype, alias = pickle_load(key)
+                process_build_files(stage, filetype, self.root_dir, alias)
 
     def run(self):
+        global storage
+        signal.signal(signal.SIGINT, signal_handler)
+        signal.signal(signal.SIGTERM, signal_handler)
         process_build_files(self.stage, self.filetype, self.root_dir)
         print('We are WATCHING your every moves ...')
         self.setup()
         self.notifier.start()
-        while True:
+        worker_thread = Thread(target=run_build_thread_callback,
+                               args=(self,))
+        worker_thread.start()
+        while storage['process_running']:
             try:
-                sleep(2)
-                self.perform_build()
+                sleep(1)
             except Exception as e:
-                #self.notifier.stop()
+                storage['process_running'] = False
                 print(e)
-                #break
+        self.notifier.stop()
         self.notifier.join()
+        worker_thread.join()
