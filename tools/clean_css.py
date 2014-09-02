@@ -36,10 +36,10 @@ from PyBuildTool.utils.common import (
     finalize_shadow_jutsu,
     silent_str_function,
 )
-#from PyBuildTool.utils.warnings import ThereCanBeOnlyOne
+from PyBuildTool.utils.warnings import ThereCanBeOnlyOne
 from SCons.Action import Action
 from SCons.Builder import Builder
-#from SCons.Errors import StopError
+from SCons.Errors import StopError
 from SCons.Node.Python import Value
 
 tool_name = 'clean_css'

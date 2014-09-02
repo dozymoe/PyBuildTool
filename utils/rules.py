@@ -20,6 +20,9 @@ class Jshint(Rule):
 class Patch(Rule):
     pass
 
+class PngCrush(Rule):
+    pass
+
 class Pylint(Rule):
     pass
 
