@@ -45,6 +45,7 @@ Options:
     * zmem          : int,   None,  zlib_compression_mem_level [1-9, default 9]
     * zitxt         : str,   None,  b|a "keyword" "lcode" "tkey" "text"
     * ztxt          : str,   None,  b[efore_IDAT]|a[fter_IDAT] "keywrod" "text"
+    * quiet         : bool,  True,  quiet
 
 Requirements:
 
@@ -253,13 +254,17 @@ def tool_generator(source, target, env, for_signature):
     if cfg.get('ztxt', None):
         args.append('-ztxt="%s"' % cfg['ztxt'])
 
+    # quiet
+    if cfg.get('quiet', True):
+        args.append('-q')
+
     env['%s_ARGS' % tool_name.upper()] = ' '.join(args)
 
     return [
         Action(finalize_shadow_jutsu, silent_str_function),
         Action(
             '${t}_BIN ${t}_ARGS $SOURCES.attributes.RealName '
-            '-o $TARGETS.attributes.RealName'.format(t=tool_name.upper()),
+            '$TARGETS.attributes.RealName'.format(t=tool_name.upper()),
             tool_str,
         ),
     ]
