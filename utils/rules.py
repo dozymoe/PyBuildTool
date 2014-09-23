@@ -14,6 +14,9 @@ class Copy(Rule):
 class GZip(Rule):
     group_file_in = True
 
+class Handlebars(Rule):
+    pass
+
 class Jshint(Rule):
     pass
 
