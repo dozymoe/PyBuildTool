@@ -12,7 +12,7 @@ def post_install_waf():
 class CustomInstall(BaseInstall):
     def run(self):
         BaseInstall.run(self)
-        self.execute(post_install_waf, msg="Installing waf")
+        self.execute(post_install_waf, (), msg="Installing waf")
 
 
 setup(
