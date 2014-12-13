@@ -145,6 +145,10 @@ Install
 5.   Create `build_rules.yml` file with content like our example, this will be
      your build rules.
 
+6.   `waf configure`
+
+7.   `waf build_dev`
+
 
 [1]: http://code.google.com/p/waf/
 [3]: http://github.com/dozymoe/PyBuildTool
