@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
-from distutils.command.install import install as BaseInstall
+from setuptools  import setup
+from setuptools.command.install import install as BaseInstall
 
 
 def post_install_waf():
