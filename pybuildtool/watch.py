@@ -55,7 +55,7 @@ def watch_files(bld):
 
 def watch(bld):
     global files, conf_file, running
-    conf_file = os.path.join(bld.path.abspath(), 'waf.yml') 
+    conf_file = os.path.join(bld.path.abspath(), 'build_rules.yml') 
     files = watch_files(bld)
 
     signal.signal(signal.SIGINT, signal_handler)
