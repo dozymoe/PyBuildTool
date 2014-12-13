@@ -22,7 +22,6 @@ setup(
     author='Fahri Reza',
     author_email='dozymoe@gmail.com',
     url='http://pybuildtool.fireh.biz.id',
-    scripts=['waf'],
     packages=['pybuildtool'],
     data_files=[('.', ['wscript'])],
     install_requires=['pyyaml', 'waftools', 'watchdog'],
