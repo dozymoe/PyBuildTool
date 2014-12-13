@@ -80,133 +80,142 @@ Requirements:
 
 """
 
-from PyBuildTool.utils.common import (
-    perform_shadow_jutsu,
-    finalize_shadow_jutsu,
-    silent_str_function,
-)
-#from PyBuildTool.utils.warnings import ThereCanBeOnlyOne
-from SCons.Action import Action
-from SCons.Builder import Builder
-#from SCons.Errors import StopError
-from SCons.Node.Python import Value
+import os
+from base import Task as BaseTask
 
-tool_name = 'uglifyjs'
-file_processor = 'node_modules/uglify-js/bin/uglifyjs'
+tool_name = __name__
 
-def tool_str(target, source, env):
-    perform_shadow_jutsu(target=target, source=source, env=env)
-    return env.subst('%s minified $TARGETS.attributes.RealName' % tool_name,
-                     target=target)
+class Task(BaseTask):
+    conf = {
+        'replace_patterns': ((r'\.js$', '.min.js'),),
+    }
 
-def tool_generator(source, target, env, for_signature):
-    perform_shadow_jutsu(target=target, source=source, env=env)
+    def prepare_args(self):
+        cfg = self.conf
+        args = []
 
-    env['%s_BIN' % tool_name.upper()] = file_processor
+        if cfg.get('source_map', None):
+            args.append("--source-map='%s'" % cfg['source_map'])
 
-    args = []
-    cfg = env.get('TOOLCFG', {})
-    if isinstance(cfg, Value):  cfg = cfg.read()
+        if cfg.get('source_map_root', None):
+            args.append("--source-map-root='%s'" % cfg['source_map_root'])
 
-    if cfg.get('source-map', None):
-        args.append("--source-map='%s'" % cfg['source-map'])
+        if cfg.get('source_map_url', None):
+            args.append("--source-map-url='%s'" % cfg['source_map_url'])
 
-    if cfg.get('source-map-root', None):
-        args.append("--source-map-root='%s'" % cfg['source-map-root'])
+        if cfg.get('source_map_include_sources', None):
+            args.append('--source-map-include-sources')
 
-    if cfg.get('source-map-url', None):
-        args.append("--source-map-url='%s'" % cfg['source-map-url'])
+        if cfg.get('in_source_map', None):
+            args.append("--in-source-map='%s'" % cfg['in_source_map'])
 
-    if cfg.get('source-map-include-sources', None):
-        args.append('--source-map-include-sources')
+        if cfg.get('screw_ie8', None):
+            args.append('--screw-ie8')
 
-    if cfg.get('in-source-map', None):
-        args.append("--in-source-map='%s'" % cfg['in-source-map'])
+        if cfg.get('expr', None):
+            args.append('--expr')
 
-    if cfg.get('screw-ie8', None):
-        args.append('--screw-ie8')
+        if cfg.get('prefix', None):
+            args.append("--prefix='%s'" % cfg['prefix'])
 
-    if cfg.get('expr', None):
-        args.append('--expr')
+        if cfg.get('beautify', None):
+            args.appendd("--beautify='%s'" % cfg['beautify'])
 
-    if cfg.get('prefix', None):
-        args.append("--prefix='%s'" % cfg['prefix'])
+        if not cfg.get('mangle', None) is None:
+            if len(cfg['mangle']):
+                args.append("--mangle='%s'" % cfg['mangle'])
+            else:
+                args.append('--mangle')
 
-    if cfg.get('beautify', None):
-        args.appendd("--beautify='%s'" % cfg['beautify'])
+        if cfg.get('reserved', None):
+            args.append("--reserved='%s'" % cfg['reserved'])
 
-    if not cfg.get('mangle', None) is None:
-        if len(cfg['mangle']):
-            args.append("--mangle='%s'" % cfg['mangle'])
-        else:
-            args.append('--mangle')
+        if not cfg.get('compress', None) is None:
+            if len(cfg['compress']):
+                args.append("--compress='%s'" % cfg['compress'])
+            else:
+                args.append('--compress')
 
-    if cfg.get('reserved', None):
-        args.append("--reserved='%s'" % cfg['reserved'])
+        if cfg.get('define', None):
+            args.append("--define='%s'" % cfg['define'])
 
-    if not cfg.get('compress', None) is None:
-        if len(cfg['compress']):
-            args.append("--compress='%s'" % cfg['compress'])
-        else:
-            args.append('--compress')
+        if cfg.get('enclose', None):
+            args.append("--enclose='%s'" % cfg['enclose'])
 
-    if cfg.get('define', None):
-        args.append("--define='%s'" % cfg['define'])
+        if not cfg.get('comments', None) is None:
+            if len(cfg['comments']):
+                args.append("--comments='%s'" % cfg['comments'])
+            else:
+                args.append('--comments')
 
-    if cfg.get('enclose', None):
-        args.append("--enclose='%s'" % cfg['enclose'])
+        if cfg.get('preamble', None):
+            args.append("--preamble='%s'" % cfg['preamble'])
 
-    if not cfg.get('comments', None) is None:
-        if len(cfg['comments']):
-            args.append("--comments='%s'" % cfg['comments'])
-        else:
-            args.append('--comments')
+        if cfg.get('stats', None):
+            args.append('--stats')
 
-    if cfg.get('preamble', None):
-        args.append("--preamble='%s'" % cfg['preamble'])
+        if cfg.get('acorn', None):
+            args.append('--acorn')
 
-    if cfg.get('stats', None):
-        args.append('--stats')
+        if cfg.get('spidermonkey', None):
+            args.append('--spidermonkey')
 
-    if cfg.get('acorn', None):
-        args.append('--acorn')
+        if cfg.get('self', None):
+            args.append('--self')
 
-    if cfg.get('spidermonkey', None):
-        args.append('--spidermonkey')
+        if cfg.get('wrap', None):
+            args.append("--wrap='%s'" % cfg['wrap'])
 
-    if cfg.get('self', None):
-        args.append('--self')
+        if cfg.get('export_all', None):
+            args.append('--export-all')
 
-    if cfg.get('wrap', None):
-        args.append("--wrap='%s'" % cfg['wrap'])
+        if cfg.get('lint', None):
+            args.append('--lint')
 
-    if cfg.get('export-all', None):
-        args.append('--export-all')
+        if cfg.get('verbose', None):
+            args.append('--verbose')
 
-    if cfg.get('lint', None):
-        args.append('--lint')
+        if cfg.get('noerr', None):
+            args.append('--noerr')
 
-    if cfg.get('verbose', None):
-        args.append('--verbose')
+        return args
 
-    if cfg.get('noerr', None):
-        args.append('--noerr')
 
-    env['%s_ARGS' % tool_name.upper()] = ' '.join(args)
+    def perform(self):
+        if len(self.file_in) != 1:
+            self.bld.fatal('%s only need one input' % tool_name.capitalize())
+        if len(self.file_out) != 1:
+            self.bld.fatal('%s only have one output' % tool_name.capitalize())
 
-    return [
-        Action(finalize_shadow_jutsu, silent_str_function),
-        Action(
-            '${t}_BIN ${t}_ARGS --output="$TARGETS.attributes.RealName" '
-            '$SOURCES.attributes.RealName'.format(t=tool_name.upper()),
-            tool_str,
-        ),
-    ]
+        if self.bld.variant in ('dev', 'devel', 'development'):
+            executable = self.env['CP_BIN']
+            return self.exec_command(
+                '{exe} {in_} {out}'.format(
+                exe=executable,
+                in_=self.file_in[0],
+                out=self.file_out[0],
+            ))
 
-def generate(env):
-    """Add builders and construction variables to the Environment."""
+        executable = self.env['%s_BIN' % tool_name.upper()]
+        return self.exec_command(
+            '{exe} {arg} {in_} -o {out}'.format(
+            exe=executable,
+            arg=' '.join(self.prepare_args()),
+            in_=self.file_in[0],
+            out=self.file_out[0],
+        ))
 
-    env['BUILDERS'][tool_name] = Builder(generator=tool_generator)
 
-def exists(env):
-    return env.Detect(file_processor)
+def configure(conf):
+    if len(conf.env.CP_BIN) == 0:
+        conf.env.CP_BIN = conf.find_program('cp')[0]
+
+    bin_path = 'node_modules/uglify-js/bin/uglifyjs'
+    conf.start_msg("Checking for progam '%s'" % tool_name)
+    if os.path.exists(bin_path):
+        bin_path = os.path.realpath(bin_path)
+        conf.end_msg(bin_path)
+    else:
+        conf.end_msg('not found')
+        bin_path = conf.find_program('uglifyjs')[0]
+    conf.env['%s_BIN' % tool_name.upper()] = bin_path
