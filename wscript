@@ -43,6 +43,8 @@ def configure(ctx):
     ctx.load('jshint', tooldir=pybuildtool_dir)
     ctx.load('patch', tooldir=pybuildtool_dir)
     ctx.load('pngcrush', tooldir=pybuildtool_dir)
+    ctx.load('pylint', tooldir=pybuildtool_dir)
+    ctx.load('shell', tooldir=pybuildtool_dir)
     ctx.load('stylus', tooldir=pybuildtool_dir)
     ctx.load('uglifyjs', tooldir=pybuildtool_dir)
 
