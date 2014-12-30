@@ -16,7 +16,7 @@ Options:
 Requirements:
 
     * stylus
-      to install, edit package.json, run `npm install`
+      to install, run `npm install --save-dev stylus`
     * node.js
 
 """
@@ -106,7 +106,7 @@ def configure(conf):
         conf.env.CAT_BIN = conf.find_program('cat')[0]
 
     bin_path = 'node_modules/stylus/bin/stylus'
-    conf.start_msg("Checking for progam '%s'" % tool_name)
+    conf.start_msg("Checking for program '%s'" % tool_name)
     if os.path.exists(bin_path):
         bin_path = os.path.realpath(bin_path)
         conf.end_msg(bin_path)

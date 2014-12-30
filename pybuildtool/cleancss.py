@@ -11,7 +11,7 @@ Options:
     * root-path            : str, None, a root path to which resolve absolute
                              @import rules and rebase relative URLs
     * skip-import          : bool, False, disable @import processing
-    * skip-rebase          : bool, False, disable URLs rebasing
+    * skip_rebase          : bool, False, disable URLs rebasing
     * skip-advanced        : bool, False, disable advanced optimizations -
                              selector & property merging, reduction, etc
     * skip-aggressive-merging: bool, False, disable properties merging based
@@ -67,7 +67,7 @@ class Task(BaseTask):
             args.append('--skip-import')
 
         # disable URLs rebasing
-        if cfg.get('skip-rebase', False):
+        if cfg.get('skip_rebase', False):
             args.append('--skip-rebase')
 
         # disable advanced optimizations - selector & property merging,

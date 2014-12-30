@@ -40,7 +40,6 @@ class Task(BaseTask):
         self.cmd = cfg.get('commands')
 
     def perform(self):
-        self.prepare()
         if self.conf.get('with_file_in', True):
             cmd = '{pre} {exe} {arg} {in_}'
         else:

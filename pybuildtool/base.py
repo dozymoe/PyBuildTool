@@ -58,7 +58,12 @@ class Rule(object):
                     if replace_patterns:
                         for (pat, rep) in replace_patterns:
                             foo = re.sub(pat, rep, foo)
-                    result.append(os.path.join(fo, os.path.basename(foo)))
+                    basedir = self.conf.get('_source_basedir_', False)
+                    if basedir and foo.startswith(basedir):
+                        foo = foo[len(basedir):]
+                    else:
+                        foo = os.path.basename(foo)
+                    result.append(os.path.join(fo, foo))
             else:
                 result.append(fo)
         return result
@@ -91,9 +96,15 @@ class Rule(object):
                         if replace_patterns:
                             for (pat, rep) in replace_patterns:
                                 foo = re.sub(pat, rep, foo)
+                        # use basedir to produce file_out
+                        basedir = self.conf.get('_source_basedir_', False)
+                        if basedir and foo.startswith(basedir):
+                            foo = foo[len(basedir):]
+                        else:
+                            foo = os.path.basename(foo)
                         result.append({
                             'file_in': [fi],
-                            'file_out': [os.path.join(fo, os.path.basename(foo))],
+                            'file_out': [os.path.join(fo, foo)],
                             'token_in': token_in,
                             'token_out': token_out,
                         })
@@ -201,6 +212,7 @@ class Group(object):
 
 
 class Task(BaseTask):
+    args = []
     conf = {}
     group  = None
     file_in = None
@@ -216,6 +228,9 @@ class Task(BaseTask):
         self.file_out = []
         self.token_in = []
         self.token_out = []
+
+    def prepare(self):
+        pass
 
     def prepare_args(self):
         return []
@@ -258,6 +273,7 @@ class Task(BaseTask):
 
     def run(self):
         self.prepare_shadow_jutsu()
+        self.prepare()
         ret = self.perform()
         if ret == 0:
             self.finalize_shadow_jutsu()
@@ -305,7 +321,7 @@ def data_merge(a, b):
 def is_non_string_iterable(data):
     # http://stackoverflow.com/a/17222092
     try:
-        if isinstance(obj, unicode):
+        if isinstance(data, unicode) or isinstance(data, str):
             return False
     except NameError:
         pass

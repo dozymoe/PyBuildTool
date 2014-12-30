@@ -1,6 +1,10 @@
 """ Merge files from sources into copious targets. """
 
 from base import Task as BaseTask
+try:
+    from shlex import quote
+except ImportError:
+    from pipes import quote
 
 tool_name = __name__
 
@@ -18,7 +22,7 @@ class Task(BaseTask):
             '{exe} {arg} {in_} > {out}'.format(
             exe=executable,
             arg=' '.join(self.prepare_args()),
-            in_=' '.join(self.file_in),
+            in_=' '.join(quote(f) for f in self.file_in),
             out=self.file_out[0],
         ))
 
