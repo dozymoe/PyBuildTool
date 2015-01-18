@@ -7,9 +7,11 @@ from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 from yaml import load as yaml_load
 from helper import get_source_files
+#from browser_reload_notifier import BrowserReloadNotifier
 
 conf_file = ''
 files = []
+#browser_notifier = BrowserReloadNotifier('0.0.0.0')
 rebuild = True
 running = True
 
@@ -42,6 +44,7 @@ def thread_callback():
         if rebuild:
             rebuild = False
             os.system('waf build_dev')
+            #browser_notifier.trigger()
         sleep(10)
 
 
@@ -61,6 +64,7 @@ def watch(bld):
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
+    #browser_notifier.start()
     event_handler = FileChangeHandler(bld)
     observer = Observer()
     observer.schedule(event_handler, bld.path.abspath(), recursive=True)
@@ -77,6 +81,7 @@ def watch(bld):
     observer.stop()
     observer.join()
     worker.join()
+    browser_notifier.stop()
 
 
 Context.g_module.__dict__['watch'] = watch

@@ -90,7 +90,7 @@ class Task(BaseTask):
         'replace_patterns': ((r'\.js$', '.min.js'),),
     }
 
-    def prepare_args(self):
+    def prepare(self):
         cfg = self.conf
         args = []
 
@@ -200,7 +200,7 @@ class Task(BaseTask):
         return self.exec_command(
             '{exe} {arg} {in_} -o {out}'.format(
             exe=executable,
-            arg=' '.join(self.prepare_args()),
+            arg=' '.join(self.args),
             in_=self.file_in[0],
             out=self.file_out[0],
         ))

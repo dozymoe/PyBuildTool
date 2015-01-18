@@ -35,6 +35,8 @@ def configure(ctx):
     # load predefined tools from pybuildtool
     from imp import find_module
     pybuildtool_dir = find_module('pybuildtool')[1]
+    ctx.load('autoprefixer', tooldir=pybuildtool_dir)
+    ctx.load('browserify', tooldir=pybuildtool_dir)
     ctx.load('cleancss', tooldir=pybuildtool_dir)
     ctx.load('concat', tooldir=pybuildtool_dir)
     ctx.load('cp', tooldir=pybuildtool_dir)
