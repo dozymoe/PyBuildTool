@@ -81,7 +81,7 @@ def watch(bld):
     observer.stop()
     observer.join()
     worker.join()
-    browser_notifier.stop()
+    #browser_notifier.stop()
 
 
 Context.g_module.__dict__['watch'] = watch
