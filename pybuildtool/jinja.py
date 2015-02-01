@@ -21,6 +21,7 @@ class Task(BaseTask):
     conf = {
         '_source_grouped_': True,
     }
+    name = tool_name
     search_dir = ['.']
     template_name = None
     variables = None

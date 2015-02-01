@@ -21,11 +21,13 @@ from base import Task as BaseTask, expand_resource
 tool_name = __name__
 
 class Task(BaseTask):
+
+    name = tool_name
     workdir = '.'
 
-    def prepare_args(self):
+    def prepare(self):
         cfg = self.conf
-        args = []
+        args = self.args
 
         # Change current directory, before running pylint, helps module imports
         c = cfg.get('work_dir', None)
@@ -67,15 +69,13 @@ class Task(BaseTask):
         if plugins:
             args.append('--load-plugins=%s' % ','.join(plugins))
 
-        return args
-
 
     def perform(self):
         executable = self.env['%s_BIN' % tool_name.upper()]
         return self.exec_command(
             'cd {cwd}; {exe} {arg} {in_}'.format(
             exe=executable,
-            arg=' '.join(self.prepare_args()),
+            arg=' '.join(self.args),
             in_=' '.join(self.file_in),
             cwd=self.workdir,
         ))

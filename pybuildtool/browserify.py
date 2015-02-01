@@ -23,6 +23,7 @@ class Task(BaseTask):
     conf = {
         '_source_grouped_': True,
     }
+    name = tool_name
 
     def perform(self):
         if len(self.file_out) != 1:

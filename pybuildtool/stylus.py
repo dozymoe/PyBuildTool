@@ -27,13 +27,16 @@ from base import Task as BaseTask
 tool_name = __name__
 
 class Task(BaseTask):
+
     conf = {
         'replace_patterns': ((r'\.styl$', '.css'),)
     }
+    name = tool_name
 
-    def prepare_args(self):
+    def prepare(self):
         cfg = self.conf
-        args = ['--print']
+        self.args = ['--print']
+        args = self.args
 
         # Utilize the Stylus plugin at <path>.
         plugin_dirs = cfg.get('plugins-path', [])
@@ -82,8 +85,6 @@ class Task(BaseTask):
         if cfg.get('resolve-url', True):
             args.append('--resolve-url')
 
-        return args
-
 
     def perform(self):
         if len(self.file_out) != 1:
@@ -95,7 +96,7 @@ class Task(BaseTask):
             '{cat} {in_} | {exe} {arg} > {out}'.format(
             cat=cat_executable,
             exe=executable,
-            arg=' '.join(self.prepare_args()),
+            arg=' '.join(self.args),
             in_=' '.join(self.file_in),
             out=self.file_out[0],
         ))

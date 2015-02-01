@@ -15,13 +15,13 @@ from base import Task as BaseTask
 tool_name = __name__
 
 class Task(BaseTask):
+
     conf = {
         'replace_patterns': ((r'\.handlebars$', '.js'),),
     }
+    name = tool_name
 
     def perform(self):
-        print(self.file_in)
-        print(self.file_out)
         if len(self.file_in) != 1:
             self.bld.fatal('%s only need one input' % tool_name.capitalize())
         if len(self.file_out) != 1:
@@ -31,7 +31,7 @@ class Task(BaseTask):
         return self.exec_command(
             '{exe} {arg} {in_} -f {out}'.format(
             exe=executable,
-            arg=' '.join(self.prepare_args()),
+            arg=' '.join(self.args),
             in_=self.file_in[0],
             out=self.file_out[0],
         ))

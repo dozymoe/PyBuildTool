@@ -9,9 +9,11 @@ except ImportError:
 tool_name = __name__
 
 class Task(BaseTask):
+
     conf = {
         '_source_grouped_': True,
     }
+    name = tool_name
 
     def perform(self):
         if len(self.file_out) != 1:
@@ -21,7 +23,7 @@ class Task(BaseTask):
         return self.exec_command(
             '{exe} {arg} {in_} > {out}'.format(
             exe=executable,
-            arg=' '.join(self.prepare_args()),
+            arg=' '.join(self.args),
             in_=' '.join(quote(f) for f in self.file_in),
             out=self.file_out[0],
         ))

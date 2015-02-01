@@ -86,13 +86,15 @@ from base import Task as BaseTask
 tool_name = __name__
 
 class Task(BaseTask):
+
     conf = {
         'replace_patterns': ((r'\.js$', '.min.js'),),
     }
+    name = tool_name
 
     def prepare(self):
         cfg = self.conf
-        args = []
+        args = self.args
 
         if cfg.get('source_map', None):
             args.append("--source-map='%s'" % cfg['source_map'])
@@ -177,8 +179,6 @@ class Task(BaseTask):
 
         if cfg.get('noerr', None):
             args.append('--noerr')
-
-        return args
 
 
     def perform(self):

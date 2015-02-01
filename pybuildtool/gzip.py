@@ -12,12 +12,14 @@ from base import Task as BaseTask
 tool_name = __name__
 
 class Task(BaseTask):
+
     conf = {
         'replace_patterns': ((r'$', '.gz'),),
     }
+    name = tool_name
 
-    def prepare_args(self):
-        return ['--stdout', '--best']
+    def prepare(self):
+        self.args = ['--stdout', '--best']
 
 
     def perform(self):
@@ -30,7 +32,7 @@ class Task(BaseTask):
         return self.exec_command(
             '{exe} {arg} {in_} > {out}'.format(
             exe=executable,
-            arg=' '.join(self.prepare_args()),
+            arg=' '.join(self.args),
             in_=self.file_in[0],
             out=self.file_out[0],
         ))

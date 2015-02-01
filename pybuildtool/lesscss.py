@@ -6,7 +6,7 @@ extendable.
 
 Options:
 
-    * keep-line-breaks     : bool, False, keep line breaks
+    * keep_line_breaks     : bool, False, keep line breaks
 
 Requirements:
 
@@ -22,16 +22,20 @@ from base import Task as BaseTask
 tool_name = __name__
 
 class Task(BaseTask):
+
     conf = {
         'replace_patterns': ((r'\.less$', '.css'),)
     }
+    name = tool_name
 
     def prepare(self):
         cfg = self.conf
+        args = self.args
 
         # keep line breaks
-        #if cfg.get('keep-line-breaks', False):
-        #    args.append('--keep-line-breaks')
+        if cfg.get('keep_line_breaks', False):
+            args.append('--keep-line-breaks')
+
 
     def perform(self):
         if len(self.file_in) != 1:
@@ -43,7 +47,7 @@ class Task(BaseTask):
         return self.exec_command(
             '{exe} {arg} {in_} {out}'.format(
             exe=executable,
-            arg=' '.join(self.prepare_args()),
+            arg=' '.join(self.args),
             in_=self.file_in[0],
             out=self.file_out[0],
         ))

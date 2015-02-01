@@ -20,14 +20,16 @@ from base import Task as BaseTask
 tool_name = __name__
 
 class Task(BaseTask):
+
     conf = {
         '_source_grouped_': True,
     }
+    name = tool_name
 
-    def prepare_args(self):
+    def prepare(self):
         bld = self.group.context
         cfg = self.conf
-        args = []
+        args = self.args
 
         # Custom configuration file
         if cfg.get('config_file', None):
@@ -51,14 +53,13 @@ class Task(BaseTask):
             args.append("--exclude-path='%s'" % bld.path.find_resource(
                 cfg['ignore_list_file']).abspath())
 
-        return args
 
     def perform(self):
         executable = self.env['%s_BIN' % tool_name.upper()]
         return self.exec_command(
             '{exe} {arg} {in_}'.format(
             exe=executable,
-            arg=' '.join(self.prepare_args()),
+            arg=' '.join(self.args),
             in_=' '.join(self.file_in),
         ))
 

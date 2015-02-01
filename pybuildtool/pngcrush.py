@@ -58,10 +58,12 @@ from base import Task as BaseTask
 tool_name = __name__
 
 class Task(BaseTask):
-    
-    def prepare_args(self):
+
+    name = tool_name
+
+    def prepare(self):
         cfg = self.conf
-        args = []
+        args = self.args
 
         # already_crushed_size [e.g., 8192]
         if cfg.get('already', None):
@@ -230,7 +232,6 @@ class Task(BaseTask):
         if cfg.get('quiet', True):
             args.append('-q')
 
-        return args
 
     def perform(self):
         if len(self.file_in) != 1:
@@ -242,7 +243,7 @@ class Task(BaseTask):
         return self.exec_command(
             '{exe} {arg} {in_} {out}'.format(
             exe=executable,
-            arg=' '.join(self.prepare_args()),
+            arg=' '.join(self.args),
             in_=self.file_in[0],
             out=self.file_out[0],
         ))

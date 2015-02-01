@@ -19,15 +19,16 @@ tool_name = __name__
 
 class Task(BaseTask):
 
-    def prepare_arg(self):
+    name = tool_name
+
+    def prepare(self):
         cfg = self.conf
-        args = []
+        args = self.args
 
         if cfg.get('patch_file') is None:
             self.bld.fatal('InvalidOptions: "patch_file" is missing')
         args.append('-i ' + os.path.realpath(cfg['patch_file']))
 
-        return args
 
     def perform(self):
         if len(self.file_in) != 1:
@@ -39,10 +40,11 @@ class Task(BaseTask):
         return self.exec_command(
             '{exe} {arg} -o {out} {in_}'.format(
             exe=executable,
-            arg=' '.join(self.prepare_arg()),
+            arg=' '.join(self.args),
             in_=self.file_in[0],
             out=self.file_out[0],
         ))
+
 
 def configure(conf):
     conf.env['%s_BIN' % tool_name.upper()] = conf.find_program('patch')[0]

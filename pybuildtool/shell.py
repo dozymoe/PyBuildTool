@@ -15,11 +15,12 @@ from base import Task as BaseTask, expand_resource
 tool_name = __name__
 
 class Task(BaseTask):
+
     conf = {
         '_source_grouped_': True,
     }
+    name = tool_name
     prefix = []
-    args = []
     cmd = None
 
     def prepare(self):
@@ -37,7 +38,8 @@ class Task(BaseTask):
             self.prefix.append('cd %s;' \
                 % expand_resource(self.group, c))
 
-        self.cmd = cfg.get('commands')
+        self.cmd = cfg.get('commands').format(**self.group.get_patterns())
+
 
     def perform(self):
         if self.conf.get('with_file_in', True):
@@ -50,4 +52,7 @@ class Task(BaseTask):
             pre=' '.join(self.prefix),
             arg=' '.join(self.args),
             in_=' '.join(self.file_in),
-        ))
+            ),
+            stdout=None,
+            stderr=None,
+        )

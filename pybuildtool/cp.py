@@ -6,6 +6,8 @@ tool_name = __name__
 
 class Task(BaseTask):
 
+    name = tool_name
+
     def perform(self):
         if len(self.file_in) != 1:
             self.bld.fatal('%s only need one output' % tool_name.capitalize())
@@ -16,7 +18,7 @@ class Task(BaseTask):
         return self.exec_command(
             '{exe} {arg} {in_} {out}'.format(
             exe=executable,
-            arg=' '.join(self.prepare_args()),
+            arg=' '.join(self.args),
             in_=self.file_in[0],
             out=self.file_out[0],
         ))

@@ -37,13 +37,15 @@ from base import Task as BaseTask
 tool_name = __name__
 
 class Task(BaseTask):
+
     conf = {
         'replace_patterns': ((r'\.css$', '.min.css'),)
     }
+    name = tool_name
 
-    def prepare_args(self):
+    def prepare(self):
         cfg = self.conf
-        args = []
+        args = self.args
 
         # keep line breaks
         if cfg.get('keep-line-breaks', False):
@@ -95,8 +97,6 @@ class Task(BaseTask):
         if cfg.get('debug', False):
             args.append('--debug')
 
-        return args
-
 
     def perform(self):
         if len(self.file_in) != 1:
@@ -117,7 +117,7 @@ class Task(BaseTask):
         return self.exec_command(
             '{exe} {arg} {in_} -o {out}'.format(
             exe=executable,
-            arg=' '.join(self.prepare_args()),
+            arg=' '.join(self.args),
             in_=self.file_in[0],
             out=self.file_out[0],
         ))

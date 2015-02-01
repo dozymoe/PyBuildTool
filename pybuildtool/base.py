@@ -217,11 +217,26 @@ class Task(BaseTask):
     group  = None
     file_in = None
     file_out = None
+    name = None
     token_in = None
     token_out = None
 
     def __init__(self, group, config, *args, **kwargs):
         super(Task, self).__init__(*args, **kwargs)
+        # Task's configuration can be declared higher in the build tree,
+        # but it needs to be prefixed with its tool-name.
+        # Tool-name however can only be defined by the tool module by observing
+        # predefined `__name__` variable, which value is the name of the
+        # tool module.
+        if self.name:
+            name = self.name + '_'
+            for key in config.keys():
+                if not key.startswith(name):
+                    continue
+                task_conf = key[len(name):]
+                if task_conf in config:
+                    continue
+                config[task_conf] = config[key]
         self.conf = config
         self.group = group
         self.file_in = []
@@ -301,6 +316,7 @@ def data_merge(a, b):
             else:
                 # append to list
                 a.append(b)
+            a = list(set(a))
         elif isinstance(a, dict):
             # dicts must be merged
             if isinstance(b, dict):

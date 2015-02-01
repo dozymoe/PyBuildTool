@@ -21,6 +21,7 @@ tool_name = __name__
 
 class Task(BaseTask):
 
+    name = tool_name
     prefix = []
 
     def prepare(self):

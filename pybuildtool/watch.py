@@ -1,5 +1,6 @@
 import os
 import signal
+from collections import OrderedDict
 from threading import Thread
 from time import sleep
 from waflib import Context
@@ -53,7 +54,8 @@ def watch_files(bld):
         conf = yaml_load(f)
     files = get_source_files(conf, bld)
     files.append(conf_file)
-    return files
+    # see http://stackoverflow.com/a/17016257
+    return list(OrderedDict.fromkeys(os.path.realpath(f) for f in files))
 
 
 def watch(bld):
