@@ -128,6 +128,13 @@ Several things to keep in mind:
     they happens to have used the same option field name.
 
 
+Warning
+-------
+
+`waf` does not like it if the source and target existed in the same directory,
+see: [Files are always built][7].
+
+
 Install
 -------
 
@@ -155,3 +162,4 @@ Install
 [4]: http://github.com/dozymoe/PyBuildTool/wiki
 [5]: http://ant.apache.org/manual/dirtasks.html
 [6]: http://yaml.org/spec/1.2/spec.html#id2785586
+[7]: https://code.google.com/p/waf/wiki/FAQ#The_same_files_are_always_built

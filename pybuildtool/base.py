@@ -212,7 +212,7 @@ class Group(object):
 
 
 class Task(BaseTask):
-    args = []
+    args = None
     conf = {}
     group  = None
     file_in = None
@@ -228,15 +228,19 @@ class Task(BaseTask):
         # Tool-name however can only be defined by the tool module by observing
         # predefined `__name__` variable, which value is the name of the
         # tool module.
-        if self.name:
-            name = self.name + '_'
-            for key in config.keys():
-                if not key.startswith(name):
-                    continue
-                task_conf = key[len(name):]
-                if task_conf in config:
-                    continue
-                config[task_conf] = config[key]
+        if config:
+            if self.name:
+                name = self.name + '_'
+                for key in config.keys():
+                    if not key.startswith(name):
+                        continue
+                    task_conf = key[len(name):]
+                    if task_conf in config:
+                        continue
+                    config[task_conf] = config[key]
+        else:
+            config = {}
+        self.args = []
         self.conf = config
         self.group = group
         self.file_in = []
