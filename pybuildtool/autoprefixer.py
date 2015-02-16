@@ -7,6 +7,7 @@ Options:
                  Separate browsers by comma. For example, '> 1%, opera 12'.
                  You can set browsers by global usage statistics: '> 1%',
                  or last version: 'last 2 versions'
+    * keep     : bool, False, do not remove outdated prefixes
 
 Requirements:
 
@@ -21,8 +22,6 @@ from base import Task as BaseTask
 
 tool_name = __name__
 
-class Task(BaseTask):
-
     name = tool_name
 
     def prepare(self):
@@ -32,6 +31,11 @@ class Task(BaseTask):
         c = cfg.get('browsers', None)
         if c:
             self.args.append('--browsers %s' % c)
+
+        # outdated prefix
+        c = cfg.get('keep', False)
+        if c:
+            self.args.append('--no-remove')
 
 
     def perform(self):

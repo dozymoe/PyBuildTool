@@ -3,26 +3,26 @@ Preprocess CSS files using [Stylus](http://learnboost.github.io/stylus/).
 
 Options:
 
-    * plugins-path  : list, [],    location of stylus plugins
-    * inline-image  : bool, False, use data URI
-    * includes-path : list, [],    lookup paths
+    * plugins       : list, [],    location of stylus plugins
+    * inline_image  : bool, False, use data URI
+    * include_paths : list, [],    lookup paths
     * compress      : bool, False, compress CSS output
     * firebug       : bool, False, debug information for FireStylus
-    * line-numbers  : bool, False, print out stylus line number
-    * import-files  : bool, [],    always import selected stylus files
-    * include-css   : bool, True,  pull in CSS files with @import
-    * resolve-url   : bool, True,  resolve relative urls inside imports
+    * line_numbers  : bool, False, print out stylus line number
+    * import_files  : bool, [],    always import selected stylus files
+    * include_css   : bool, True,  pull in CSS files with @import
+    * resolve_url   : bool, True,  resolve relative urls inside imports
 
 Requirements:
 
+    * node.js
     * stylus
       to install, run `npm install --save-dev stylus`
-    * node.js
 
 """
 
 import os
-from base import Task as BaseTask
+from base import Task as BaseTask, expand_resource
 
 tool_name = __name__
 
@@ -39,50 +39,58 @@ class Task(BaseTask):
         args = self.args
 
         # Utilize the Stylus plugin at <path>.
-        plugin_dirs = cfg.get('plugins-path', [])
+        plugin_dirs = cfg.get('plugins', [])
         if not isinstance(plugin_dirs, list):
             plugin_dirs = [plugin_dirs]
         for plugin_dir in plugin_dirs:
-            args.append('--use=%s' % plugin_dir)
+            args.append("--use '%s'" % expand_resource(self.group, plugin_dir))
 
         # Utilize image inlining via data URI support.
-        if cfg.get('inline-image', False):
+        c = cfg.get('inline_image', False)
+        if c:
             args.append('--inline')
 
         # Add <path> to lookup paths.
-        include_dirs = cfg.get('includes-path', [])
+        include_dirs = cfg.get('include_paths', [])
         if not isinstance(include_dirs, list):
             include_dirs = [include_dirs]
         for include_dir in include_dirs:
-            args.append('--include=%s' % include_dir)
+            args.append("--include '%s'" % expand_resource(self.group,
+                    include_dir))
 
         # Compress CSS output.
-        if cfg.get('compress', False):
+        c = cfg.get('compress', False)
+        if c:
             args.append('--compress')
 
         # Emits debug infos in the generated CSS that can be used by the
         # FireStylus Firebug plugin.
-        if cfg.get('firebug', False):
+        c = cfg.get('firebug', False)
+        if c:
             args.append('--firebug')
 
         # Emits comments in the generated CSS indicating the corresponding
         # Stylus line
-        if cfg.get('line-numbers', False):
+        c = cfg.get('line_numbers', False)
+        if c:
             args.append('--line-numbers')
 
         # Import stylus <file>.
-        import_files = cfg.get('import-files', [])
+        import_files = cfg.get('import_files', [])
         if not isinstance(import_files, list):
             import_files = [import_files]
         for import_file in import_files:
-            args.append('--import=%s' % import_file)
+            args.append("--import '%s'" % expand_resource(self.group,
+                    import_file))
 
         # Include regular CSS on @import
-        if cfg.get('include-css', True):
+        c = cfg.get('include_css', True)
+        if c:
             args.append('--include-css')
 
         # Resolve relative urls inside imports
-        if cfg.get('resolve-url', True):
+        c = cfg.get('resolve_url', True)
+        if c:
             args.append('--resolve-url')
 
 
