@@ -22,6 +22,8 @@ from base import Task as BaseTask
 
 tool_name = __name__
 
+class Task(BaseTask):
+
     name = tool_name
 
     def prepare(self):
