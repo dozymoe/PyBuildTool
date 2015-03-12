@@ -1,6 +1,27 @@
 """
 Precompile handlebars templates.
 
+Options:
+
+    * amd          : bool, None, exports amd style (require.js)
+    * commonjs     : bool, None, exports CommonJS style, path to Handlebars
+                     module [default: null]
+    * handlebarpath: str, None, path to handlebar.js (only valid for amd-style)
+                     [default: ""]
+    * known        : list, [], known helpers
+    * knownOnly    : bool, None, known helpers only
+    * minimize     : bool, None, minimize output
+    * namespace    : str, None, template namespace
+                     [default: 'Handlebars.templates']
+    * simple       : bool, None, output template function only
+    * root         : str, None, template root, base value that will be stripped
+                     from template names
+    * partial      : bool, None, compiling a partial template
+    * data         : hash, None, include data when compiling
+    * extension    : str, None, template extension [default: 'handlebars']
+    * bom          : bool, None, removes the BOM (Byte Order Mark) from the
+                     beginning of the templates
+
 Requirements:
 
     * handlebars
@@ -11,6 +32,7 @@ Requirements:
 
 import os
 from base import Task as BaseTask
+from json import dumps as json_dump
 
 tool_name = __name__
 
@@ -20,6 +42,63 @@ class Task(BaseTask):
         'replace_patterns': ((r'\.handlebars$', '.js'),),
     }
     name = tool_name
+
+    def prepare(self):
+        cfg = self.conf
+        args = self.args
+
+        c = cfg.get('amd')
+        if c:
+            args.append('--amd')
+
+        c = cfg.get('commonjs')
+        if c:
+            args.append('--commonjs')
+
+        c = cfg.get('handlebarpath')
+        if c:
+            args.append("--handlebarPath='%s'" % c)
+
+        c = cfg.get('known', [])
+        for handler in c:
+            args.append("--known='%s'" % handler)
+
+        c = cfg.get('known_only')
+        if c:
+            args.append('--knownOnly')
+
+        c = cfg.get('minimize')
+        if c:
+            args.append('--min')
+
+        c = cfg.get('namespace')
+        if c:
+            args.append("--namespace='%s'" % c)
+
+        c = cfg.get('simple')
+        if c:
+            args.append('--simple')
+
+        c = cfg.get('root')
+        if c:
+            args.append("--root='%s'" % c)
+
+        c = cfg.get('partial')
+        if c:
+            args.append('--partial')
+
+        c = cfg.get('data')
+        if c:
+            args.append("--data='%s'" % json_dump(c))
+
+        c = cfg.get('extension')
+        if c:
+            args.append("--extension='%s'" % c)
+
+        c = cfg.get('bom')
+        if c:
+            args.append('--bom')
+
 
     def perform(self):
         if len(self.file_in) != 1:
