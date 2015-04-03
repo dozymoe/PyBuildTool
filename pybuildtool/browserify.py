@@ -5,6 +5,11 @@ your dependencies.
 This tool will accept multiple file_in, but only the first one will be
 processed, the others are treated as dependency.
 
+Options:
+
+    * transform_module: list, [], use a transform module on
+                        top-level files
+
 Requirements:
 
     * node.js
@@ -24,6 +29,14 @@ class Task(BaseTask):
         '_source_grouped_': True,
     }
     name = tool_name
+
+    def prepare(self):
+        args = self.args
+        conf = self.conf
+
+        for mod in conf.get('transform_module', []):
+            args.append("--transform '%s'" % mod)
+
 
     def perform(self):
         if len(self.file_out) != 1:

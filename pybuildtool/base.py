@@ -59,6 +59,8 @@ class Rule(object):
                         for (pat, rep) in replace_patterns:
                             foo = re.sub(pat, rep, foo)
                     basedir = self.conf.get('_source_basedir_', False)
+                    if basedir:
+                        basedir = expand_resource(self.group, basedir)
                     if basedir and foo.startswith(basedir):
                         foo = foo[len(basedir):]
                     else:
