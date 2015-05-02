@@ -1,4 +1,5 @@
 import os, re
+from copy import deepcopy
 from time import time
 from waflib.Task import Task as BaseTask
 
@@ -227,10 +228,11 @@ class Task(BaseTask):
         super(Task, self).__init__(*args, **kwargs)
         # Task's configuration can be declared higher in the build tree,
         # but it needs to be prefixed with its tool-name.
-        # Tool-name however can only be defined by the tool module by observing
-        # predefined `__name__` variable, which value is the name of the
-        # tool module.
+        # Tool-name however can only be defined by the tool's module by
+        # observing predefined `__name__` variable, which value is the name
+        # of the tool's module.
         if config:
+            my_config = deepcopy(config)
             if self.name:
                 name = self.name + '_'
                 for key in config.keys():
@@ -239,11 +241,11 @@ class Task(BaseTask):
                     task_conf = key[len(name):]
                     if task_conf in config:
                         continue
-                    config[task_conf] = config[key]
+                    my_config[task_conf] = config[key]
         else:
-            config = {}
+            my_config = {}
         self.args = []
-        self.conf = config
+        self.conf = my_config
         self.group = group
         self.file_in = []
         self.file_out = []
