@@ -53,9 +53,41 @@ class OrderedDictYAMLLoader(yaml.Loader):
         return mapping
 
 
+def group_is_leaf(group):
+    return any(x in group for x in ('file_in', 'raw_file_in', 'file_out',
+            'raw_file_out', 'token_in', 'token_out', 'depend_in',
+            'raw_depend_in', 'extra_out', 'raw_extra_out'))
+
+
+def make_list(items):
+    if items is None:
+        return []
+    elif not is_non_string_iterable(items):
+        return [items]
+    else:
+        return items
+
+
 def prepare_targets(conf, bld):
     groups = {}
     constant_regex = re.compile(r'^[A-Z_]+$')
+
+    def _parse_input_listing(source_list, pattern):
+        for f in source_list:
+            f = f.format(**pattern)
+            if f.startswith('@'):
+                for x in groups[f[1:]].rule.files:
+                    yield x
+            elif not ('*' in f or '?' in f):
+                yield f
+            # expands wildcards (using ant_glob)
+            elif os.path.isabs(f):
+                for node in bld.root.ant_glob(f[1:]):
+                    yield node.abspath()
+            else:
+                for node in bld.path.ant_glob(f):
+                    yield node.relpath()
+
 
     def parse_group(group_name, group, level, parent_group):
         if 'options' in group:
@@ -64,9 +96,6 @@ def prepare_targets(conf, bld):
         else:
             options = {}
 
-        is_leaf = 'file_in' in group or 'file_out' in group or \
-            'token_in' in group or 'token_out' in group
-
         g = Group(group_name, parent_group, **options)
         if parent_group is None:
             g.context = bld
@@ -74,56 +103,50 @@ def prepare_targets(conf, bld):
         groups[g.get_name()] = g
         pattern = g.get_patterns()
                 
-        if is_leaf:
-            file_in = []
-            raw_file_in = group.get('file_in', [])
-            if not is_non_string_iterable(raw_file_in):
-                raw_file_in = [raw_file_in]
-            for f in raw_file_in:
-                f = f.format(**pattern)
-                if f.startswith('@'):
-                    file_in += groups[f[1:]].rule.files
-                    continue
-                if not ('*' in f or '?' in f):
-                    file_in.append(f)
-                    continue
-                # expands wildcards (using ant_glob)
-                if os.path.isabs(f):
-                    paths = bld.root.ant_glob(f[1:])
-                    file_in += (node.abspath() for node in paths)
-                else:
-                    paths = bld.path.ant_glob(f)
-                    file_in += (node.relpath() for node in paths)
+        if group_is_leaf(group):
+            original_file_in = make_list(group.get('file_in')) +\
+                    make_list(group.get('raw_file_in'))
+            file_in = [x for x in _parse_input_listing(original_file_in,
+                    pattern)]
             
-            file_out = []
-            raw_file_out = group.get('file_out', [])
-            if not is_non_string_iterable(raw_file_out):
-                raw_file_out = [raw_file_out]
-            for f in raw_file_out:
+            original_depend_in = make_list(group.get('depend_in')) +\
+                    make_list(group.get('raw_depend_in'))
+            depend_in = [x for x in _parse_input_listing(original_depend_in,
+                    pattern)]
+
+            original_file_out = make_list(group.get('file_out'))
+            file_out = [x.format(**pattern) for x in original_file_out]
+
+            original_raw_file_out = make_list(group.get('raw_file_out'))
+            for f in original_raw_file_out:
                 f = f.format(**pattern)
+                # because realpath() will remove the last path separator,
+                # we need it to identify a directory
+                is_dir = f.endswith(os.path.sep) or f.endswith('/')
+                f = os.path.realpath(f)
+                if is_dir and not f.endswith(os.path.sep):
+                    f += os.path.sep
                 file_out.append(f)
 
+            original_extra_out = make_list(group.get('extra_out')) +\
+                    make_list(group.get('raw_extra_out'))
+            extra_out = [x.format(**pattern) for x in original_extra_out]
+
+            original_token_in = make_list(group.get('token_in'))
             token_in = []
-            raw_token_in = group.get('token_in', [])
-            if not is_non_string_iterable(raw_token_in):
-                raw_token_in = [raw_token_in]
-            for f in raw_token_in:
+            for f in original_token_in:
                 f = f.format(**pattern)
                 if f.startswith('@'):
                     token_in += groups[f[1:]].rule.tokens
                 else:
                     token_in.append(f)
 
-            token_out = []
-            raw_token_out = group.get('token_out', [])
-            if not is_non_string_iterable(raw_token_out):
-                raw_token_out = [raw_token_out]
-            for f in raw_token_out:
-                f = f.format(**pattern)
-                token_out.append(f)
+            original_token_out = make_list(group.get('token_out'))
+            token_out = [x.format(**pattern) for x in original_token_out]
 
             g(file_in=file_in, file_out=file_out, token_in=token_in,
-                    token_out=token_out)
+                    token_out=token_out, depend_in=depend_in,
+                    extra_out=extra_out)
             return
 
         for subgroup in group:
@@ -142,20 +165,13 @@ def get_source_files(conf, bld):
     groups = {}
     constant_regex = re.compile(r'^[A-Z_]+$')
 
-    def parse_group(group_name, group, level, sandboxed):
+    def parse_group(group_name, group, level):
         groups['_%s' % level] = group_name
 
-        if 'file_in' in group or 'file_out' in group or \
-                'token_in' in group or 'token_out' in group:
-            # is leaf
-            if sandboxed or 'file_in' not in group:
-                return
+        if group_is_leaf(group):
 
-            if is_non_string_iterable(group['file_in']):
-                group_files = group['file_in']
-            else:
-                group_files = [group['file_in']]
-
+            group_files = make_list(group.get('raw_file_in')) +\
+                    make_list(group.get('raw_depend_in'))
             for f in group_files:
                 f = f.format(**groups)
                 if f.startswith('@'):
@@ -169,22 +185,17 @@ def get_source_files(conf, bld):
                 else:
                     paths = bld.path.ant_glob(f)
                 files.extend(node.abspath() for node in paths)
+
             return
         
         for subgroup in group:
             if subgroup == 'options':
                 continue
-            sandboxed = 'options' in group[subgroup] and \
-                group[subgroup]['options'].get('_source_sandboxed_',
-                        sandboxed)
-
-            parse_group(subgroup, group[subgroup], level + 1, sandboxed)
+            parse_group(subgroup, group[subgroup], level + 1)
 
     for group in conf:
         if constant_regex.match(group):
             continue
-        sandboxed = 'options' in conf[group] and \
-            conf[group]['options'].get('_source_sandboxed_', True)
-        parse_group(group, conf[group], 1, sandboxed)
+        parse_group(group, conf[group], 1)
 
     return files
