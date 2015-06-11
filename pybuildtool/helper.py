@@ -1,6 +1,6 @@
 import os
 import re
-from base import Group, is_non_string_iterable
+from base import Group, make_list
 
 # make dictionary loaded by yaml has order of dictionary keys equal to how it
 # was written
@@ -57,15 +57,6 @@ def group_is_leaf(group):
     return any(x in group for x in ('file_in', 'raw_file_in', 'file_out',
             'raw_file_out', 'token_in', 'token_out', 'depend_in',
             'raw_depend_in', 'extra_out', 'raw_extra_out'))
-
-
-def make_list(items):
-    if items is None:
-        return []
-    elif not is_non_string_iterable(items):
-        return [items]
-    else:
-        return items
 
 
 def prepare_targets(conf, bld):

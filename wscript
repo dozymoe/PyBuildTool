@@ -42,6 +42,7 @@ def configure(ctx):
     #ctx.load('cp', tooldir=pybuildtool_dir)
     #ctx.load('gzip', tooldir=pybuildtool_dir)
     #ctx.load('handlebars', tooldir=pybuildtool_dir)
+    #ctx.load('html_lint', tooldir=pybuildtool_dir)
     #ctx.load('jinja', tooldir=pybuildtool_dir)
     #ctx.load('jshint', tooldir=pybuildtool_dir)
     #ctx.load('lesscss', tooldir=pybuildtool_dir)

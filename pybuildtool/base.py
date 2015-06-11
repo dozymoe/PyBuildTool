@@ -311,8 +311,7 @@ class Task(BaseTask):
         if '_source_excluded_' in self.conf:
             for f in self.conf['_source_excluded_']:
                 nodes = expand_resource(self.group, f)
-                if nodes and len(nodes):
-                    source_exclude += nodes
+                source_exclude += make_list(nodes)
 
         for node in self.inputs:
             path = node.abspath()
@@ -431,3 +430,12 @@ def expand_resource(group, path):
             node = bld.path.find_resource(path)
         if node:
             return node.abspath()
+
+
+def make_list(items):
+    if items is None:
+        return []
+    elif not is_non_string_iterable(items):
+        return [items]
+    else:
+        return items

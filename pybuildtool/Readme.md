@@ -177,7 +177,7 @@ Install
 
 1.   Create virtualenv, activate it
 
-2.   `pip install git+https://github.com/dozymoe/PyBuildTool@master' or
+2.   `pip install git+https://github.com/dozymoe/PyBuildTool@v1.1.0` or
      `pip install https://github.com/dozymoe/PyBuildTool/archive/master.zip`
 
 3.   Install `waf`, just download from [waf project][1] into your shell PATH or
@@ -193,7 +193,7 @@ Install
 
 6.   `waf configure`
 
-7.   `waf build_dev`
+7.   `waf build_dev` or `waf watch_dev`
 
 
 [1]: https://waf.io/

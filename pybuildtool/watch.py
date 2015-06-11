@@ -72,7 +72,7 @@ def watch(bld):
     conf_file = os.path.join(bld.path.abspath(), 'build_rules.yml') 
     files = watch_files(bld)
 
-    if bld.options.get('build_notifier'):
+    if bld.options.browser_notifier:
         from browser_reload_notifier import BrowserReloadNotifier
         browser_notifier = BrowserReloadNotifier('0.0.0.0')
 
