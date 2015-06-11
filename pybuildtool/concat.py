@@ -1,5 +1,6 @@
 """ Merge files from sources into copious targets. """
 
+import os
 from base import Task as BaseTask
 from shutil import copyfileobj
 
@@ -15,6 +16,9 @@ class Task(BaseTask):
     def perform(self):
         if len(self.file_out) != 1:
             self.bld.fatal('%s can only have one output' % tool_name.capitalize())
+
+        if os.path.isdir(self.file_out[0]):
+            self.bld.fatal('cannot concat to a directory')
 
         try:
             with open(self.file_out[0], 'wb') as dest:

@@ -1,3 +1,14 @@
+'''
+CSS-Live-Reloader notifier
+
+see: https://github.com/sergiosgc/CSS-Live-Reloader
+
+Requirements:
+
+    * ws4py
+      to install, run `pip install ws4py`
+
+'''
 from threading import Thread
 from wsgiref.simple_server import make_server
 from ws4py.websocket import WebSocket

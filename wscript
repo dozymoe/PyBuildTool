@@ -46,6 +46,7 @@ def configure(ctx):
     #ctx.load('jshint', tooldir=pybuildtool_dir)
     #ctx.load('lesscss', tooldir=pybuildtool_dir)
     #ctx.load('lftp', tooldir=pybuildtool_dir)
+    #ctx.load('nunjucks', tooldir=pybuildtool_dir)
     #ctx.load('patch', tooldir=pybuildtool_dir)
     #ctx.load('pngcrush', tooldir=pybuildtool_dir)
     #ctx.load('pylint', tooldir=pybuildtool_dir)
@@ -53,16 +54,24 @@ def configure(ctx):
     #ctx.load('scp', tooldir=pybuildtool_dir)
     #ctx.load('shell', tooldir=pybuildtool_dir)
     #ctx.load('stylus', tooldir=pybuildtool_dir)
+    #ctx.load('ttf2eot', tooldir=pybuildtool_dir)
+    #ctx.load('ttf2svg', tooldir=pybuildtool_dir)
+    #ctx.load('ttf2woff', tooldir=pybuildtool_dir)
     #ctx.load('uglifyjs', tooldir=pybuildtool_dir)
 
 
 from waflib.Build import BuildContext, CleanContext, InstallContext
 from waflib.Build import UninstallContext
+from waflib.Context import Context
 
+class WatchContext(Context):
+    cmd = 'watch'
+    fun = 'watch'
+    variant = STAGES[0]
 
 for stage in STAGES:
     for build_class in (BuildContext, CleanContext, InstallContext,
-            UninstallContext):
+            UninstallContext, WatchContext):
         name = build_class.__name__.replace('Context', '').lower()
         class TempClass(build_class):
             cmd = name + '_' + stage

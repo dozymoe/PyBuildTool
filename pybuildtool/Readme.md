@@ -196,7 +196,7 @@ Install
 7.   `waf build_dev`
 
 
-[1]: http://code.google.com/p/waf/
+[1]: https://waf.io/
 [3]: http://github.com/dozymoe/PyBuildTool
 [4]: http://github.com/dozymoe/PyBuildTool/wiki
 [5]: http://ant.apache.org/manual/dirtasks.html

@@ -95,25 +95,22 @@ class Task(BaseTask):
 
 
     def perform(self):
+        if len(self.file_in) != 1:
+            self.bld.fatal('%s only need one input' % tool_name.capitalize())
         if len(self.file_out) != 1:
             self.bld.fatal('%s can only have one output' % tool_name.capitalize())
 
         executable = self.env['%s_BIN' % tool_name.upper()]
-        cat_executable = self.env['CAT_BIN']
         return self.exec_command(
-            '{cat} {in_} | {exe} {arg} > {out}'.format(
-            cat=cat_executable,
+            '{exe} {arg} < {in_} > {out}'.format(
             exe=executable,
             arg=' '.join(self.args),
-            in_=' '.join(self.file_in),
+            in_=self.file_in[0],
             out=self.file_out[0],
         ))
 
 
 def configure(conf):
-    if len(conf.env.CAT_BIN) == 0:
-        conf.env.CAT_BIN = conf.find_program('cat')[0]
-
     bin_path = 'node_modules/stylus/bin/stylus'
     conf.start_msg("Checking for program '%s'" % tool_name)
     if os.path.exists(bin_path):
