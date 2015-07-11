@@ -308,10 +308,9 @@ class Task(BaseTask):
 
     def prepare_shadow_jutsu(self):
         source_exclude = []
-        if '_source_excluded_' in self.conf:
-            for f in self.conf['_source_excluded_']:
-                nodes = expand_resource(self.group, f)
-                source_exclude += make_list(nodes)
+        for f in make_list(self.conf.get('_source_excluded_')):
+            nodes = expand_resource(self.group, f)
+            source_exclude += make_list(nodes)
 
         for node in self.inputs:
             path = node.abspath()
