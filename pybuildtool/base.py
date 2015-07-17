@@ -1,3 +1,4 @@
+import logging
 import os, re
 from copy import deepcopy
 from time import time
@@ -202,7 +203,10 @@ class Group(object):
     def __call__(self, file_in=None, file_out=None, token_in=None,
             token_out=None, depend_in=None, extra_out=None, **config):
         bld = self.group.context
-        task_class = bld.tools[self.name].Task
+        try:
+            task_class = bld.tools[self.name].Task
+        except KeyError:
+            logging.error('Unknown tool: ' + self.name)
         conf = {}
         data_merge(conf, self.conf)
         data_merge(conf, task_class.conf)
