@@ -100,4 +100,4 @@ def configure(conf):
         conf.end_msg(bin_path)
         conf.env['%s_BIN' % tool_name.upper()] = bin_path
     else:
-        conf.end_msg('not found')
+        conf.end_msg('not found', color='YELLOW')

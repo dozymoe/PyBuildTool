@@ -123,6 +123,6 @@ def configure(conf):
         bin_path = os.path.realpath(bin_path)
         conf.end_msg(bin_path)
     else:
-        conf.end_msg('not found')
+        conf.end_msg('not found', color='YELLOW')
         bin_path = conf.find_program('handlebars')[0]
     conf.env['%s_BIN' % tool_name.upper()] = bin_path

@@ -369,11 +369,12 @@ def data_merge(a, b):
             # lists can be only appended
             if isinstance(b, list):
                 # merge lists
-                a.extend(b)
-            else:
+                for c in b:
+                    if not c in a:
+                        a.append(c)
+            elif not b in a:
                 # append to list
                 a.append(b)
-            a = list(set(a))
         elif isinstance(a, dict):
             # dicts must be merged
             if isinstance(b, dict):
@@ -435,10 +436,12 @@ def expand_resource(group, path):
             return node.abspath()
 
 
-def make_list(items):
+def make_list(items, nodict=False):
     if items is None:
         return []
     elif not is_non_string_iterable(items):
+        return [items]
+    elif nodict and isinstance(items, dict):
         return [items]
     else:
         return items
