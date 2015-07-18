@@ -334,8 +334,12 @@ class Task(BaseTask):
             else:
                 self.file_out.append(node.abspath())
 
-    def finalize_shadow_jutsu(self):
-        for filename in self.token_out:
+    def finalize_shadow_jutsu(self, use_file_out=False):
+        if use_file_out:
+            filenames = self.file_out
+        else:
+            filenames = self.token_out
+        for filename in filenames:
             try:
                 os.makedirs(os.path.dirname(filename))
             except OSError:

@@ -5,6 +5,11 @@ Options:
 
     * module        : str, None, ansible module name to run
     * args          : dict, None, arguments for the module
+    * free_form     : str, None, modules like `shell` and `command`, besides
+                      args, also take in free_form arg
+                      we facilitate this to provide direct access to
+                      `modules_args`, our args option will actually be send as
+                      `complex_args`
     * with_items    : str, None, dot separated dictionary keys for `context`
     * hosts         : list, None, host names from ANSIBLE_HOSTS file
     * hosts_pattern : str, '*', limit target hosts to a pattern
@@ -38,8 +43,14 @@ tool_name = __name__
 class Task(BaseTask):
 
     name = tool_name
-    context = {}
-    items = []
+    context = None
+    items = None
+
+    def __init__(self, *args, **kwargs):
+        super(Task, self).__init__(*args, **kwargs)
+        self.context = {}
+        self.items = []
+
 
     def prepare(self):
         c = self.conf.get('module')
@@ -59,6 +70,10 @@ class Task(BaseTask):
         if c:
             assert isinstance(c, dict)
             self.args.append(('complex_args', c))
+
+        c = self.conf.get('free_form')
+        if c:
+            self.args.append(('module_args', c))
 
         c = self.conf.get('forks')
         if c:
@@ -127,18 +142,21 @@ class Task(BaseTask):
         # with_items
         c = self.conf.get('with_items')
         if isinstance(c, list):
-            self.items = [{'item': item for item in c}]
+            wi = c
         elif c:
             c = c.split('.')
             wi = self.context
             for wi_idx in c:
                 wi = wi[wi_idx]
-            assert isinstance(wi, list)
-            for wi_item in wi:
-                if isinstance(wi_item, dict):
-                    self.items.append(wi_item)
-                else:
-                    self.items.append({'item': wi_item})
+            wi = make_list(wi, nodict=True)
+        else:
+            wi = []
+
+        for wi_item in wi:
+            if isinstance(wi_item, dict):
+                self.items.append(wi_item)
+            else:
+                self.items.append({'item': wi_item})
 
 
     def perform(self):
@@ -150,6 +168,7 @@ class Task(BaseTask):
 
         def extract_errors(result):
             print(result)
+            changed = False
             success = True
             for host in result['contacted']:
                 if result['contacted'][host].get('failed'):
@@ -158,10 +177,13 @@ class Task(BaseTask):
                         'msg': result['contacted'][host]['msg'],
                     })
                     success = False
-            return success
+                if result['contacted'][host].get('changed'):
+                    changed = True
+            return success, changed
 
+        success = True
+        changed = False
         if len(self.items):
-            success = True
             args = dict(self.args)
             kwargs = args['complex_args']
             for item in self.items:
@@ -173,10 +195,22 @@ class Task(BaseTask):
                         item_kwargs[field] = kwargs[field]
                 args['complex_args'] = item_kwargs
                 result = ansible.runner.Runner(**args).run()
-                success = success and extract_errors(result)
+                was_success, was_changed = extract_errors(result)
+                success = success and was_success
+                changed = changed or was_changed
         else:
             result = ansible.runner.Runner(**dict(self.args)).run()
-            success = extract_errors(result)
+            was_success, was_changed = extract_errors(result)
+            success = success and was_success
+            changed = changed or was_changed
+
+        if changed:
+            self.finalize_shadow_jutsu(use_file_out=True)
+        elif success:
+            for fo in self.file_out:
+                if not os.path.exists(fo):
+                    self.finalize_shadow_jutsu(use_file_out=True)
+                    break
 
         if success:
             return 0
