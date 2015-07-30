@@ -15,16 +15,16 @@ class Rule(object):
         self.token_out = token_out or []
         self.depend_in = depend_in or []
         self.extra_out = extra_out or []
+        self.bld = group.context
 
         # token_out should only contain one item, can't really think of a
         # reason otherwise
         if len(self.token_out) > 1:
-            raise Exception('A rule may only produce one token')
+            self.bld.fatal('A rule may only produce one token')
 
         # expands wildcards (using ant_glob)
-        bld = group.context
         for fs in (self.file_in, self.depend_in):
-            self._expand_input_wilcards(bld, fs)
+            self._expand_input_wilcards(fs)
 
         # normalize `replace_patterns`, must be a list
         replace_patterns = self.conf.get('replace_patterns', False)
@@ -32,7 +32,7 @@ class Rule(object):
             self.conf['replace_patterns'] = [replace_patterns]
 
 
-    def _expand_input_wilcards(self, bld, items):
+    def _expand_input_wilcards(self, items):
         for_removal = []
         for_insertion = []
         for f in items:
@@ -40,10 +40,10 @@ class Rule(object):
                 continue
             for_removal.append(f)
             if os.path.isabs(f):
-                paths = bld.root.ant_glob(f[1:])
+                paths = self.bld.root.ant_glob(f[1:])
                 for_insertion += (node.abspath() for node in paths)
             else:
-                paths = bld.path.ant_glob(f)
+                paths = self.bld.path.ant_glob(f)
                 for_insertion += (node.relpath() for node in paths)
         for f in for_removal:
             items.remove(f)
@@ -52,7 +52,7 @@ class Rule(object):
 
     def _token_to_filename(self, token_name):
         if '/' in token_name:
-            raise Exception('Invalid token name: "%s"'% token_name)
+            self.bld.fatal('Invalid token name: "%s"'% token_name)
         return os.path.join('.waf_flags_token',
             token_name.replace(':', '__'))
 
@@ -99,7 +99,7 @@ class Rule(object):
         if len(self.extra_out) and (len(self.file_out) > 1 or\
                 (len(self.file_out) and self.file_out[0].endswith(
                 os.path.sep))):
-            raise Exception('Cannot use extra_out with multiple file_out')
+            self.bld.fatal('Cannot use extra_out with multiple file_out')
 
         for fo in self.file_out:
             if self.conf.get('_source_grouped_', False):
@@ -206,7 +206,7 @@ class Group(object):
         try:
             task_class = bld.tools[self.name].Task
         except KeyError:
-            logging.error('Unknown tool: ' + self.name)
+            bld.fatal('Unknown tool: ' + self.name)
         conf = {}
         data_merge(conf, self.conf)
         data_merge(conf, task_class.conf)

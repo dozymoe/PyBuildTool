@@ -7,7 +7,6 @@ Options:
                                 running shell command
     * virtualenv   : str, None, python virtualenv directory
     * commands     : str, None, shell command
-    * with_file_in : bool, True, set file-in files as argument to commands
 """
 
 from base import Task as BaseTask, expand_resource
@@ -42,10 +41,7 @@ class Task(BaseTask):
 
 
     def perform(self):
-        if self.conf.get('with_file_in', True):
-            cmd = '{pre} {exe} {arg} {in_}'
-        else:
-            cmd = '{pre} {exe} {arg}'
+        cmd = '{pre} {exe} {arg} {in_}'
         return self.exec_command(
             cmd.format(
             exe=self.cmd,

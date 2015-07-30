@@ -119,9 +119,19 @@ def prepare_targets(conf, bld):
                     f += os.path.sep
                 file_out.append(f)
 
-            original_extra_out = make_list(group.get('extra_out')) +\
-                    make_list(group.get('raw_extra_out'))
+            original_extra_out = make_list(group.get('extra_out')) 
             extra_out = [x.format(**pattern) for x in original_extra_out]
+
+            original_raw_extra_out = make_list(group.get('raw_extra_out'))
+            for f in original_raw_extra_out:
+                f = f.format(**pattern)
+                # because realpath() will remove the last path separator,
+                # we need it to identify a directory
+                is_dir = f.endswith(os.path.sep) or f.endswith('/')
+                f = os.path.realpath(f)
+                if is_dir and not f.endswith(os.path.sep):
+                    f += os.path.sep
+                extra_out.append(f)
 
             original_token_in = make_list(group.get('token_in'))
             token_in = []
