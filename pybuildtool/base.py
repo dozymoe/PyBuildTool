@@ -251,9 +251,20 @@ class Group(object):
                 else:
                     task.set_outputs(bld.path.find_or_declare(f))
             for f in r.get('extra_out', []):
-                node = bld.path.find_or_declare(f)
-                node.is_virtual_out = True
-                task.set_outputs(node)
+                if f.startswith(os.path.sep):
+                    # create outside files
+                    f_dir = os.path.dirname(f)
+                    try:
+                        os.makedirs(f_dir)
+                    except OSError:
+                    #except FileExistsError:
+                        pass
+                    f_node = bld.root.find_dir(f_dir)
+                    f_node = f_node.make_node(os.path.basename(f))
+                else:
+                    f_node = bld.path.find_or_declare(f)
+                f_node.is_virtual_out = True
+                task.set_outputs(f_node)
             for f in r.get('token_in', []):
                 node = bld.path.find_or_declare(f)
                 node.is_virtual_in = True
