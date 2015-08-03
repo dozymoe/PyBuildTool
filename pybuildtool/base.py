@@ -225,7 +225,8 @@ class Group(object):
                     node = bld.root.find_resource(f[1:])
                 else:
                     node = bld.path.find_resource(f)
-                assert node is not None, '"%s" does not exists' % f
+                if node is None:
+                    bld.fatal('"%s" does not exists' % f)
                 task.set_inputs(node)
             for f in r.get('depend_in', []):
                 if os.path.isabs(f):
@@ -234,7 +235,8 @@ class Group(object):
                     node = bld.root.find_resource(f[1:])
                 else:
                     node = bld.path.find_resource(f)
-                assert node is not None, '"%s" does not exists' % f
+                if node is None:
+                    bld.fatal('"%s" does not exists' % f)
                 node.is_virtual_in = True
                 task.set_inputs(node)
             for f in r.get('file_out', []):
