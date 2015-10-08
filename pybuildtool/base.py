@@ -164,6 +164,7 @@ class Group(object):
     env  = None
     context = None
     group = None
+
     level = 1
     rule = None
 
@@ -226,7 +227,7 @@ class Group(object):
                 else:
                     node = bld.path.find_resource(f)
                 if node is None:
-                    bld.fatal('"%s" does not exists' % f)
+                    bld.fatal('Source file "%s" does not exist' % f)
                 task.set_inputs(node)
             for f in r.get('depend_in', []):
                 if os.path.isabs(f):

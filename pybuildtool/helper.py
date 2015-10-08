@@ -63,6 +63,18 @@ def prepare_targets(conf, bld):
     groups = {}
     constant_regex = re.compile(r'^[A-Z_]+$')
 
+    def _add_raw_files(raw_file_list, file_list, pattern):
+        for f in raw_file_list:
+            f = f.format(**pattern)
+            # because realpath() will remove the last path separator,
+            # we need it to identify a directory
+            is_dir = f.endswith(os.path.sep) or f.endswith('/')
+            f = os.path.realpath(f)
+            if is_dir and not f.endswith(os.path.sep):
+                f += os.path.sep
+            file_list.append(f)
+
+
     def _parse_input_listing(source_list, pattern):
         for f in source_list:
             f = f.format(**pattern)
@@ -93,45 +105,29 @@ def prepare_targets(conf, bld):
 
         groups[g.get_name()] = g
         pattern = g.get_patterns()
-                
+
         if group_is_leaf(group):
-            original_file_in = make_list(group.get('file_in')) +\
-                    make_list(group.get('raw_file_in'))
+            original_file_in = make_list(group.get('file_in'))
             file_in = [x for x in _parse_input_listing(original_file_in,
                     pattern)]
+            _add_raw_files(make_list(group.get('raw_file_in')), file_in,
+                    pattern)
             
-            original_depend_in = make_list(group.get('depend_in')) +\
-                    make_list(group.get('raw_depend_in'))
+            original_depend_in = make_list(group.get('depend_in'))
             depend_in = [x for x in _parse_input_listing(original_depend_in,
                     pattern)]
+            _add_raw_files(make_list(group.get('raw_depend_in')), depend_in,
+                    pattern)
 
             original_file_out = make_list(group.get('file_out'))
             file_out = [x.format(**pattern) for x in original_file_out]
-
-            original_raw_file_out = make_list(group.get('raw_file_out'))
-            for f in original_raw_file_out:
-                f = f.format(**pattern)
-                # because realpath() will remove the last path separator,
-                # we need it to identify a directory
-                is_dir = f.endswith(os.path.sep) or f.endswith('/')
-                f = os.path.realpath(f)
-                if is_dir and not f.endswith(os.path.sep):
-                    f += os.path.sep
-                file_out.append(f)
+            _add_raw_files(make_list(group.get('raw_file_out')), file_out,
+                    pattern)
 
             original_extra_out = make_list(group.get('extra_out')) 
             extra_out = [x.format(**pattern) for x in original_extra_out]
-
-            original_raw_extra_out = make_list(group.get('raw_extra_out'))
-            for f in original_raw_extra_out:
-                f = f.format(**pattern)
-                # because realpath() will remove the last path separator,
-                # we need it to identify a directory
-                is_dir = f.endswith(os.path.sep) or f.endswith('/')
-                f = os.path.realpath(f)
-                if is_dir and not f.endswith(os.path.sep):
-                    f += os.path.sep
-                extra_out.append(f)
+            _add_raw_files(make_list(group.get('raw_extra_out')), extra_out,
+                    pattern)
 
             original_token_in = make_list(group.get('token_in'))
             token_in = []
