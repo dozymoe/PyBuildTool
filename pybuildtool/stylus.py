@@ -38,12 +38,12 @@ class Task(BaseTask):
         self.args = ['--print']
         args = self.args
 
-        # Utilize the Stylus plugin at <path>.
+        # Utilize the Stylus plugins.
         plugin_dirs = cfg.get('plugins', [])
         if not isinstance(plugin_dirs, list):
             plugin_dirs = [plugin_dirs]
         for plugin_dir in plugin_dirs:
-            args.append("--use '%s'" % expand_resource(self.group, plugin_dir))
+            args.append("--use '%s'" % plugin_dir)
 
         # Utilize image inlining via data URI support.
         c = cfg.get('inline_image', False)
