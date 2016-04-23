@@ -1,4 +1,10 @@
-*.pyc
-*.swp
+# python
 
-/rules.yml
+*.pyc
+/*.egg-info/
+
+
+# vim
+
+*.swo
+*.swp

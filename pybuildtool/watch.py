@@ -50,6 +50,10 @@ def thread_callback(context):
             rebuild = False
             os.system(' '.join([
                 'waf',
+                # my build tool is broken ;(
+                # I dunno why but the targets are not rebuild when missing,
+                # always clean before build for now
+                'clean_%s' % context.variant,
                 'build_%s' % context.variant,
                 '--jobs=%s' % context.options.jobs,
             ]))
