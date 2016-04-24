@@ -15,6 +15,7 @@ class Rule(object):
         self.token_out = token_out or []
         self.depend_in = depend_in or []
         self.extra_out = extra_out or []
+        self.group = group
         self.bld = group.context
 
         # token_out should only contain one item, can't really think of a
@@ -76,7 +77,7 @@ class Rule(object):
                     if basedir:
                         basedir = expand_resource(self.group, basedir)
                     if basedir and foo.startswith(basedir):
-                        foo = foo[len(basedir):]
+                        foo = foo[len(basedir):].strip('/')
                     else:
                         foo = os.path.basename(foo)
                     result.append(os.path.join(fo, foo))
@@ -133,8 +134,10 @@ class Rule(object):
                         foo = re.sub(pat, rep, foo)
                 # use basedir to produce file_out
                 basedir = self.conf.get('_source_basedir_', False)
+                if basedir:
+                    basedir = expand_resource(self.group, basedir)
                 if basedir and foo.startswith(basedir):
-                    foo = foo[len(basedir):]
+                    foo = foo[len(basedir):].strip('/')
                 else:
                     foo = os.path.basename(foo)
                 result.append({
