@@ -13,7 +13,8 @@ STAGES = ('dev', 'stage', 'prod')
 def build(bld):
     # load main configuration file
     import os, yaml
-    from helper import prepare_targets, OrderedDictYAMLLoader
+    from pybuildtool.misc.resource import prepare_targets
+    from pybuildtool.misc.yaml import OrderedDictYAMLLoader
     conf_file = os.path.join(bld.path.abspath(), 'build_rules.yml')
     with open(conf_file) as f:
         conf = yaml.load(f, Loader=OrderedDictYAMLLoader)
@@ -22,43 +23,47 @@ def build(bld):
 
 
 def options(opt):
+    import os
     # add loadable modules from waf root directory
     import sys
     sys.path.append(opt.path.abspath())
     # load predefined tools from pybuildtool
     from imp import find_module
     pybuildtool_dir = find_module('pybuildtool')[1]
-    opt.load('watch', tooldir=pybuildtool_dir)
+    addons_dir = os.path.join(pybuildtool_dir, 'addons')
+    opt.load('watch', tooldir=addons_dir)
 
 
 def configure(ctx):
+    import os
     # load predefined tools from pybuildtool
     from imp import find_module
     pybuildtool_dir = find_module('pybuildtool')[1]
-    #ctx.load('autoprefixer', tooldir=pybuildtool_dir)
-    #ctx.load('browserify', tooldir=pybuildtool_dir)
-    #ctx.load('cleancss', tooldir=pybuildtool_dir)
-    #ctx.load('concat', tooldir=pybuildtool_dir)
-    #ctx.load('cp', tooldir=pybuildtool_dir)
-    #ctx.load('gzip', tooldir=pybuildtool_dir)
-    #ctx.load('handlebars', tooldir=pybuildtool_dir)
-    #ctx.load('html_lint', tooldir=pybuildtool_dir)
-    #ctx.load('jinja', tooldir=pybuildtool_dir)
-    #ctx.load('jshint', tooldir=pybuildtool_dir)
-    #ctx.load('lesscss', tooldir=pybuildtool_dir)
-    #ctx.load('lftp', tooldir=pybuildtool_dir)
-    #ctx.load('nunjucks', tooldir=pybuildtool_dir)
-    #ctx.load('patch', tooldir=pybuildtool_dir)
-    #ctx.load('pngcrush', tooldir=pybuildtool_dir)
-    #ctx.load('pylint', tooldir=pybuildtool_dir)
-    #ctx.load('rjs', tooldir=pybuildtool_dir)
-    #ctx.load('scp', tooldir=pybuildtool_dir)
-    #ctx.load('shell', tooldir=pybuildtool_dir)
-    #ctx.load('stylus', tooldir=pybuildtool_dir)
-    #ctx.load('ttf2eot', tooldir=pybuildtool_dir)
-    #ctx.load('ttf2svg', tooldir=pybuildtool_dir)
-    #ctx.load('ttf2woff', tooldir=pybuildtool_dir)
-    #ctx.load('uglifyjs', tooldir=pybuildtool_dir)
+    tools_dir = os.path.join(pybuildtool_dir, 'tools')
+    #ctx.load('autoprefixer', tooldir=tools_dir)
+    #ctx.load('browserify', tooldir=tools_dir)
+    #ctx.load('cleancss', tooldir=tools_dir)
+    #ctx.load('concat', tooldir=tools_dir)
+    #ctx.load('cp', tooldir=tools_dir)
+    #ctx.load('gzip', tooldir=tools_dir)
+    #ctx.load('handlebars', tooldir=tools_dir)
+    #ctx.load('html_lint', tooldir=tools_dir)
+    #ctx.load('jinja', tooldir=tools_dir)
+    #ctx.load('jshint', tooldir=tools_dir)
+    #ctx.load('lesscss', tooldir=tools_dir)
+    #ctx.load('lftp', tooldir=tools_dir)
+    #ctx.load('nunjucks', tooldir=tools_dir)
+    #ctx.load('patch', tooldir=tools_dir)
+    #ctx.load('pngcrush', tooldir=tools_dir)
+    #ctx.load('pylint', tooldir=tools_dir)
+    #ctx.load('rjs', tooldir=tools_dir)
+    #ctx.load('scp', tooldir=tools_dir)
+    #ctx.load('shell', tooldir=tools_dir)
+    #ctx.load('stylus', tooldir=tools_dir)
+    #ctx.load('ttf2eot', tooldir=tools_dir)
+    #ctx.load('ttf2svg', tooldir=tools_dir)
+    #ctx.load('ttf2woff', tooldir=tools_dir)
+    #ctx.load('uglifyjs', tooldir=tools_dir)
 
 
 from waflib.Build import BuildContext, CleanContext, InstallContext

@@ -4,7 +4,7 @@ from setuptools  import setup
 
 setup(
     name='PyBuildTool',
-    version='1.1.1',
+    version='2.0.1',
     description='Build utility to manage web resources',
     author='Fahri Reza',
     author_email='dozymoe@gmail.com',
