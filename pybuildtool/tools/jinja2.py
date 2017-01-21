@@ -13,6 +13,12 @@ Options:
                       it must have variable type dict named: `export`
     * context_yaml  : str, None, yaml file containing context for template
     * context       : any, {}, context to be used in template
+
+Requirements:
+
+    * jinja2
+      to install, run `pip install jinja2`
+
 """
 import os
 import sys

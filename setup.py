@@ -1,6 +1,6 @@
-from setuptools  import setup, find_packages
+from setuptools import setup, find_packages
 
-RELEASE_VERSION = '2.0.1'
+RELEASE_VERSION = '2.0.2'
 
 setup(
     name='pybuildtool',
@@ -14,7 +14,7 @@ setup(
     description='Build utility to manage web resources',
     packages=find_packages(exclude=['tests']),
     include_package_data=True,
-    platform='any',
+    platforms='any',
     license='MIT',
     install_requires=[
         'pyyaml',

@@ -74,14 +74,15 @@ Options:
 
 Requirements:
 
-    * uglify-js
-      to install, edit package.json, run `npm install`
     * node.js
+    * uglify-js
+      to install, run `npm install --save-dev uglify-js`
 
 """
 
 import os
 from pybuildtool.core.task import Task as BaseTask
+from shutil import copyfile, Error
 
 tool_name = __name__
 
@@ -188,13 +189,12 @@ class Task(BaseTask):
             self.bld.fatal('%s only have one output' % tool_name.capitalize())
 
         if self.bld.variant in ('dev', 'devel', 'development'):
-            executable = self.env['CP_BIN']
-            return self.exec_command(
-                '{exe} {in_} {out}'.format(
-                exe=executable,
-                in_=self.file_in[0],
-                out=self.file_out[0],
-            ))
+            try:
+                copyfile(self.file_in[0], self.file_out[0])
+                return 0
+            except (IOError, Error):
+                self.bld.fatal('cannot copy file to ' + self.file_out[0])
+            return -1
 
         executable = self.env['%s_BIN' % tool_name.upper()]
         return self.exec_command(
@@ -207,9 +207,6 @@ class Task(BaseTask):
 
 
 def configure(conf):
-    if len(conf.env.CP_BIN) == 0:
-        conf.env.CP_BIN = conf.find_program('cp')[0]
-
     bin_path = 'node_modules/uglify-js/bin/uglifyjs'
     conf.start_msg("Checking for progam '%s'" % tool_name)
     if os.path.exists(bin_path):

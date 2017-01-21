@@ -21,9 +21,10 @@ Options:
 
 Requirements:
 
+    * node.js
     * nunjucks
       to install, run `npm install --save-dev nunjucks`
-    * node.js
+
 """
 
 import os

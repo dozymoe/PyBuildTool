@@ -9,7 +9,7 @@ Options:
 Requirements:
 
     * unzip
-      to install, run `sudo apt-get install unzip` (for example)
+      to install, for example run `apt-get install unzip`
 
 """
 

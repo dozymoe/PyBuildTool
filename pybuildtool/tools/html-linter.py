@@ -1,11 +1,6 @@
 """
 HTML5 Linter based on Google Style Guide 
 
-Requirements:
-
-    * html-linter
-      to install, run `pip install html-linter`
-
 Options:
 
     * disable : list:str, [], any combination of: doctype, entities,
@@ -14,6 +9,12 @@ Options:
                 names, capitalization, quotation, indentation, formatting,
                 boolean_attribute, invalid_attribute, void_zero,
                 invalid_handler, http_equiv, extra_whitespace
+
+Requirements:
+
+    * html-linter
+      to install, run `pip install html-linter`
+
 """
 
 from pybuildtool.core.task import Task as BaseTask

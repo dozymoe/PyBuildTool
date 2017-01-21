@@ -1,10 +1,6 @@
 """
 Validate python files.
 
-Requirements:
-
-    * pylint (python library)
-
 Options:
 
     * work_dir         : str,      None,  change current directory before
@@ -14,6 +10,12 @@ Options:
     * plugins          : list:str, [] ,   plugins to load (ex. pylint_django)
     * reporter         : str,      None,  custom reporter
     * full_report      : bool,     False, full report or only the messages
+
+Requirements:
+
+    * pylint
+      to install, run `pip install pylint`
+
 """
 
 from pybuildtool.core.task import Task as BaseTask

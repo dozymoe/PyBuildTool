@@ -1,17 +1,19 @@
 """
 Validate javascript files.
 
-Requirements:
-
-    * jshint (javascript library)
-    * jshint executable in node_modules directory where scons executed
-
 Options:
 
     * config_file      : str, None, jshint configuration file
     * reporter         : str, None, custom reporter
     * ignore_files     : list, [],  excludes files matching pattern
     * ignore_list_file : str, None, jshintignore file
+
+Requirements:
+
+    * node.js
+    * jshint
+      to install, run `node install --save-dev jshint`
+
 """
 
 import os

@@ -1,11 +1,6 @@
 """
 Validate javascript files.
 
-Requirements:
-
-    * jscs (javascript library)
-    * jscs executable
-
 Options:
 
     * config_file      : str, None, jscs configuration file
@@ -21,6 +16,13 @@ Options:
                          checkstyle, junit, inline
                          also accepts relative or absolute path to custom
                          reporter
+
+Requirements:
+
+    * node.js
+    * jscs
+      to install, run `npm install --save-dev jscs`
+
 """
 
 import os

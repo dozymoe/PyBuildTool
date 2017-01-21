@@ -39,7 +39,7 @@ There're three stages predefined: "dev", "stage", and "prod" (see the
 temporary build directory of their own but they still share the same build
 rules.
 
-Currently stages were implemented like this: for ``cleancss`` tool, if the
+Currently stages were implemented like this: for ``clean-css`` tool, if the
 current stage was one of "dev" or "devel" or "development" it will do copy
 operation instead of css file minification.
 
@@ -214,15 +214,15 @@ Install
      You could also ``pip install waftools`` and then run ``wafinstall``,
      caution: this method will modify your ``~/.bashrc`` adding ``WAFDIR=???``.
 
-4.   Copy and modify ``wscript`` in your project's root directory, specify the
+#.   Copy and modify ``wscript`` in your project's root directory, specify the
      build tools your are going to use.
 
-5.   Create ``build_rules.yml`` with content like our example, this will be
+#.   Create ``build_rules.yml`` with content like our example, this will be
      your build rules.
 
-6.   ``waf configure``
+#.   ``waf configure``
 
-7.   ``waf build_dev`` or ``waf watch_dev``
+#.   ``waf build_dev`` or ``waf watch_dev``
 
 
 .. _ant glob: http://ant.apache.org/manual/dirtasks.html

@@ -50,7 +50,8 @@ Options:
 Requirements:
 
     * pngcrush
-      make available from executable $PATH
+      to install, for example run `apt-get install pngcrush`
+
 """
 
 from pybuildtool.core.task import Task as BaseTask

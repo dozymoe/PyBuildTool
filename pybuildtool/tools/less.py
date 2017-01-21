@@ -10,9 +10,9 @@ Options:
 
 Requirements:
 
-    * lessc
-      to install, run `npm install --save-dev less`
     * node.js
+    * less
+      to install, run `npm install --save-dev less`
 
 """
 
