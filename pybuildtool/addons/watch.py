@@ -54,7 +54,7 @@ def thread_callback(context):
                 # my build tool is broken ;(
                 # I dunno why but the targets are not rebuild when missing,
                 # always clean before build for now
-                'clean_%s' % context.variant,
+                #'clean_%s' % context.variant,
                 'build_%s' % context.variant,
                 '--jobs=%s' % context.options.jobs,
             ]))

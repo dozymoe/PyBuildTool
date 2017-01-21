@@ -1,15 +1,25 @@
-#!/usr/bin/env python
+from setuptools  import setup, find_packages
 
-from setuptools  import setup
+RELEASE_VERSION = '2.0.1'
 
 setup(
-    name='PyBuildTool',
-    version='2.0.1',
-    description='Build utility to manage web resources',
+    name='pybuildtool',
+    version=RELEASE_VERSION,
+    url='https://github.com/dozymoe/PyBuildTool',
+    download_url='https://github.com/dozymoe/PyBuildTool/tarball/' +\
+            RELEASE_VERSION,
+
     author='Fahri Reza',
     author_email='dozymoe@gmail.com',
-    url='https://github.com/dozymoe/PyBuildTool',
-    packages=['pybuildtool'],
-    data_files=[('.', ['wscript'])],
-    install_requires=['pyyaml', 'watchdog'],
+    description='Build utility to manage web resources',
+    packages=find_packages(exclude=['tests']),
+    include_package_data=True,
+    platform='any',
+    license='MIT',
+    install_requires=[
+        'pyyaml',
+        'watchdog',
+    ],
 )
+
+print('Copy the file: wscript from https://github.com/dozymoe/PyBuildTool.')
