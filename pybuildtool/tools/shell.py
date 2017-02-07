@@ -21,7 +21,7 @@ class Task(BaseTask):
         '_source_grouped_': True,
     }
     name = tool_name
-    prefix = []
+    workdir = '.'
     cmd = None
 
     def prepare(self):
@@ -36,21 +36,20 @@ class Task(BaseTask):
         # Change current directory
         c = cfg.get('work_dir', None)
         if c:
-            self.prefix.append('cd %s;' \
-                % expand_resource(self.group, c))
+            self.workdir = expand_resource(self.group, c)
 
         self.cmd = cfg.get('commands').format(**self.group.get_patterns())
 
 
     def perform(self):
-        cmd = '{pre} {exe} {arg} {in_}'
+        cmd = '{exe} {arg} {in_}'
         return self.exec_command(
             cmd.format(
             exe=self.cmd,
-            pre=' '.join(self.prefix),
             arg=' '.join(self.args),
             in_=' '.join(self.file_in),
             ),
             stdout=None,
             stderr=None,
+            cwd=self.workdir,
         )

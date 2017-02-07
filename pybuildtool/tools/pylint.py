@@ -26,19 +26,19 @@ tool_name = __name__
 class Task(BaseTask):
 
     name = tool_name
-    workdir = '.'
+    workdir = None
 
     def prepare(self):
         cfg = self.conf
         args = self.args
 
         # Change current directory, before running pylint, helps module imports
-        c = cfg.get('work_dir', None)
+        c = cfg.get('work_dir')
         if c:
             self.workdir = expand_resource(self.group, c)
 
         # Specify a configuration file
-        c = cfg.get('config_file', None)
+        c = cfg.get('config_file')
         if c:
             args.append("--rcfile='%s'" % expand_resource(self.group, c))
 
@@ -76,12 +76,11 @@ class Task(BaseTask):
     def perform(self):
         executable = self.env['%s_BIN' % tool_name.upper()]
         return self.exec_command(
-            'cd {cwd}; {exe} {arg} {in_}'.format(
+            '{exe} {arg} {in_}'.format(
             exe=executable,
             arg=' '.join(self.args),
             in_=' '.join(self.file_in),
-            cwd=self.workdir,
-        ))
+        ), cwd=self.workdir)
 
 
 def configure(conf):
