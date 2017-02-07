@@ -14,11 +14,11 @@ usually have it watched the project files while editing with vim.
 PyBuildTool is written in python as a higher level interface to `Waf
 <http://waf.io>`_, a meta build system.
 
-The configuration file you'd interact with: ``build_rules.yml``, is declarative,
+The configuration file you'd interact with: ``build.yml``, is declarative,
 written in yaml. While the build tools which you could also write, were made to
 be simple, following a pattern.
 
-The configuration file does not need to be named "build_rules.yml", just change
+The configuration file does not need to be named "build.yml", just change
 the file ``wscript`` (this is something that waf needs). You need to create
 ``wscript`` file yourself, following the example here:
 http://raw.githubusercontent.com/dozymoe/PyBuildTool/master/pybuildtool/wscript.example
@@ -30,7 +30,7 @@ See how they were imported by the ``wscript`` file.
 Since you control the ``wscript`` file, you control much of the aspect of the
 build process.
 
-If you wanted to go deeper than just editing ``build_rules.yml`` you could read
+If you wanted to go deeper than just editing ``build.yml`` you could read
 `introduction to waf and wscript <http://waf.io/apidocs/tutorial.html>`_, or
 a more technical `waf project structure <http://waf.io/book/#_basic_project_structure>`_.
 
@@ -43,7 +43,7 @@ Currently stages were implemented like this: for ``clean-css`` tool, if the
 current stage was one of "dev" or "devel" or "development" it will do copy
 operation instead of css file minification.
 
-This is an example of ``build_rules.yml``, pretend it's a django project:
+This is an example of ``build.yml``, pretend it's a django project:
 
 .. code:: yaml
 
@@ -217,7 +217,7 @@ Install
 #.   Copy and modify ``wscript`` in your project's root directory, specify the
      build tools your are going to use.
 
-#.   Create ``build_rules.yml`` with content like our example, this will be
+#.   Create ``build.yml`` with content like our example, this will be
      your build rules.
 
 #.   ``waf configure``

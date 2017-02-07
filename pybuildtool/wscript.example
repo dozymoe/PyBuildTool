@@ -15,7 +15,7 @@ def build(bld):
     import os, yaml
     from pybuildtool.misc.resource import prepare_targets
     from pybuildtool.misc.yaml import OrderedDictYAMLLoader
-    conf_file = os.path.join(bld.path.abspath(), 'build_rules.yml')
+    conf_file = os.path.join(bld.path.abspath(), 'build.yml')
     with open(conf_file) as f:
         conf = yaml.load(f, Loader=OrderedDictYAMLLoader)
     # parse data as waf tasks

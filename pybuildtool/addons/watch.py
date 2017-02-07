@@ -74,7 +74,7 @@ def watch_files(bld):
 
 def watch(bld):
     global browser_notifier, files, conf_file, running
-    conf_file = os.path.join(bld.path.abspath(), 'build_rules.yml') 
+    conf_file = os.path.join(bld.path.abspath(), 'build.yml') 
     files = watch_files(bld)
 
     if bld.options.browser_notifier:
