@@ -88,9 +88,9 @@ class Task(BaseTask):
 
     def perform(self):
         if len(self.file_out) != 0:
-            self.bld.fatal("%s produce no output" % tool_name.capitalize())
+            self.bld.fatal('%s produce no output' % tool_name.capitalize())
 
-        executable = self.env['%s_BIN' % tool_name.upper()]
+        executable = self.env['SPHINX_BUILD_BIN']
         return self.exec_command(
             '{exe} {arg} {in_}'.format(
             exe=executable,
@@ -100,5 +100,4 @@ class Task(BaseTask):
 
 
 def configure(conf):
-    conf.env['%s_BIN' % tool_name.upper()] =\
-            conf.find_program('sphinx-build')[0]
+    conf.env['SPHINX_BUILD_BIN'] = conf.find_program('sphinx-build')[0]
