@@ -3,6 +3,7 @@ from copy import deepcopy
 from pybuildtool.misc.collections import make_list
 from pybuildtool.misc.path import expand_resource
 from time import time
+from uuid import uuid4
 from waflib.Task import Task as BaseTask
 
 class Task(BaseTask):
@@ -16,8 +17,12 @@ class Task(BaseTask):
     token_in = None
     token_out = None
 
+    _id = None
+
     def __init__(self, group, config, *args, **kwargs):
         super(Task, self).__init__(*args, **kwargs)
+        self._id = uuid4().hex
+
         # Task's configuration can be declared higher in the build tree,
         # but it needs to be prefixed with its tool-name.
         # Tool-name however can only be defined by the tool's module by
@@ -59,11 +64,13 @@ class Task(BaseTask):
             nodes = expand_resource(self.group, f)
             source_exclude += make_list(nodes)
 
+        task_uid = self._id
+
         for node in self.inputs:
             path = node.abspath()
             if node.parent.name.startswith('.waf_flags_'):
                 self.token_in.append(path)
-            elif getattr(node, 'is_virtual_in', False):
+            elif getattr(node, 'is_virtual_in_' + task_uid, False):
                 pass
             elif path in source_exclude:
                 pass
@@ -74,7 +81,7 @@ class Task(BaseTask):
             path = node.abspath()
             if node.parent.name.startswith('.waf_flags_'):
                 self.token_out.append(path)
-            elif getattr(node, 'is_virtual_out', False):
+            elif getattr(node, 'is_virtual_out_' + task_uid, False):
                 pass
             else:
                 self.file_out.append(path)

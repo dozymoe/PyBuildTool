@@ -70,6 +70,7 @@ class Group(object):
                 depend_in, extra_out)
         for r in self.rule.rules:
             task = task_class(self.group, conf, env=bld.env)
+            task_uid = task._id
 
             for f in r.get('file_in', []):
                 if os.path.isabs(f):
@@ -93,7 +94,7 @@ class Group(object):
                     node = bld.path.find_resource(f)
                 if node is None:
                     bld.fatal('"%s" does not exists' % f)
-                node.is_virtual_in = True
+                setattr(node, 'is_virtual_in_' + task_uid, True)
 
                 debug('%s:%s: %s', 'input', 'depend_in', str(node))
                 task.set_inputs(node)
@@ -128,21 +129,21 @@ class Group(object):
                     node = d_node.make_node(os.path.basename(f))
                 else:
                     node = bld.path.find_or_declare(f)
-                node.is_virtual_out = True
+                setattr(node, 'is_virtual_out_' + task_uid, True)
 
                 debug('%s:%s: %s', 'output', 'extra_out', str(node))
                 task.set_outputs(node)
 
             for f in r.get('token_in', []):
                 node = bld.path.find_or_declare(f)
-                node.is_virtual_in = True
+                setattr(node, 'is_virtual_in_' + task_uid, True)
 
                 debug('%s:%s: %s', 'input', 'token_in', str(node))
                 task.set_inputs(node)
 
             for f in  r.get('token_out', []):
                 node = bld.path.find_or_declare(f)
-                node.is_virtual_out = True
+                setattr(node, 'is_virtual_out_' + task_uid, True)
 
                 debug('%s:%s: %s', 'output', 'token_out', str(node))
                 task.set_outputs(node)
