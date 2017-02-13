@@ -36,6 +36,8 @@ class Task(BaseTask):
         c = cfg.get('work_dir')
         if c:
             self.workdir = expand_resource(self.group, c)
+            if self.workdir is None:
+                self.bld.fatal(cfg['work_dir'] + ' not found.')
 
         # Specify a configuration file
         c = cfg.get('config_file')
@@ -74,13 +76,23 @@ class Task(BaseTask):
 
 
     def perform(self):
+        if len(self.file_in) == 0:
+            self.bld.fatal('%s needs input' % tool_name.capitalize())
+        if len(self.file_out) != 0:
+            self.bld.fatal('%s produces no output' % tool_name.capitalize())
+
+        kwargs = {}
+        if self.workdir is not None:
+            kwargs['cwd'] = self.workdir
+
         executable = self.env['%s_BIN' % tool_name.upper()]
         return self.exec_command(
             '{exe} {arg} {in_}'.format(
-            exe=executable,
-            arg=' '.join(self.args),
-            in_=' '.join(self.file_in),
-        ), cwd=self.workdir)
+                exe=executable,
+                arg=' '.join(self.args),
+                in_=' '.join(self.file_in),
+            ),
+            **kwargs)
 
 
 def configure(conf):

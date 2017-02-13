@@ -21,7 +21,7 @@ class Task(BaseTask):
         '_source_grouped_': True,
     }
     name = tool_name
-    workdir = '.'
+    workdir = None
     cmd = None
 
     def prepare(self):
@@ -37,19 +37,24 @@ class Task(BaseTask):
         c = cfg.get('work_dir', None)
         if c:
             self.workdir = expand_resource(self.group, c)
+            if self.workdir is None:
+                self.bld.fatal(cfg['work_dir'] + ' not found.')
 
         self.cmd = cfg.get('commands').format(**self.group.get_patterns())
 
 
     def perform(self):
-        cmd = '{exe} {arg} {in_}'
+        if len(self.file_out) != 0:
+            self.bld.fatal('%s produces no output' % tool_name.capitalize())
+
+        kwargs = {'stdout': None, 'stderr': None}
+        if self.workdir is not None:
+            kwargs['cwd'] = self.workdir
+
         return self.exec_command(
-            cmd.format(
-            exe=self.cmd,
-            arg=' '.join(self.args),
-            in_=' '.join(self.file_in),
+            '{exe} {arg} {in_}'.format(
+                exe=self.cmd,
+                arg=' '.join(self.args),
+                in_=' '.join(self.file_in),
             ),
-            stdout=None,
-            stderr=None,
-            cwd=self.workdir,
-        )
+            **kwargs)

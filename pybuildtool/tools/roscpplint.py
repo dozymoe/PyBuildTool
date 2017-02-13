@@ -66,6 +66,8 @@ class Task(BaseTask):
         c = cfg.get('work_dir')
         if c:
             self.workdir = expand_resource(self.group, c)
+            if self.workdir is None:
+                self.bld.fatal(cfg['work_dir'] + ' not found.')
 
         # Output
         c = cfg.get('output')
@@ -101,14 +103,19 @@ class Task(BaseTask):
         if len(self.file_out) != 0:
             self.bld.fatal("%s doesn't produce files" % tool_name.capitalize())
 
+        kwargs = {}
+        if self.workdir is not None:
+            kwargs['cwd'] = self.workdir
+
         executable = self.env['%s_BIN' % tool_name.upper()]
         # TODO: roslint doesn't work in python3, xrange and bytes
         return self.exec_command(
             'python2 {exe} {arg} {in_}'.format(
-            exe=executable,
-            arg=' '.join(self.args),
-            in_=' '.join(self.file_in),
-        ), cwd=self.workdir)
+                exe=executable,
+                arg=' '.join(self.args),
+                in_=' '.join(self.file_in),
+            ),
+            **kwargs)
 
 
 def configure(conf):

@@ -22,7 +22,7 @@ tool_name = __name__
 class Task(BaseTask):
 
     name = tool_name
-    workdir = '.'
+    workdir = None
 
     def prepare(self):
         cfg = self.conf
@@ -32,6 +32,8 @@ class Task(BaseTask):
         c = cfg.get('work_dir', None)
         if c:
             self.workdir = expand_resource(self.group, c)
+            if self.workdir is None:
+                self.bld.fatal(cfg['work_dir'] + ' not found.')
 
         # Specify a configuration file
         c = cfg.get('config_file', None)
@@ -40,12 +42,22 @@ class Task(BaseTask):
 
 
     def perform(self):
+        if len(self.file_in) != 0:
+            self.bld.fatal('%s takes no input' % tool_name.capitalize())
+        if len(self.file_out) != 0:
+            self.bld.fatal('%s produces no output' % tool_name.capitalize())
+
+        kwargs = {}
+        if self.workdir is not None:
+            kwargs['cwd'] = self.workdir
+
         executable = self.env['%s_BIN' % tool_name.upper()]
         return self.exec_command(
             '{exe} {arg}'.format(
-            exe=executable,
-            arg=' '.join(self.args),
-        ), cwd=self.workdir)
+                exe=executable,
+                arg=' '.join(self.args),
+            ),
+            **kwargs)
 
 
 def configure(conf):
