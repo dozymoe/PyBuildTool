@@ -20,6 +20,7 @@ Requirements:
 
 import os
 from pybuildtool.core.task import Task as BaseTask
+from pybuildtool.misc.collections import make_list
 
 tool_name = __name__
 
@@ -34,7 +35,7 @@ class Task(BaseTask):
         args = self.args
         conf = self.conf
 
-        for mod in conf.get('transform_module', []):
+        for mod in make_list(conf.get('transform_module')):
             args.append("--transform '%s'" % mod)
 
 

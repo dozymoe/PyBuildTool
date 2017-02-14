@@ -23,6 +23,7 @@ Requirements:
 
 import os
 from pybuildtool.core.task import Task as BaseTask
+from pybuildtool.misc.collections import make_list
 from pybuildtool.misc.path import expand_resource
 
 tool_name = __name__
@@ -40,10 +41,7 @@ class Task(BaseTask):
         args = self.args
 
         # Utilize the Stylus plugins.
-        plugin_dirs = cfg.get('plugins', [])
-        if not isinstance(plugin_dirs, list):
-            plugin_dirs = [plugin_dirs]
-        for plugin_dir in plugin_dirs:
+        for plugin_dir in make_list(cfg.get('plugins')):
             args.append("--use '%s'" % plugin_dir)
 
         # Utilize image inlining via data URI support.
@@ -52,10 +50,7 @@ class Task(BaseTask):
             args.append('--inline')
 
         # Add <path> to lookup paths.
-        include_dirs = cfg.get('include_paths', [])
-        if not isinstance(include_dirs, list):
-            include_dirs = [include_dirs]
-        for include_dir in include_dirs:
+        for include_dir in make_list(cfg.get('include_paths')):
             args.append("--include '%s'" % expand_resource(self.group,
                     include_dir))
 
@@ -77,10 +72,7 @@ class Task(BaseTask):
             args.append('--line-numbers')
 
         # Import stylus <file>.
-        import_files = cfg.get('import_files', [])
-        if not isinstance(import_files, list):
-            import_files = [import_files]
-        for import_file in import_files:
+        for import_file in make_list(cfg.get('import_files')):
             args.append("--import '%s'" % expand_resource(self.group,
                     import_file))
 

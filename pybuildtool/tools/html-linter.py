@@ -18,6 +18,7 @@ Requirements:
 """
 
 from pybuildtool.core.task import Task as BaseTask
+from pybuildtool.misc.collections import make_list
 
 tool_name = __name__
 
@@ -39,8 +40,8 @@ class Task(BaseTask):
         cfg = self. conf
         args = self.args
 
-        c = cfg.get('disable', None)
-        if c:
+        c = make_list(cfg.get('disable'))
+        if len(c):
             invalid_disable_items = set(c) - self.DISABLE_LIST
             if len(invalid_disable_items):
                 self.bld.fatal('invalid disable configuration items: ' +\

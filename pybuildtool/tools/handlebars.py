@@ -32,6 +32,7 @@ Requirements:
 
 import os
 from pybuildtool.core.task import Task as BaseTask
+from pybuildtool.misc.collections import make_list
 from json import dumps as json_dump
 
 tool_name = __name__
@@ -59,8 +60,7 @@ class Task(BaseTask):
         if c:
             args.append("--handlebarPath='%s'" % c)
 
-        c = cfg.get('known', [])
-        for handler in c:
+        for handler in make_list(cfg.get('known')):
             args.append("--known='%s'" % handler)
 
         c = cfg.get('known_only')

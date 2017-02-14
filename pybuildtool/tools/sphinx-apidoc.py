@@ -19,6 +19,7 @@ Requirements:
 
 """
 from pybuildtool.core.task import Task as BaseTask
+from pybuildtool.misc.collections import make_list
 from pybuildtool.misc.path import expand_resource, expand_wildcard
 
 tool_name = __name__
@@ -50,8 +51,7 @@ class Task(BaseTask):
             self.bld.fatal(cfg['project_dir'] + ' not found.')
         args.append(project_dir)
 
-        c = cfg.get('exclude', [])
-        for fname in c:
+        for fname in make_list(cfg.get('exclude')):
             exclude_files = expand_wildcard(self.group, fname)
             if exclude_files is None:
                 self.bld.fatal(fname + ' not found.')

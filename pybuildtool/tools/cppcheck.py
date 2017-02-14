@@ -159,6 +159,7 @@ Requirements:
 
 import os
 from pybuildtool.core.task import Task as BaseTask
+from pybuildtool.misc.collections import make_list
 from pybuildtool.misc.path import expand_resource
 
 tool_name = __name__
@@ -193,8 +194,7 @@ class Task(BaseTask):
             args.append('--check-library')
 
         # Config exclude directory
-        c = cfg.get('config_exclude', [])
-        for path in c:
+        for path in make_list(cfg.get('config_exclude')):
             args.append('--config-exclude=' + expand_resource(self.group, path))
 
         # Config excludes file
@@ -209,39 +209,33 @@ class Task(BaseTask):
             args.append('--dump')
 
         # Defines
-        c = cfg.get('define', [])
-        for define in c:
+        for define in make_list(cfg.get('define')):
             args.append('-D' + define)
 
         # Undefines
-        c = cfg.get('undefine', [])
-        for define in c:
+        for define in make_list(cfg.get('undefine')):
             args.append('-U' + define)
 
         # Enable additional checks
-        c = cfg.get('enable_check', [])
+        c = make_list(cfg.get('enable_check'))
         if len(c):
             args.append('--enable=' + ','.join(c))
 
         # Exit code suppressions
-        c = cfg.get('ignore_files', [])
-        for path in c:
+        for path in make_list(cfg.get('ignore_files')):
             args.append('--exitcode-suppressions=' + expand_resource(self.group,
                     path))
 
         # Search directory for include files
-        c = cfg.get('include_path', [])
-        for path in c:
+        for path in make_list(cfg.get('include_path')):
             args.append('-I ' + expand_resource(self.group, path))
 
         # Include
-        c = cfg.get('include', [])
-        for path in c:
+        for path in make_list(cfg.get('include')):
             args.append('--include=' + expand_resource(self.group, path))
 
         # Exclude
-        c = cfg.get('exclude', [])
-        for path in c:
+        for path in make_list(cfg.get('exclude')):
             args.append('-i ' + expand_resource(self.group, path))
 
         # Inconclusive, allow false positives
@@ -295,7 +289,7 @@ class Task(BaseTask):
             args.append('--quiet')
 
         # Relative paths
-        c = cfg.get('relative_paths', [])
+        c = make_list(cfg.get('relative_paths'))
         if len(c):
             args.append('--relative-paths=' + ';'.join(c))
 
@@ -310,13 +304,11 @@ class Task(BaseTask):
             args.append('--rule-file=' + expand_resource(self.group, c))
 
         # Standard
-        c = cfg.get('standard', [])
-        for std in c:
+        for std in make_list(cfg.get('standard')):
             args.append('--std=' + std)
 
         # Suppress
-        c = cfg.get('disable', [])
-        for dis in c:
+        for dis in make_list(cfg.get('disable')):
             args.append('--suppress=' + dis)
 
         # Suppressions list

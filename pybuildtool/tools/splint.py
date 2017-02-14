@@ -16,6 +16,7 @@ Requirements:
 
 """
 from pybuildtool.core.task import Task as BaseTask
+from pybuildtool.misc.collections import make_list
 from pybuildtool.misc.path import expand_resource
 
 tool_name = __name__
@@ -37,7 +38,7 @@ class Task(BaseTask):
                 self.bld.fatal(cfg['work_dir'] + ' not found.')
 
         # Flags
-        c = cfg.get('flags', [])
+        c = make_list(cfg.get('flags'))
         if len(c) == 0:
             # see: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=498809;msg=10
             c = [

@@ -18,6 +18,7 @@ Requirements:
 
 import os
 from pybuildtool.core.task import Task as BaseTask
+from pybuildtool.misc.collections import make_list
 
 tool_name = __name__
 
@@ -44,9 +45,7 @@ class Task(BaseTask):
 
         # Exclude files matching the given filename pattern
         # (same as .jshintignore)
-        exclude_files = cfg.get('ignore_files', [])
-        if not isinstance(exclude_files, list):
-            exclude_files = [exclude_files]
+        exclude_files = make_list(cfg.get('ignore_files'))
         for exclude_file in exclude_files:
             args.append('--exclude=%s' % exclude_file)
 

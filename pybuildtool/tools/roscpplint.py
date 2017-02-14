@@ -49,6 +49,7 @@ Requirements:
 
 import os
 from pybuildtool.core.task import Task as BaseTask
+from pybuildtool.misc.collections import make_list
 from pybuildtool.misc.path import expand_resource
 
 tool_name = __name__
@@ -75,7 +76,7 @@ class Task(BaseTask):
             args.append('--output=' + c)
 
         # Filters
-        c = cfg.get('filter', [])
+        c = make_list(cfg.get('filter'))
         if len(c):
             args.append('--filter=' + ','.join(c))
 
@@ -95,7 +96,7 @@ class Task(BaseTask):
             args.append('--linelength=%i' % c)
 
         # Extensions
-        c = cfg.get('extensions', ['c', 'cpp', 'h'])
+        c = make_list(cfg.get('extensions', ['c', 'cpp', 'h']))
         args.append('--extensions=' + ','.join(c))
 
 

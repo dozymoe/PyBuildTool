@@ -19,6 +19,7 @@ Requirements:
 """
 
 from pybuildtool.core.task import Task as BaseTask
+from pybuildtool.misc.collections import make_list
 from pybuildtool.misc.path import expand_resource
 
 tool_name = __name__
@@ -68,10 +69,8 @@ class Task(BaseTask):
             args.append('--reports=n')
 
         # Plugins
-        plugins = cfg.get('plugins', [])
-        if not isinstance(plugins, list):
-            plugins = [plugins]
-        if plugins:
+        plugins = make_list(cfg.get('plugins'))
+        if len(plugins):
             args.append('--load-plugins=%s' % ','.join(plugins))
 
 
