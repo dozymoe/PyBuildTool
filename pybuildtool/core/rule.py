@@ -1,4 +1,5 @@
 import os
+import re
 from pybuildtool.misc.collections import make_list
 from pybuildtool.misc.path import expand_resource
 
