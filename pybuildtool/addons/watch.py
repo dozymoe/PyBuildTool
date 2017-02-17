@@ -6,6 +6,8 @@ add option `browser-notifier`, see the tool `browser_reload_notifier`
 import os
 import signal
 from collections import OrderedDict
+from subprocess import call
+import sys
 from threading import Thread
 from time import sleep
 from waflib import Context
@@ -44,20 +46,12 @@ def signal_handler(signum, frame):
     running = False
 
 
-def thread_callback(context):
+def thread_callback(context, build_args):
     global rebuild
     while running:
         if rebuild:
             rebuild = False
-            os.system(' '.join([
-                'waf',
-                # my build tool is broken ;(
-                # I dunno why but the targets are not rebuild when missing,
-                # always clean before build for now
-                #'clean_%s' % context.variant,
-                'build_%s' % context.variant,
-                '--jobs=%s' % context.options.jobs,
-            ]))
+            call(build_args)
             if browser_notifier:
                 browser_notifier.trigger()
         sleep(10)
@@ -93,7 +87,19 @@ def watch(bld):
     observer.schedule(event_handler, bld.path.abspath(), recursive=True)
     observer.start()
     print('We are WATCHING your every moves ...')
-    worker = Thread(target=thread_callback, kwargs={'context': bld})
+
+    build_args = sys.argv[:]
+    for ii in range(1, len(build_args)):
+        if build_args[ii].startswith('watch'):
+            build_args[ii] = build_args[ii].replace('watch', 'build', 1)
+            break
+
+    worker = Thread(
+            target=thread_callback,
+            kwargs={
+                'context': bld,
+                'build_args': build_args,
+            })
     worker.start()
 
     while running:
