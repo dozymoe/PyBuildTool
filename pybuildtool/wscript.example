@@ -56,6 +56,7 @@ def configure(ctx):
     #ctx.load('jshint', tooldir=tools_dir)
     #ctx.load('less', tooldir=tools_dir)
     #ctx.load('lftp', tooldir=tools_dir)
+    #ctx.load('metadata2fontface', tooldir=tools_dir)
     #ctx.load('nunjucks', tooldir=tools_dir)
     #ctx.load('patch', tooldir=tools_dir)
     #ctx.load('pngcrush', tooldir=tools_dir)
