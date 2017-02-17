@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-RELEASE_VERSION = '2.0.5'
+RELEASE_VERSION = '2.0.6'
 
 setup(
     name='pybuildtool',
