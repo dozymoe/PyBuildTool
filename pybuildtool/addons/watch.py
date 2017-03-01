@@ -19,11 +19,13 @@ from pybuildtool.misc.resource import get_source_files
 
 conf_file = ''
 files = []
+watchers = {}
 browser_notifier = None
 rebuild = True
 running = True
 
 class FileChangeHandler(FileSystemEventHandler):
+
     bld = None
 
     def __init__(self, bld):
@@ -38,7 +40,7 @@ class FileChangeHandler(FileSystemEventHandler):
         if event.src_path in files:
             rebuild = True
             if event.src_path == conf_file:
-                files = watch_files(self.bld)
+                watch_files(self.bld)
 
 
 def signal_handler(signum, frame):
@@ -58,18 +60,31 @@ def thread_callback(context, build_args):
 
 
 def watch_files(bld):
+    global files
     with open(conf_file) as f:
         conf = yaml_load(f)
     files = get_source_files(conf, bld)
     files.append(conf_file)
     # see http://stackoverflow.com/a/17016257
-    return list(OrderedDict.fromkeys(os.path.realpath(f) for f in files))
+    files = list(OrderedDict.fromkeys(os.path.realpath(f) for f in files))
+
+    watchers = {}
+    event_handler = FileChangeHandler(bld)
+    for filename in files:
+        dirname = os.path.dirname(filename)
+        if dirname in watchers:
+            continue
+
+        observer = Observer()
+        watchers[dirname] = observer
+        observer.schedule(event_handler, dirname)
+        observer.start()
 
 
 def watch(bld):
     global browser_notifier, files, conf_file, running
     conf_file = os.path.join(bld.path.abspath(), 'build.yml') 
-    files = watch_files(bld)
+    watch_files(bld)
 
     if bld.options.browser_notifier:
         from pybuildtool.addons.watch_files.browser_reload_notifier import\
@@ -82,10 +97,6 @@ def watch(bld):
 
     if browser_notifier:
         browser_notifier.start()
-    event_handler = FileChangeHandler(bld)
-    observer = Observer()
-    observer.schedule(event_handler, bld.path.abspath(), recursive=True)
-    observer.start()
     print('We are WATCHING your every moves ...')
 
     build_args = sys.argv[:]
