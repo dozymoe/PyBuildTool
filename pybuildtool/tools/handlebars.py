@@ -29,11 +29,10 @@ Requirements:
     * node.js
 
 """
-
 import os
+from json import dumps as json_dump
 from pybuildtool.core.task import Task as BaseTask
 from pybuildtool.misc.collections import make_list
-from json import dumps as json_dump
 
 tool_name = __name__
 
@@ -104,7 +103,8 @@ class Task(BaseTask):
         if len(self.file_in) != 1:
             self.bld.fatal('%s only need one input' % tool_name.capitalize())
         if len(self.file_out) != 1:
-            self.bld.fatal('%s can only have one output' % tool_name.capitalize())
+            self.bld.fatal('%s can only have one output' %\
+                    tool_name.capitalize())
 
         executable = self.env['%s_BIN' % tool_name.upper()]
         return self.exec_command(

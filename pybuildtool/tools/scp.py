@@ -14,7 +14,6 @@ Requirements:
       to install, for example run `apt-get install openssh`
 
 """
-
 from pybuildtool.core.task import Task as BaseTask
 from pybuildtool.misc.path import expand_resource
 
@@ -63,7 +62,7 @@ class Task(BaseTask):
 
         executable = self.env['%s_BIN' % tool_name.upper()]
         return self.exec_command(
-            "{exe} {arg} {in_} {hst}:{out_}".format(
+            "{exe} {arg} {in_} {hst}:{out}".format(
             exe=executable,
             arg=' '.join(self.args),
             in_=self.file_in[0],

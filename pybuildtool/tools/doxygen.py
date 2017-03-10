@@ -12,8 +12,6 @@ Requirements:
       to install, for example run `apt-get install doxygen`
 
 """
-
-import os
 from pybuildtool.core.task import Task as BaseTask
 from pybuildtool.misc.path import expand_resource
 

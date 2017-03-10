@@ -18,7 +18,6 @@ Requirements:
       to install, run `pip install restructuredtext-lint`
 
 """
-
 import os
 import re
 from pybuildtool.core.task import Task as BaseTask
@@ -100,6 +99,6 @@ class Task(BaseTask):
 def configure(conf):
     conf.start_msg("Checking for python module '%s'" % tool_name)
     try:
-        import restructuredtext_lint # pylint: disable=unused-import
+        import restructuredtext_lint # pylint:disable=unused-import,unused-variable
     except ImportError:
         conf.end_msg('not found', color='YELLOW')

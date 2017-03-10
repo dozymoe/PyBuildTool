@@ -76,7 +76,9 @@ class Task(BaseTask):
 
     def perform(self):
         if len(self.file_in) == 0:
-            self.bld.fatal('%s needs input' % tool_name.capitalize())
+            self.bld.fatal('%s for %s needs input' % (tool_name.capitalize(),
+                    self.token_out[0]))
+
         if len(self.file_out) != 0:
             self.bld.fatal('%s produces no output' % tool_name.capitalize())
 

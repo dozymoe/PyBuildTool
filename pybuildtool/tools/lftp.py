@@ -63,7 +63,7 @@ class Task(BaseTask):
 
         executable = self.env['%s_BIN' % tool_name.upper()]
         return self.exec_command(
-            "{exe} {arg} -e 'put {in_} -o {out_}' {hst}".format(
+            "{exe} {arg} -e 'put {in_} -o {out}' {hst}".format(
             exe=executable,
             arg=' '.join(self.args),
             in_=self.file_in[0],

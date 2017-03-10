@@ -69,19 +69,19 @@ class Rule(object):
             is_dir = fo.endswith(os.path.sep)
             if is_dir:
                 for fi in self.file_in:
-                    foo = fi
+                    fofi = fi
                     replace_patterns = self.conf.get('replace_patterns', False)
                     if replace_patterns:
                         for (pat, rep) in replace_patterns:
-                            foo = re.sub(pat, rep, foo)
+                            fofi = re.sub(pat, rep, fofi)
                     basedir = self.conf.get('_source_basedir_', False)
                     if basedir:
                         basedir = expand_resource(self.group, basedir)
-                    if basedir and foo.startswith(basedir):
-                        foo = foo[len(basedir):].strip('/')
+                    if basedir and fofi.startswith(basedir):
+                        fofi = fofi[len(basedir):].strip('/')
                     else:
-                        foo = os.path.basename(foo)
-                    result.append(os.path.join(fo, foo))
+                        fofi = os.path.basename(fofi)
+                    result.append(os.path.join(fo, fofi))
             else:
                 result.append(fo)
         for fo in self.extra_out:
@@ -131,22 +131,22 @@ class Rule(object):
                     })
                     continue
 
-                foo = fi
+                fofi = fi
                 replace_patterns = self.conf.get('replace_patterns', False)
                 if replace_patterns:
                     for (pat, rep) in replace_patterns:
-                        foo = re.sub(pat, rep, foo)
+                        fofi = re.sub(pat, rep, fofi)
                 # use basedir to produce file_out
                 basedir = self.conf.get('_source_basedir_', False)
                 if basedir:
                     basedir = expand_resource(self.group, basedir)
-                if basedir and foo.startswith(basedir):
-                    foo = foo[len(basedir):].strip('/')
+                if basedir and fofi.startswith(basedir):
+                    fofi = fofi[len(basedir):].strip('/')
                 else:
-                    foo = os.path.basename(foo)
+                    fofi = os.path.basename(fofi)
                 result.append({
                     'file_in': [fi],
-                    'file_out': [os.path.join(fo, foo)],
+                    'file_out': [os.path.join(fo, fofi)],
                     'token_in': token_in,
                     'token_out': token_out,
                     'depend_in': self.depend_in,

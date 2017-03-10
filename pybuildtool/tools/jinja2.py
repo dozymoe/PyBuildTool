@@ -73,7 +73,7 @@ class Task(BaseTask):
                 self.bld.fatal('"context_python" for %s has invalid value' %\
                         tool_name.capitalize())
             dirname, filename = os.path.split(python_file)
-            filebase, fileext = os.path.splitext(filename)
+            filebase, _ = os.path.splitext(filename)
             if os.path.exists(os.path.join(dirname, '__init__.py')):
                 sys.path.append(dirname)
                 mod = __import__(filebase)

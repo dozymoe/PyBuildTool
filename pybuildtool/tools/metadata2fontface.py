@@ -96,7 +96,7 @@ class Task(BaseTask):
 
 
     def _get_fonts_from_protobuf(self, filename):
-        from google.protobuf import text_format
+        from google.protobuf import text_format # pylint:disable=import-error
         from pybuildtool.vendor.fonts_public_pb2 import FamilyProto
 
         message = FamilyProto()

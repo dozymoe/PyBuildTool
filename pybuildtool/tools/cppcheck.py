@@ -117,7 +117,8 @@ Options:
                       directory tree.
     * rule          : str, None, Match regular expression.
     * rule_file     : str, None, Use given rule file. For more information,
-                      see: http://sourceforge.net/projects/cppcheck/files/Articles/
+                      see:
+                      http://sourceforge.net/projects/cppcheck/files/Articles/
     * standard      : list, None, Set standard. The available options are:
                       * posix
                         POSIX compatible code
@@ -156,8 +157,6 @@ Requirements:
       to install, for example run `apt-get install cppcheck`
 
 """
-
-import os
 from pybuildtool.core.task import Task as BaseTask
 from pybuildtool.misc.collections import make_list
 from pybuildtool.misc.path import expand_resource

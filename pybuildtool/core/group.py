@@ -1,5 +1,5 @@
 import os
-from waflib.Logs import debug, error, warn, info
+from waflib.Logs import debug # pylint:disable=import-error
 from pybuildtool.core.rule import Rule
 from pybuildtool.misc.collections import data_merge
 
@@ -7,7 +7,7 @@ class Group(object):
 
     name = None
     conf = None
-    env  = None
+    env = None
     context = None
     group = None
 
@@ -48,7 +48,7 @@ class Group(object):
         return self
 
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, type_, value, traceback):
         pass
 
 

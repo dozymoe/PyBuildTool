@@ -1,5 +1,5 @@
 """
-HTML5 Linter based on Google Style Guide 
+HTML5 Linter based on Google Style Guide
 
 Options:
 
@@ -16,7 +16,6 @@ Requirements:
       to install, run `pip install html-linter`
 
 """
-
 from pybuildtool.core.task import Task as BaseTask
 from pybuildtool.misc.collections import make_list
 
@@ -67,4 +66,3 @@ class Task(BaseTask):
 def configure(conf):
     bin_path = conf.find_program('html_lint.py')[0]
     conf.env['%s_BIN' % tool_name.upper()] = bin_path
-

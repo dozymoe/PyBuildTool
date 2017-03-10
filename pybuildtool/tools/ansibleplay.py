@@ -28,12 +28,10 @@ Requirements:
       to install, run `pip install ansible`
 
 '''
-
 import os
-import six
 import sys
-
-from waflib import Logs
+import six
+from waflib import Logs # pylint:disable=import-error
 from yaml import safe_load as yaml_load
 
 from pybuildtool.misc.collections import make_list
@@ -123,7 +121,7 @@ class Task(BaseTask):
                 self.bld.fatal('"context_python" for %s has invalid value' %\
                         tool_name.capitalize())
             dirname, filename = os.path.split(python_file)
-            filebase, fileext = os.path.splitext(filename)
+            filebase, _ = os.path.splitext(filename)
             if os.path.exists(os.path.join(dirname, '__init__.py')):
                 sys.path.append(dirname)
                 mod = __import__(filebase)
@@ -144,12 +142,12 @@ class Task(BaseTask):
         # with_items
         c = self.conf.get('with_items')
         if isinstance(c, list):
-            wi = c
+            wi = list(c)
         elif c:
             c = c.split('.')
-            wi = self.context
+            wi_ctx = self.context
             for wi_idx in c:
-                wi = wi[wi_idx]
+                wi = wi_ctx[wi_idx]
             wi = make_list(wi, nodict=True)
         else:
             wi = []
@@ -162,7 +160,7 @@ class Task(BaseTask):
 
 
     def perform(self):
-        import ansible.runner
+        import ansible.runner # pylint:disable=import-error
 
         def log_error(data):
             Logs.error('Got "{msg}" from {host}'.format(
@@ -223,6 +221,6 @@ class Task(BaseTask):
 def configure(conf):
     conf.start_msg("Checking for python module '%s'" % tool_name)
     try:
-        import ansible # pylint: disable=unused-import
+        import ansible # pylint: disable=unused-variable
     except ImportError:
         conf.end_msg('not found', color='YELLOW')

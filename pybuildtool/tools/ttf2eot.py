@@ -9,8 +9,6 @@ Requirements:
       to install, download/compile from https://github.com/metaflop/ttf2eot
 
 """
-
-import re
 from pybuildtool.core.task import Task as BaseTask
 
 tool_name = __name__

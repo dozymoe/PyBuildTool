@@ -11,8 +11,12 @@ def data_merge(a, b):
         return a
     key = None
     try:
-        #if a is None or isinstance(a, str) or isinstance(a, unicode) or isinstance(a, int) or isinstance(a, long) or isinstance(a, float):
-        if a is None or isinstance(a, str) or isinstance(a, int) or isinstance(a, float):
+        #if a is None or isinstance(a, str) or isinstance(a, unicode) or
+        #isinstance(a, int) or isinstance(a, long) or isinstance(a, float):
+
+        if a is None or isinstance(a, str) or isinstance(a, int) or\
+                isinstance(a, float):
+
             # border case for first run or if a is a primitive
             a = b
         elif isinstance(a, list):
@@ -34,11 +38,16 @@ def data_merge(a, b):
                     else:
                         a[key] = b[key]
             else:
-                raise Exception('Cannot merge non-dict "%s" into dict "%s"' % (b, a))
+                raise Exception('Cannot merge non-dict "%s" into dict "%s"' %\
+                (b, a))
+
         else:
             raise Exception('NOT IMPLEMENTED "%s" into "%s"' % (b, a))
     except TypeError as e:
-        raise Exception('TypeError "%s" in key "%s" when merging "%s" into "%s"' % (e, key, b, a))
+        raise Exception(
+                'TypeError "%s" in key "%s" when merging "%s" into "%s"' %\
+                (e, key, b, a))
+
     return a
 
 

@@ -1,16 +1,17 @@
 import os
 from copy import deepcopy
-from pybuildtool.misc.collections import make_list
-from pybuildtool.misc.path import expand_resource
 from time import time
 from uuid import uuid4
-from waflib.Task import Task as BaseTask
+from waflib.Task import Task as BaseTask # pylint:disable=import-error
+
+from pybuildtool.misc.collections import make_list
+from pybuildtool.misc.path import expand_resource
 
 class Task(BaseTask):
 
     args = None
     conf = None
-    group  = None
+    group = None
     file_in = None
     file_out = None
     name = None

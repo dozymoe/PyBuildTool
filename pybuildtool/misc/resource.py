@@ -32,7 +32,7 @@ def get_source_files(conf, bld):
                 files.extend(node.abspath() for node in paths)
 
             return
-        
+
         for subgroup in group:
             if subgroup == 'options':
                 continue
@@ -109,7 +109,7 @@ def prepare_targets(conf, bld):
                     pattern)]
             _add_raw_files(make_list(group.get('raw_file_in')), file_in,
                     pattern)
-            
+
             original_depend_in = make_list(group.get('depend_in'))
             depend_in = [x for x in _parse_input_listing(original_depend_in,
                     pattern)]
@@ -121,7 +121,7 @@ def prepare_targets(conf, bld):
             _add_raw_files(make_list(group.get('raw_file_out')), file_out,
                     pattern)
 
-            original_extra_out = make_list(group.get('extra_out')) 
+            original_extra_out = make_list(group.get('extra_out'))
             extra_out = [x.format(**pattern) for x in original_extra_out]
             _add_raw_files(make_list(group.get('raw_extra_out')), extra_out,
                     pattern)

@@ -10,7 +10,7 @@ from subprocess import call
 import sys
 from threading import Thread
 from time import sleep
-from waflib import Context
+from waflib import Context # pylint:disable=import-error
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 from yaml import load as yaml_load
@@ -34,7 +34,7 @@ class FileChangeHandler(FileSystemEventHandler):
 
 
     def on_any_event(self, event):
-        global files, rebuild
+        global rebuild # pylint:disable=global-statement
         if event.is_directory:
             return
         if event.src_path in files:
@@ -44,12 +44,12 @@ class FileChangeHandler(FileSystemEventHandler):
 
 
 def signal_handler(signum, frame):
-    global running
+    global running # pylint:disable=global-statement
     running = False
 
 
 def thread_callback(context, build_args):
-    global rebuild
+    global rebuild # pylint:disable=global-statement
     while running:
         if rebuild:
             rebuild = False
@@ -60,13 +60,18 @@ def thread_callback(context, build_args):
 
 
 def watch_files(bld):
-    global files
+    global files, watchers # pylint:disable=global-statement
     with open(conf_file) as f:
         conf = yaml_load(f)
-    files = get_source_files(conf, bld)
-    files.append(conf_file)
+    source_files = get_source_files(conf, bld)
+    source_files.append(conf_file)
     # see http://stackoverflow.com/a/17016257
-    files = list(OrderedDict.fromkeys(os.path.realpath(f) for f in files))
+    files = list(OrderedDict.fromkeys(os.path.realpath(f)\
+            for f in source_files))
+
+    for observer in watchers.values():
+        observer.stop()
+        observer.join()
 
     watchers = {}
     event_handler = FileChangeHandler(bld)
@@ -82,8 +87,8 @@ def watch_files(bld):
 
 
 def watch(bld):
-    global browser_notifier, files, conf_file, running
-    conf_file = os.path.join(bld.path.abspath(), 'build.yml') 
+    global browser_notifier, conf_file, running # pylint:disable=global-statement
+    conf_file = os.path.join(bld.path.abspath(), 'build.yml')
     watch_files(bld)
 
     if bld.options.browser_notifier:
@@ -116,10 +121,13 @@ def watch(bld):
     while running:
         try:
             sleep(1)
-        except:
+        except: # pylint:disable=bare-except
             running = False
-    observer.stop()
-    observer.join()
+
+    for observer in watchers.values():
+        observer.stop()
+        observer.join()
+
     worker.join()
     if browser_notifier:
         browser_notifier.stop()

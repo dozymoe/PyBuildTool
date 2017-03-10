@@ -40,7 +40,8 @@ class Task(BaseTask):
         # Flags
         c = make_list(cfg.get('flags'))
         if len(c) == 0:
-            # see: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=498809;msg=10
+            # see:
+            # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=498809;msg=10
             c = [
                 '-D__gnuc_va_list=va_list',
                 '-warnposix',

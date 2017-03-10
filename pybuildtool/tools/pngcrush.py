@@ -3,49 +3,90 @@ pngcrush is a png compressor
 
 Options:
 
-    * already       : int,   None,  already_crushed_size [e.g., 8192]
-    * bail          : bool,  False, bail out of trial when size exceeds best size
-                      found
-    * bit_depth     : int,   None,  bit depth to use in output file
-    * blacken       : bool,  False, zero samples underlying fully-transparent pixels
-    * brute         : int,   148,   use brute-force: try 138 different methods [11-148]
-    * color_type    : int,   None,  color_type of output file [0, 2, 4, or 6]
-    * double_gamma  : bool,  False, used for fixing gamma in PhotoShop 5.0/5.02 files
-    * filter        : int,   None,  user_filter [0-5] for specified method
-    * fix           : bool,  True,  fix otherwise fatal conditions such as bad CRCs
-    * force         : bool,  False, write a new output file even if larger than input
-    * gamma         : float, None,  gamma (float or fixed*100000, e.g., 0.45455 or 45455)
-    * huffman       : bool,  False, use only zlib strategy 2, Huffman-only
-    * iccp          : int,   None,  length "Profile Name" iccp_file
-    * itxt          : str,   None,  b[efore_IDAT]|a[fter_IDAT] "keyword"
-    * keep          : bool,  False, chunk_name
-    * level         : int,   None,  zlib_compression_level [0-9] for specified method
-    * loco          : bool,  False, "loco crush" truecolor PNGs
-    * method        : int,   None,  method [1 through 200]
-    * max           : int,   None,  maximum_IDAT_size [default 8192]
-    * mng           : bool,  False, write a new MNG, do not crush embedded PNGs
-    * nobail        : bool,  False, do not bail out early from trial -- see "-bail"
-    * nofilecheck   : bool,  False, do not check for infile.png == outfile.png
-    * nolimits      : bool,  False, turns off limits on width, height, cache, malloc
-    * noreduce      : bool,  False, turns off "-reduce" operations
-    * oldtimestamp  : bool,  False, do not reset file modification time
-    * reduce        : bool,  False, do lossless color-type or bit-depth reduction
-    * rem           : bool,  False, chunkname (or "alla" or "allb")
-    * replace_gamma : float, None,  gamma (float or fixed*100000) even if it is present
-    * resolution    : int,   None,  resolution in dpi
-    * rle           : bool,  False, use only zlib strategy 3, RLE-only
-    * save          : bool,  False, keep all copy-unsafe PNG chunks
-    * srgb          : int,   None,  [0, 1, 2, or 3]
-    * ster          : int,   None,  [0 or 1]
-    * text          : str,   None,  b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
-    * trns_array    : str,   None,  n trns[0] trns[1] .. trns[n-1]
-    * trns          : str,   None,  index red green blue gray
-    * window_size   : int,   None,  compression_window_size [32, 16, 8, 4, 2, 1, 512]
-    * zlib          : int,   None,  zlib_strategy [0, 1, 2, or 3] for specified method
-    * zmem          : int,   None,  zlib_compression_mem_level [1-9, default 9]
-    * zitxt         : str,   None,  b|a "keyword" "lcode" "tkey" "text"
-    * ztxt          : str,   None,  b[efore_IDAT]|a[fter_IDAT] "keywrod" "text"
-    * quiet         : bool,  True,  quiet
+    * already       : int,   None
+                      Already_crushed_size [e.g., 8192]
+    * bail          : bool,  False
+                      Bail out of trial when size exceeds best size found
+    * bit_depth     : int,   None
+                      Bit depth to use in output file
+    * blacken       : bool,  False
+                      Zero samples underlying fully-transparent pixels
+    * brute         : int,   148
+                      Use brute-force: try 138 different methods [11-148]
+    * color_type    : int,   None
+                      Color_type of output file [0, 2, 4, or 6]
+    * double_gamma  : bool,  False
+                      Used for fixing gamma in PhotoShop 5.0/5.02 files
+    * filter        : int,   None
+                      user_filter [0-5] for specified method
+    * fix           : bool,  True
+                      Fix otherwise fatal conditions such as bad CRCs
+    * force         : bool,  False
+                      Write a new output file even if larger than input
+    * gamma         : float, None
+                      Gamma (float or fixed*100000, e.g., 0.45455 or 45455)
+    * huffman       : bool,  False
+                      Use only zlib strategy 2, Huffman-only
+    * iccp          : int,   None
+                      Length "Profile Name" iccp_file
+    * itxt          : str,   None
+                      b[efore_IDAT]|a[fter_IDAT] "keyword"
+    * keep          : bool,  False
+                      chunk_name
+    * level         : int,   None
+                      zlib_compression_level [0-9] for specified method
+    * loco          : bool,  False
+                      "loco crush" truecolor PNGs
+    * method        : int,   None
+                      method [1 through 200]
+    * max           : int,   None
+                      maximum_IDAT_size [default 8192]
+    * mng           : bool,  False
+                      Write a new MNG, do not crush embedded PNGs
+    * nobail        : bool,  False
+                      Do not bail out early from trial -- see "-bail"
+    * nofilecheck   : bool,  False
+                      Do not check for infile.png == outfile.png
+    * nolimits      : bool,  False
+                      Turns off limits on width, height, cache, malloc
+    * noreduce      : bool,  False
+                      Turns off "-reduce" operations
+    * oldtimestamp  : bool,  False
+                      Do not reset file modification time
+    * reduce        : bool,  False
+                      Do lossless color-type or bit-depth reduction
+    * rem           : bool,  False
+                      chunkname (or "alla" or "allb")
+    * replace_gamma : float, None
+                      Gamma (float or fixed*100000) even if it is present
+    * resolution    : int,   None
+                      Resolution in dpi
+    * rle           : bool,  False
+                      Use only zlib strategy 3, RLE-only
+    * save          : bool,  False
+                      Keep all copy-unsafe PNG chunks
+    * srgb          : int,   None
+                      [0, 1, 2, or 3]
+    * ster          : int,   None
+                      [0 or 1]
+    * text          : str,   None
+                      b[efore_IDAT]|a[fter_IDAT] "keyword" "text"
+    * trns_array    : str,   None
+                      n trns[0] trns[1] .. trns[n-1]
+    * trns          : str,   None
+                      index red green blue gray
+    * window_size   : int,   None
+                      compression_window_size [32, 16, 8, 4, 2, 1, 512]
+    * zlib          : int,   None
+                      zlib_strategy [0, 1, 2, or 3] for specified method
+    * zmem          : int,   None
+                      zlib_compression_mem_level [1-9, default 9]
+    * zitxt         : str,   None
+                      b|a "keyword" "lcode" "tkey" "text"
+    * ztxt          : str,   None
+                      b[efore_IDAT]|a[fter_IDAT] "keywrod" "text"
+    * quiet         : bool,  True
+                      quiet
 
 Requirements:
 
@@ -53,7 +94,6 @@ Requirements:
       to install, for example run `apt-get install pngcrush`
 
 """
-
 from pybuildtool.core.task import Task as BaseTask
 
 tool_name = __name__
@@ -96,11 +136,11 @@ class Task(BaseTask):
         # user_filter [0-5] for specified method
         if cfg.get('filter', None):
             args.append('-f=%i' % cfg['filter'])
-        
+
         # fix otherwise fatal conditions such as bad CRCs
         if cfg.get('fix', True):
             args.append('-fix')
-        
+
         # write a new output file even if larger than input
         if cfg.get('force', None):
             args.append('-force')
@@ -238,7 +278,8 @@ class Task(BaseTask):
         if len(self.file_in) != 1:
             self.bld.fatal('%s only need one input' % tool_name.capitalize())
         if len(self.file_out) != 1:
-            self.bld.fatal('%s can only have one output' % tool_name.capitalize())
+            self.bld.fatal('%s can only have one output' %\
+                    tool_name.capitalize())
 
         executable = self.env['%s_BIN' % tool_name.upper()]
         return self.exec_command(

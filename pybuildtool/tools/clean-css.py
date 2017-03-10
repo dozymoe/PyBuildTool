@@ -30,10 +30,9 @@ Requirements:
     * node.js
 
 """
-
 import os
-from pybuildtool.core.task import Task as BaseTask
 from shutil import copyfile, Error
+from pybuildtool.core.task import Task as BaseTask
 
 tool_name = __name__
 
@@ -60,8 +59,8 @@ class Task(BaseTask):
         if cfg.get('first-special-comment', False):
             args.append('--s1')
 
-        # a root path to which resolve absolute @import rules and reabse relative
-        # URLs
+        # a root path to which resolve absolute @import rules and rebase
+        # relative URLs
         if cfg.get('root-path', None):
             args.append('--root=%s' % cfg['root-path'])
 
