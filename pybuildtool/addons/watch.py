@@ -53,7 +53,9 @@ def thread_callback(context, build_args):
     while running:
         if rebuild:
             rebuild = False
-            call(build_args)
+            # On windows we'd be using waf.bat
+            use_shell = os.name == 'nt'
+            call(build_args, shell=use_shell)
             if browser_notifier:
                 browser_notifier.trigger()
         sleep(10)

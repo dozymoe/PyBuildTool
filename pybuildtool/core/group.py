@@ -76,7 +76,7 @@ class Group(object):
                 if os.path.isabs(f):
                     if not os.path.exists(f):
                         continue
-                    node = bld.root.find_resource(f[1:])
+                    node = bld.root.find_resource(f.lstrip('/'))
                 else:
                     node = bld.path.find_resource(f)
                 if node is None:
@@ -89,7 +89,7 @@ class Group(object):
                 if os.path.isabs(f):
                     if not os.path.exists(f):
                         continue
-                    node = bld.root.find_resource(f[1:])
+                    node = bld.root.find_resource(f.lstrip('/'))
                 else:
                     node = bld.path.find_resource(f)
                 if node is None:

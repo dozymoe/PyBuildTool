@@ -8,9 +8,9 @@ def expand_resource(group, path):
     path = path.format(**group.get_patterns())
     if os.path.isabs(path):
         if path.endswith(os.path.sep):
-            node = bld.root.find_dir(path[1:])
+            node = bld.root.find_dir(path.lstrip('/'))
         else:
-            node = bld.root.find_resource(path[1:])
+            node = bld.root.find_resource(path.lstrip('/'))
         if node:
             return node.abspath()
     else:
@@ -36,9 +36,9 @@ def expand_wildcard(group, path):
 
     elif os.path.isabs(path):
         if path.endswith(os.path.sep):
-            node = bld.root.find_dir(path[1:])
+            node = bld.root.find_dir(path.lstrip('/'))
         else:
-            node = bld.root.find_resource(path[1:])
+            node = bld.root.find_resource(path.lstrip('/'))
         if node:
             return [node.abspath()]
 
