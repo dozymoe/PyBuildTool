@@ -1,7 +1,7 @@
 import os
 from waflib.Logs import debug # pylint:disable=import-error
 from pybuildtool.core.rule import Rule
-from pybuildtool.misc.collections import data_merge
+from pybuildtool.misc.collections_utils import data_merge
 
 class Group(object):
 

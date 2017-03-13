@@ -24,7 +24,7 @@ import os
 import sys
 from pybuildtool.core.task import Task as BaseTask
 from pybuildtool.misc.path import expand_resource
-from pybuildtool.misc.collections import is_non_string_iterable
+from pybuildtool.misc.collections_utils import is_non_string_iterable
 from jinja2 import Environment, FileSystemLoader
 from yaml import safe_load as yaml_load
 

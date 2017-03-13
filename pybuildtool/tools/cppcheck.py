@@ -158,7 +158,7 @@ Requirements:
 
 """
 from pybuildtool.core.task import Task as BaseTask
-from pybuildtool.misc.collections import make_list
+from pybuildtool.misc.collections_utils import make_list
 from pybuildtool.misc.path import expand_resource
 
 tool_name = __name__

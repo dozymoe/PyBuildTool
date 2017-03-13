@@ -1,6 +1,6 @@
 import os
 import re
-from pybuildtool.misc.collections import make_list
+from pybuildtool.misc.collections_utils import make_list
 from pybuildtool.misc.path import expand_resource
 
 class Rule(object):

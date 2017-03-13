@@ -34,7 +34,7 @@ import six
 from waflib import Logs # pylint:disable=import-error
 from yaml import safe_load as yaml_load
 
-from pybuildtool.misc.collections import make_list
+from pybuildtool.misc.collections_utils import make_list
 from pybuildtool.misc.path import expand_resource
 from pybuildtool.core.task import Task as BaseTask
 

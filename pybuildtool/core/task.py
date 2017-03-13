@@ -4,7 +4,7 @@ from time import time
 from uuid import uuid4
 from waflib.Task import Task as BaseTask # pylint:disable=import-error
 
-from pybuildtool.misc.collections import make_list
+from pybuildtool.misc.collections_utils import make_list
 from pybuildtool.misc.path import expand_resource
 
 class Task(BaseTask):

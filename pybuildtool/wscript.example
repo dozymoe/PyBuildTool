@@ -14,7 +14,7 @@ def build(bld):
     # load main configuration file
     import os, yaml
     from pybuildtool.misc.resource import prepare_targets
-    from pybuildtool.misc.yaml import OrderedDictYAMLLoader
+    from pybuildtool.misc.yaml_utils import OrderedDictYAMLLoader
     conf_file = os.path.join(bld.path.abspath(), 'build.yml')
     with open(conf_file) as f:
         conf = yaml.load(f, Loader=OrderedDictYAMLLoader)

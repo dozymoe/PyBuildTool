@@ -1,7 +1,7 @@
 import os
 import re
 from pybuildtool.core.group import Group
-from pybuildtool.misc.collections import make_list
+from pybuildtool.misc.collections_utils import make_list
 
 def get_source_files(conf, bld):
     """Collect raw file inputs."""
