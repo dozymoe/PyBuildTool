@@ -1,3 +1,4 @@
+import os
 # where `waf` will store its configuration
 top = '.'
 # directory for temporary files created during build process
@@ -7,12 +8,15 @@ out = '.BUILD'
 
 # stages, for example: 'dev' will provide separate build environment with
 # commands like `waf build_dev` and `waf clean_dev`, that is build variants
-STAGES = ('dev', 'stage', 'prod')
+if 'PROJECT_VARIANT' in os.environ:
+    STAGES = (os.environ['PROJECT_VARIANT'],)
+else:
+    STAGES = ('dev', 'stage', 'prod')
 
 
 def build(bld):
     # load main configuration file
-    import os, yaml
+    import yaml
     from pybuildtool.misc.resource import prepare_targets
     from pybuildtool.misc.yaml_utils import OrderedDictYAMLLoader
     conf_file = os.path.join(bld.path.abspath(), 'build.yml')
@@ -23,7 +27,6 @@ def build(bld):
 
 
 def options(opt):
-    import os
     # add loadable modules from waf root directory
     import sys
     sys.path.append(opt.path.abspath())
@@ -35,7 +38,6 @@ def options(opt):
 
 
 def configure(ctx):
-    import os
     # load predefined tools from pybuildtool
     from imp import find_module
     pybuildtool_dir = find_module('pybuildtool')[1]
@@ -84,11 +86,20 @@ from waflib.Context import Context
 class WatchContext(Context):
     cmd = 'watch'
     fun = 'watch'
-    variant = STAGES[0]
+    variant = ''
 
-for stage in STAGES:
+for index, stage in enumerate(STAGES):
     for build_class in (BuildContext, CleanContext, InstallContext,
             UninstallContext, WatchContext):
+
+        if index == 0:
+            BuildContext.variant = stage
+            CleanContext.variant = stage
+            InstallContext.variant = stage
+            UninstallContext.variant = stage
+            WatchContext.variant = stage
+            continue
+
         name = build_class.__name__.replace('Context', '').lower()
         class TempClass(build_class):
             cmd = name + '_' + stage
