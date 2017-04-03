@@ -109,3 +109,71 @@ class Task(BaseTask):
         if ret == 0:
             self.finalize_shadow_jutsu()
         return ret
+
+
+    def add_bool_args(self, *options):
+        for option in options:
+            value = self.conf.get(option)
+            if not value:
+                continue
+
+            option = '--' + option.replace('_', '-')
+            self.args.append(option)
+
+
+    def add_int_args(self, *options):
+        for option in options:
+            try:
+                value = int(self.conf.get(option))
+            except (TypeError, ValueError):
+                continue
+
+            option = '--' + option.replace('_', '-')
+            self.args.append('%s=%i' % (option, value))
+
+
+    def add_list_args_join(self, separator, *options):
+        for option in options:
+            values = make_list(self.conf.get(option))
+            if len(values) == 0:
+                continue
+
+            option = '--' + option.replace('_', '-')
+            value = separator.join(x.format(**self.group.get_patterns())\
+                    for x in values)
+
+            self.args.append('%s=%s' % (option, value))
+
+
+    def add_list_args_multi(self, *options):
+        for option in options:
+            values = make_list(self.conf.get(option))
+            if len(values) == 0:
+                continue
+
+            option = '--' + option.replace('_', '-')
+            for value in values:
+                value = value.format(**self.group.get_patterns())
+                self.args.append('%s=%s' % (option, value))
+
+
+    def add_path_args(self, *options):
+        for option in options:
+            value = self.conf.get(option)
+            if value is None:
+                continue
+
+            option = '--' + option.replace('_', '-')
+            value = expand_resource(self.group, value)
+            self.args.append('%s=%s' % (option, value))
+
+
+    def add_str_args(self, *options):
+        for option in options:
+            value = self.conf.get(option)
+            if value is None:
+                continue
+
+            option = '--' + option.replace('_', '-')
+            value = value.format(**self.group.get_patterns())
+            self.args.append('%s=%s' % (option, value))
