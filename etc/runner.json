@@ -1,0 +1,28 @@
+{
+    "package_name": "PyBuildTool",
+    "default_project": "pybuildtool",
+    "default_variant": "development",
+
+    "python_version": "3.5",
+    "virtualenv_dir": ".virtualenv",
+    "waf_version": "1.9.9",
+
+    "modules": [
+        "fireh_runner.modules.setup",
+        "fireh_runner.modules.pip",
+        "fireh_runner.modules.python",
+        "fireh_runner.modules.waf"
+    ],
+    "setup_modules": [
+        "fireh_runner.setup_modules.python",
+        "fireh_runner.setup_modules.pybuildtool"
+    ],
+
+    "configuration": {
+        "development": {
+            "pybuildtool": {
+                "work_dir": "."
+            }
+        }
+    }
+}

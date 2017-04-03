@@ -1,8 +1,27 @@
+# git
+
+*.orig
+
+
+# pybuildtool
+
+/build.yml
+
+
 # python
 
 *.pyc
 /*.egg-info/
 /dist/
+/.virtualenv/
+/requirements.txt
+/python_modules
+
+
+# waf
+
+/.BUILD/
+/.lock-waf_*
 
 
 # vim

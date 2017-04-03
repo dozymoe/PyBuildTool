@@ -62,7 +62,7 @@ def configure(ctx):
     #ctx.load('nunjucks', tooldir=tools_dir)
     #ctx.load('patch', tooldir=tools_dir)
     #ctx.load('pngcrush', tooldir=tools_dir)
-    #ctx.load('pylint', tooldir=tools_dir)
+    ctx.load('pylint', tooldir=tools_dir)
     #ctx.load('requirejs', tooldir=tools_dir)
     #ctx.load('restructuredtext-lint', tooldir=tools_dir)
     #ctx.load('roscpplint', tooldir=tools_dir)
