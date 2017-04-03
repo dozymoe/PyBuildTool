@@ -60,7 +60,7 @@ class Task(BaseTask):
 
 
     def perform(self):
-        from restructuredtext_lint import lint_file
+        from restructuredtext_lint import lint_file # pylint:disable=import-error
 
         result = 0
         for filename in self.file_in:
