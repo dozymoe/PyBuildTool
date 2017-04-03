@@ -30,7 +30,9 @@ def expand_wildcard(group, path):
     path = path.format(**group.get_patterns())
     if '*' in path or '?' in path:
         if os.path.isabs(path):
-            return [node.abspath() for node in bld.root.ant_glob(path[1:])]
+            return [node.abspath() for node in\
+                    bld.root.ant_glob(path.lstrip('/'))]
+
         else:
             return [node.abspath() for node in bld.path.ant_glob(path)]
 

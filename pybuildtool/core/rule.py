@@ -40,7 +40,7 @@ class Rule(object):
                 continue
             for_removal.append(f)
             if os.path.isabs(f):
-                paths = self.bld.root.ant_glob(f[1:])
+                paths = self.bld.root.ant_glob(f.lstrip('/'))
                 for_insertion += (node.abspath() for node in paths)
             else:
                 paths = self.bld.path.ant_glob(f)

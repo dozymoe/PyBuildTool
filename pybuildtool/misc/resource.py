@@ -26,7 +26,7 @@ def get_source_files(conf, bld):
                     continue
                 # expands wildcards (using ant_glob)
                 if os.path.isabs(f):
-                    paths = bld.root.ant_glob(f[1:])
+                    paths = bld.root.ant_glob(f.lstrip('/'))
                 else:
                     paths = bld.path.ant_glob(f)
                 files.extend(node.abspath() for node in paths)
@@ -68,8 +68,12 @@ def prepare_targets(conf, bld):
             is_dir = f.endswith(os.path.sep) or f.endswith('/')
             f = os.path.realpath(f)
             if is_dir and not f.endswith(os.path.sep):
-                f += os.path.sep
-            file_list.append(f)
+                file_list.append(f + os.path.sep)
+            elif '*' in f or '?' in f:
+                for node in bld.root.ant_glob(f.lstrip('/')):
+                    file_list.append(node.abspath())
+            else:
+                file_list.append(f)
 
 
     def _parse_input_listing(source_list, pattern):
@@ -82,7 +86,7 @@ def prepare_targets(conf, bld):
                 yield f
             # expands wildcards (using ant_glob)
             elif os.path.isabs(f):
-                for node in bld.root.ant_glob(f[1:]):
+                for node in bld.root.ant_glob(f.lstrip('/')):
                     yield node.abspath()
             else:
                 for node in bld.path.ant_glob(f):
