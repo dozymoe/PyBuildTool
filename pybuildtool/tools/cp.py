@@ -11,10 +11,12 @@ class Task(BaseTask):
 
     def perform(self):
         if len(self.file_in) != 1:
-            self.bld.fatal('%s only need one input' % tool_name.capitalize())
+            self.bld.fatal('%s only need one input, got %s' % (
+                    tool_name.capitalize(), repr(self.file_in)))
+
         if len(self.file_out) != 1:
-            self.bld.fatal('%s can only have one output' %\
-                    tool_name.capitalize())
+            self.bld.fatal('%s can only have one output, got %s' % (
+                    tool_name.capitalize(), repr(self.file_out)))
 
         try:
             copyfile(self.file_in[0], self.file_out[0])

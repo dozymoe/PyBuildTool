@@ -462,7 +462,7 @@ class Task(BaseTask):
         if len(self.file_in) == 0:
             self.bld.fatal('%s needs input' % tool_name.capitalize())
         if len(self.file_out) != 0:
-            self.bld.fatal("%s doesn't product output" % tool_name.capitalize())
+            self.bld.fatal("%s doesn't produce output" % tool_name.capitalize())
 
         if self.conf.get('relative') and self.workdir:
             inputs = [os.path.relpath(x, self.workdir) for x in self.file_in]
