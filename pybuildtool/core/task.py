@@ -111,6 +111,14 @@ class Task(BaseTask):
         return ret
 
 
+    def _add_arg(self, option, value, sep):
+        if sep == ' ':
+            self.args.append(option)
+            self.args.append(value)
+        else:
+            self.args.append(option + sep + value)
+
+
     def add_bool_args(self, *options):
         for option in options:
             value = self.conf.get(option)
@@ -121,7 +129,23 @@ class Task(BaseTask):
             self.args.append(option)
 
 
-    def add_int_args(self, *options):
+    def add_dict_args(self, *options, **kwargs):
+        opt_val_sep = kwargs.get('opt_val_sep', '=')
+        key_val_sep = kwargs.get('key_val_sep', '=')
+
+        for option in options:
+            if option not in self.conf:
+                continue
+
+            for key, value in self.conf[option].items():
+                value = value.format(**self.group.get_patterns())
+                item = key + key_val_sep + value
+                self._add_arg(option, item, opt_val_sep)
+
+
+    def add_int_args(self, *options, **kwargs):
+        opt_val_sep = kwargs.get('opt_val_sep', '=')
+
         for option in options:
             try:
                 value = int(self.conf.get(option))
@@ -129,10 +153,12 @@ class Task(BaseTask):
                 continue
 
             option = '--' + option.replace('_', '-')
-            self.args.append('%s=%i' % (option, value))
+            self._add_arg(option, str(value), opt_val_sep)
 
 
-    def add_list_args_join(self, separator, *options):
+    def add_list_args_join(self, separator, *options, **kwargs):
+        opt_val_sep = kwargs.get('opt_val_sep', '=')
+
         for option in options:
             values = make_list(self.conf.get(option))
             if len(values) == 0:
@@ -142,10 +168,12 @@ class Task(BaseTask):
             value = separator.join(x.format(**self.group.get_patterns())\
                     for x in values)
 
-            self.args.append('%s=%s' % (option, value))
+            self._add_arg(option, value, opt_val_sep)
 
 
-    def add_list_args_multi(self, *options):
+    def add_list_args_multi(self, *options, **kwargs):
+        opt_val_sep = kwargs.get('opt_val_sep', '=')
+
         for option in options:
             values = make_list(self.conf.get(option))
             if len(values) == 0:
@@ -154,10 +182,13 @@ class Task(BaseTask):
             option = '--' + option.replace('_', '-')
             for value in values:
                 value = value.format(**self.group.get_patterns())
-                self.args.append('%s=%s' % (option, value))
+
+                self._add_arg(option, value, opt_val_sep)
 
 
-    def add_path_args(self, *options):
+    def add_path_args(self, *options, **kwargs):
+        opt_val_sep = kwargs.get('opt_val_sep', '=')
+
         for option in options:
             value = self.conf.get(option)
             if value is None:
@@ -165,10 +196,41 @@ class Task(BaseTask):
 
             option = '--' + option.replace('_', '-')
             value = expand_resource(self.group, value)
-            self.args.append('%s=%s' % (option, value))
+            self._add_arg(option, value, opt_val_sep)
 
 
-    def add_str_args(self, *options):
+    def add_path_list_args_join(self, separator, *options, **kwargs):
+        opt_val_sep = kwargs.get('opt_val_sep', '=')
+
+        for option in options:
+            values = make_list(self.conf.get(option))
+            if len(values) == 0:
+                continue
+
+            option = '--' + option.replace('_', '-')
+            value = separator.join(expand_resource(self.group, x)\
+                    for x in values)
+
+            self._add_arg(option, value, opt_val_sep)
+
+
+    def add_path_list_args_multi(self, *options, **kwargs):
+        opt_val_sep = kwargs.get('opt_val_sep', '=')
+
+        for option in options:
+            values = make_list(self.conf.get(option))
+            if len(values) == 0:
+                continue
+
+            option = '--' + option.replace('_', '-')
+            for value in values:
+                value = expand_resource(self.group, value)
+                self._add_arg(option, value, opt_val_sep)
+
+
+    def add_str_args(self, *options, **kwargs):
+        opt_val_sep = kwargs.get('opt_val_sep', '=')
+
         for option in options:
             value = self.conf.get(option)
             if value is None:
@@ -176,4 +238,4 @@ class Task(BaseTask):
 
             option = '--' + option.replace('_', '-')
             value = value.format(**self.group.get_patterns())
-            self.args.append('%s=%s' % (option, value))
+            self._add_arg(option, value, opt_val_sep)
