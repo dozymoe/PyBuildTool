@@ -3,15 +3,67 @@ Preprocess CSS files using [Stylus](http://learnboost.github.io/stylus/).
 
 Options:
 
-    * plugins       : list, [],    location of stylus plugins
-    * inline_image  : bool, False, use data URI
-    * include_paths : list, [],    lookup paths
-    * compress      : bool, False, compress CSS output
-    * firebug       : bool, False, debug information for FireStylus
-    * line_numbers  : bool, False, print out stylus line number
-    * import_files  : bool, [],    always import selected stylus files
-    * include_css   : bool, True,  pull in CSS files with @import
-    * resolve_url   : bool, True,  resolve relative urls inside imports
+    * work_dir : str, None
+               : change current directory
+
+    * use : list, None
+          : utilize the Stylus plugin at <path>
+
+    * inline : bool, None
+             : use data URI
+
+    * include : list, None
+              : Add <path> to lookup paths
+
+    * compress : bool, None
+               : compress CSS output
+
+    * firebug : bool, None
+              : Emits debug infos in the generated CSS that can be used by the
+              : FireStylus Firebug plugin
+
+    * line_numbers : bool, None
+                   : Emits comments in the generated CSS indicating the
+                   : corresponding Stylus line
+
+    * sourcemap : bool, None
+                : Generates a sourcemap in sourcemaps v3 format
+
+    * sourcemap_inline : bool, None
+                       : Inlines sourcemap with full source text in base64
+                       : format
+
+    * sourcemap_root : str, None
+                     : "sourceRoot" property of the generated sourcemap
+
+    * sourcemap_base : str, None
+                     : Base <path> from which sourcemap and all sources are
+                     : relative
+
+    * prefix : str, None
+             : prefix all css classes
+
+    * import : list, None
+             : Import Stylus <file>
+
+    * include_css : bool, None
+                  : Include regular CSS on @import
+
+    * deps : bool, None
+           : Display dependencies of the compiled files
+
+    * disable_cache : bool, None
+                    : Disable caching
+
+    * hoist_atrules : bool, None
+                    : Move @import and @charset to the top
+
+    * resolve_url : bool, None
+                  : Resolve relative urls inside imports
+
+    * resolve_url_nocheck : bool, None
+                          : Like --resolve-url but without file existence check
+
 
 Requirements:
 
@@ -20,79 +72,53 @@ Requirements:
       to install, run `npm install --save-dev stylus`
 
 """
-
 import os
 from pybuildtool.core.task import Task as BaseTask
-from pybuildtool.misc.collections_utils import make_list
 from pybuildtool.misc.path import expand_resource
 
 tool_name = __name__
 
 class Task(BaseTask):
 
+    name = tool_name
     conf = {
         'replace_patterns': ((r'\.styl$', '.css'),)
     }
-    name = tool_name
+    workdir = None
 
     def prepare(self):
         cfg = self.conf
         self.args = ['--print']
-        args = self.args
 
-        # Utilize the Stylus plugins.
-        for plugin_dir in make_list(cfg.get('plugins')):
-            args.append("--use '%s'" % plugin_dir)
-
-        # Utilize image inlining via data URI support.
-        c = cfg.get('inline_image', False)
+        c = cfg.get('work_dir')
         if c:
-            args.append('--inline')
+            self.workdir = expand_resource(self.group, c)
 
-        # Add <path> to lookup paths.
-        for include_dir in make_list(cfg.get('include_paths')):
-            args.append("--include '%s'" % expand_resource(self.group,
-                    include_dir))
+        self.add_bool_args('inline', 'compress', 'firebug', 'line_numbers',
+                'sourcemap', 'sourcemap_inline', 'include_css', 'deps',
+                'disable_cache', 'hoist_atrules', 'resolve_url',
+                'resolve_url_nocheck')
 
-        # Compress CSS output.
-        c = cfg.get('compress', False)
-        if c:
-            args.append('--compress')
+        self.add_path_args('sourcemap_base', opt_val_sep=' ')
 
-        # Emits debug infos in the generated CSS that can be used by the
-        # FireStylus Firebug plugin.
-        c = cfg.get('firebug', False)
-        if c:
-            args.append('--firebug')
+        self.add_path_list_args_multi('use', 'include', 'import',
+                opt_val_sep=' ')
 
-        # Emits comments in the generated CSS indicating the corresponding
-        # Stylus line
-        c = cfg.get('line_numbers', False)
-        if c:
-            args.append('--line-numbers')
-
-        # Import stylus <file>.
-        for import_file in make_list(cfg.get('import_files')):
-            args.append("--import '%s'" % expand_resource(self.group,
-                    import_file))
-
-        # Include regular CSS on @import
-        c = cfg.get('include_css', True)
-        if c:
-            args.append('--include-css')
-
-        # Resolve relative urls inside imports
-        c = cfg.get('resolve_url', True)
-        if c:
-            args.append('--resolve-url')
+        self.add_str_args('sourcemap_root', 'prefix', opt_val_sep=' ')
 
 
     def perform(self):
         if len(self.file_in) != 1:
-            self.bld.fatal('%s only need one input' % tool_name.capitalize())
+            self.bld.fatal('%s only need one input, got %s' % (
+                    tool_name.capitalize(), repr(self.file_in)))
+
         if len(self.file_out) != 1:
-            self.bld.fatal('%s can only have one output' %\
-                    tool_name.capitalize())
+            self.bld.fatal('%s can only have one output, got %s ' % (\
+                    tool_name.capitalize(), repr(self.file_out)))
+
+        kwargs = {}
+        if self.workdir is not None:
+            kwargs['cwd'] = self.workdir
 
         executable = self.env['%s_BIN' % tool_name.upper()]
         return self.exec_command(
@@ -101,7 +127,8 @@ class Task(BaseTask):
             arg=' '.join(self.args),
             in_=self.file_in[0],
             out=self.file_out[0],
-        ))
+        ),
+        **kwargs)
 
 
 def configure(conf):
