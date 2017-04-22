@@ -26,7 +26,7 @@ Options:
 Requirements:
 
     * clean-css
-      to install, run `npm install --save-dev clean-css`
+      to install, run `npm install --save-dev clean-css-cli`
     * node.js
 
 """
@@ -123,7 +123,7 @@ class Task(BaseTask):
 
 
 def configure(conf):
-    bin_path = 'node_modules/clean-css/bin/cleancss'
+    bin_path = 'node_modules/clean-css-cli/bin/cleancss'
     conf.start_msg("Checking for program '%s'" % tool_name)
     if os.path.exists(bin_path):
         bin_path = os.path.realpath(bin_path)
