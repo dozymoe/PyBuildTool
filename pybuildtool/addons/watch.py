@@ -107,6 +107,9 @@ def watch(bld):
     print('We are WATCHING your every moves ...')
 
     build_args = sys.argv[:]
+    if 'PYTHON_BIN' in os.environ:
+        build_args.insert(0, os.environ['PYTHON_BIN'])
+
     for ii in range(1, len(build_args)):
         if build_args[ii].startswith('watch'):
             build_args[ii] = build_args[ii].replace('watch', 'build', 1)
