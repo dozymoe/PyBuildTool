@@ -1,4 +1,4 @@
-"""
+r"""
 FlatBuffers is an efficient cross platform serialization library for C++, C#,
 C, Go, Java, JavaScript, PHP, and Python. It was originally created at Google
 for game development and other performance-critical applications.
@@ -125,7 +125,7 @@ Requirements:
 
 """
 from pybuildtool.core.task import Task as BaseTask
-from pybuildtoo.misc.path import expand_resource
+from pybuildtool.misc.path import expand_resource
 
 tool_name = __name__
 
@@ -157,7 +157,7 @@ class Task(BaseTask):
             if output_dir is None:
                 self.bld.fatal(c + ' was not found.')
             args.append('-o')
-            args.append(ouput_dir)
+            args.append(output_dir)
 
         c = cfg.get('include_dir')
         if c:
@@ -171,7 +171,7 @@ class Task(BaseTask):
     def perform(self):
         if len(self.file_in) == 0:
             self.bld.fatal('%s needs input' % tool_name.capitalize())
-        if len(self.file_out) !=0:
+        if len(self.file_out) != 0:
             self.bld.fatal('%s produces no output' % tool_name.capitalize())
 
         executable = self.env['%s_BIN' % tool_name.upper()]

@@ -1,4 +1,5 @@
-'''
+# pylint:disable=line-too-long
+r'''
 Run MSBuild.
 
 Builds the specified targets in the project file. If a project file is not
@@ -18,7 +19,7 @@ Options:
                : property name, and <v> is the property value.
                : Example:
                :   - WarningLevel=2
-               :   - OutDir=bin\Debug\ 
+               :   - OutDir=bin\Debug\
 
     * max_cpu_count : int, None
                     : Specifies the maximum number of concurrent processes to
@@ -235,6 +236,7 @@ Requirements:
     * Microsoft Visual Studio
 
 '''
+# pylint:enable=line-too-long
 import os
 from pybuildtool.core.task import Task as BaseTask
 from pybuildtool.misc.collections_utils import make_list

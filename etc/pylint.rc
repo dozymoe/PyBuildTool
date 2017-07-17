@@ -37,7 +37,7 @@ enable=E0611,E1103,E1124,E1125,E0110,E0111,E1122,E1123,E1206,E1120,E0202,E0203,E
 # --enable=similarities". If you want to run only the classes checker, but have
 # no Warning level messages displayed, use"--disable=all --enable=classes
 # --disable=W"
-disable=protected-access,missing-docstring,invalid-name,fixme,star-args,too-many-public-methods,no-member,too-few-public-methods,bad-continuation,arguments-differ,unused-argument,locally-disabled,duplicate-code,too-many-arguments,no-self-use,too-many-locals,too-many-branches,too-many-statements,too-many-ancestors,superfluous-parens,abstract-class-not-used,abstract-class-little-used,interface-not-implemented,too-many-instance-attributes,pointless-string-statement
+disable=protected-access,missing-docstring,invalid-name,fixme,star-args,too-many-public-methods,no-member,too-few-public-methods,bad-continuation,arguments-differ,unused-argument,locally-disabled,duplicate-code,too-many-arguments,no-self-use,too-many-locals,too-many-branches,too-many-statements,too-many-ancestors,superfluous-parens,abstract-class-not-used,abstract-class-little-used,interface-not-implemented,too-many-instance-attributes,pointless-string-statement,locally-enabled
 
 
 [REPORTS]
