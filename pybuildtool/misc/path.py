@@ -1,4 +1,6 @@
 import os
+import subprocess
+import sys
 
 def expand_resource(group, path):
     """Get real path of a resource."""
@@ -53,3 +55,11 @@ def expand_wildcard(group, path):
             return [node.abspath()]
 
     return []
+
+
+def PATH(path):
+    if sys.platform != 'msys':
+        return path
+
+    msys_path = subprocess.check_output(['cygpath', '-u', path])
+    return msys_path.decode().rstrip()
