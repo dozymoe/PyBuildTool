@@ -145,7 +145,7 @@ Options:
                          : a different logger instance to each node. To specify
                          : multiple loggers, specify each logger separately.
                          : The <logger> syntax is:
-                         : [<logger class>,]<logger assembly>[;<logger parameters>]
+                         : [<logger class>,]<logger assembly>[;<logger parameters>]  #  noqa
                          : The <logger class> syntax is:
                          : [<partial or full namespace>.]<logger class name>
                          : The <logger assembly> syntax is:

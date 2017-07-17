@@ -1,4 +1,4 @@
-'''
+r'''
 Restores NuGet packages.
 
 If a solution is specified, this command restores NuGet packages that are
