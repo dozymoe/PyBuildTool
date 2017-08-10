@@ -67,6 +67,7 @@ def configure(ctx):
     ctx.load('pylint', tooldir=tools_dir)
     #ctx.load('requirejs', tooldir=tools_dir)
     #ctx.load('restructuredtext-lint', tooldir=tools_dir)
+    #ctx.load('runit_sv', tooldir=tools_dir)
     #ctx.load('roscpplint', tooldir=tools_dir)
     #ctx.load('scp', tooldir=tools_dir)
     #ctx.load('shell', tooldir=tools_dir)
