@@ -49,6 +49,7 @@ def configure(ctx):
     #ctx.load('concat', tooldir=tools_dir)
     #ctx.load('cp', tooldir=tools_dir)
     #ctx.load('cppcheck', tooldir=tools_dir)
+    #ctx.load('dot', tooldir=tools_dir)
     #ctx.load('doxygen', tooldir=tools_dir)
     #ctx.load('gzip', tooldir=tools_dir)
     #ctx.load('handlebars', tooldir=tools_dir)
