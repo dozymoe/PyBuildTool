@@ -204,13 +204,13 @@ class Task(BaseTask):
             success = success and was_success
             changed = changed or was_changed
 
-        if changed:
-            self.finalize_shadow_jutsu(use_file_out=True)
-        elif success:
-            for fo in self.file_out:
-                if not os.path.exists(fo):
-                    self.finalize_shadow_jutsu(use_file_out=True)
-                    break
+        #if changed:
+        #    self.finalize_shadow_jutsu(use_file_out=True)
+        #elif success:
+        #    for fo in self.file_out:
+        #        if not os.path.exists(fo):
+        #            self.finalize_shadow_jutsu(use_file_out=True)
+        #            break
 
         if success:
             return 0
