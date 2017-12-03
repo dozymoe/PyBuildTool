@@ -3,12 +3,17 @@ Run shell commands.
 
 Options:
 
-    * work_dir     : str, None, change current directory before
-                                running shell command
-    * virtualenv   : str, None, python virtualenv directory
-    * commands     : str, None, shell command
+    * work_dir : str, None
+               : Change current directory before running shell command
+
+    * command  : str, None
+               : shell command
+
+    * environ  : dict, None
+               : Key value pair of shell environment.
 
 """
+import os
 
 from pybuildtool.core.task import Task as BaseTask
 from pybuildtool.misc.path import expand_resource
@@ -23,31 +28,50 @@ class Task(BaseTask):
     name = tool_name
     workdir = None
     cmd = None
+    environ = None
 
     def prepare(self):
         cfg = self.conf
-
-        # Virtualenv
-        c = cfg.get('virtualenv', None)
-        if c:
-            self.prefix.append('source %s/bin/activate;' \
-                % expand_resource(self.group, c))
 
         # Change current directory
         c = cfg.get('work_dir', None)
         if c:
             self.workdir = expand_resource(self.group, c)
             if self.workdir is None:
-                self.bld.fatal(cfg['work_dir'] + ' not found.')
+                self.bld.fatal(c + ' not found.')
+        else:
+            c = os.environ.get('ROOT_DIR')
+            if c:
+                self.workdir = c
 
-        self.cmd = cfg.get('commands').format(**self.group.get_patterns())
+        c = cfg.get('command')
+        if c:
+            self.cmd = c.format(**self.group.get_patterns())
+        else:
+            self.bld.fatal('command option is required.')
+
+        # Shell environment
+        self.environ = {}
+        c = cfg.get('environ', None)
+        if c:
+            for key, value in c.items():
+                self.environ[key] = value.format(**self.group.get_patterns())
 
 
     def perform(self):
         if len(self.file_out) != 0:
             self.bld.fatal('%s produces no output' % tool_name.capitalize())
 
-        kwargs = {'stdout': None, 'stderr': None}
+        environ = os.environ.copy()
+        for key, value in self.environ.items():
+            environ[key] = value
+
+        kwargs = {
+            'stdout': None,
+            'stderr': None,
+            'shell': True,
+            'env': environ,
+        }
         if self.workdir is not None:
             kwargs['cwd'] = self.workdir
 
