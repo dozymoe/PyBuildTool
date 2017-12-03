@@ -225,8 +225,6 @@ class Task(BaseTask):
             kwargs['cwd'] = self.workdir
 
         executable = self.env['%s_BIN' % tool_name.upper()]
-        print([executable, '-o' + self.file_out[0]] +\
-                self.args, **kwargs)
         return self.exec_command([executable, '-o' + self.file_out[0]] +\
                 self.args + self.file_in, **kwargs)
 
