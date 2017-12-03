@@ -1,27 +1,25 @@
+from hashlib import md5
 import os
 import re
-from pybuildtool.misc.collections_utils import make_list
-from pybuildtool.misc.path import expand_resource
+
+from ..misc.collections_utils import make_list
+from ..misc.path import expand_resource
+
+
+def token_to_filename(token_name):
+    return os.path.join('.tokens', token_name.replace('/', '__'))
+
 
 class Rule(object):
 
-    def __init__(self, group, config, file_in, file_out, token_in, token_out,
-            depend_in, extra_out):
-
+    def __init__(self, group, config, file_in, file_out, depend_in, extra_out):
         self.conf = config or {}
         self.file_in = file_in or []
         self.file_out = file_out or []
-        self.token_in = token_in or []
-        self.token_out = token_out or []
         self.depend_in = depend_in or []
         self.extra_out = extra_out or []
         self.group = group
         self.bld = group.context
-
-        # token_out should only contain one item, can't really think of a
-        # reason otherwise
-        if len(self.token_out) > 1:
-            self.bld.fatal('A rule may only produce one token')
 
         # expands wildcards (using ant_glob)
         for fs in (self.file_in, self.depend_in):
@@ -50,12 +48,18 @@ class Rule(object):
         items += for_insertion
 
 
-    def _token_to_filename(self, token_name):
-        if '/' in token_name:
-            self.bld.fatal('Invalid token name: "%s"'% token_name)
+    def _extra_plus_token(self, file_out=None):
+        for f in self.extra_out:
+            yield f
 
-        return os.path.join('.waf_flags_token',
-                token_name.replace(':', '__'))
+        token_out = token_to_filename(self.group.get_name())
+        if file_out:
+            if hasattr(file_out, 'encode'):
+                yield token_out + '-' + md5(file_out.encode()).hexdigest()
+            else:
+                yield token_out + '-' + md5(file_out).hexdigest()
+        else:
+            yield token_out
 
 
     @property
@@ -90,15 +94,8 @@ class Rule(object):
 
 
     @property
-    def tokens(self):
-        return self.token_out
-
-
-    @property
     def rules(self):
         result = []
-        token_in = [self._token_to_filename(t) for t in self.token_in]
-        token_out = [self._token_to_filename(t) for t in self.token_out]
 
         if len(self.extra_out) and (len(self.file_out) > 1 or\
                 (len(self.file_out) and self.file_out[0].endswith(
@@ -111,10 +108,8 @@ class Rule(object):
                 result.append({
                     'file_in': self.file_in,
                     'file_out': [fo],
-                    'token_in': token_in,
-                    'token_out': token_out,
                     'depend_in': self.depend_in,
-                    'extra_out': self.extra_out,
+                    'extra_out': self._extra_plus_token(fo),
                 })
                 continue
 
@@ -124,10 +119,8 @@ class Rule(object):
                     result.append({
                         'file_in': [fi],
                         'file_out': [fo],
-                        'token_in': token_in,
-                        'token_out': token_out,
                         'depend_in': self.depend_in,
-                        'extra_out': self.extra_out,
+                        'extra_out': self._extra_plus_token(fo),
                     })
                     continue
 
@@ -144,22 +137,20 @@ class Rule(object):
                     fofi = fofi[len(basedir):].strip('/')
                 else:
                     fofi = os.path.basename(fofi)
+
+                fofi = os.path.join(fo, fofi)
                 result.append({
                     'file_in': [fi],
-                    'file_out': [os.path.join(fo, fofi)],
-                    'token_in': token_in,
-                    'token_out': token_out,
+                    'file_out': [fofi],
                     'depend_in': self.depend_in,
-                    'extra_out': self.extra_out,
+                    'extra_out': self._extra_plus_token(fofi),
                 })
 
-        if len(self.file_out) == 0 and token_out:
+        if not self.file_out:
             result.append({
                 'file_in': self.file_in,
-                'token_in': token_in,
-                'token_out': token_out,
                 'depend_in': self.depend_in,
-                'extra_out': self.extra_out,
+                'extra_out': self._extra_plus_token(),
             })
 
         return result

@@ -4,8 +4,8 @@ from time import time
 from uuid import uuid4
 from waflib.Task import Task as BaseTask # pylint:disable=import-error
 
-from pybuildtool.misc.collections_utils import make_list
-from pybuildtool.misc.path import expand_resource
+from ..misc.collections_utils import make_list
+from ..misc.path import expand_resource
 
 class Task(BaseTask):
 
@@ -69,7 +69,7 @@ class Task(BaseTask):
 
         for node in self.inputs:
             path = node.abspath()
-            if node.parent.name.startswith('.waf_flags_'):
+            if node.parent.name == '.tokens':
                 self.token_in.append(path)
             elif getattr(node, 'is_virtual_in_' + task_uid, False):
                 pass
@@ -80,7 +80,7 @@ class Task(BaseTask):
 
         for node in self.outputs:
             path = node.abspath()
-            if node.parent.name.startswith('.waf_flags_'):
+            if node.parent.name == '.tokens':
                 self.token_out.append(path)
             elif getattr(node, 'is_virtual_out_' + task_uid, False):
                 pass
@@ -88,12 +88,8 @@ class Task(BaseTask):
                 self.file_out.append(path)
 
 
-    def finalize_shadow_jutsu(self, use_file_out=False):
-        if use_file_out:
-            filenames = self.file_out
-        else:
-            filenames = self.token_out
-        for filename in filenames:
+    def finalize_shadow_jutsu(self):
+        for filename in self.token_out:
             try:
                 os.makedirs(os.path.dirname(filename))
             except OSError:

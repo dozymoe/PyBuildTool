@@ -1,7 +1,7 @@
 import os
 from waflib.Logs import debug # pylint:disable=import-error
-from pybuildtool.core.rule import Rule
-from pybuildtool.misc.collections_utils import data_merge
+from .rule import Rule
+from ..misc.collections_utils import data_merge
 
 class Group(object):
 
@@ -14,7 +14,7 @@ class Group(object):
     level = 1
     rule = None
 
-    def __init__(self, name, group, **config):
+    def __init__(self, name, group, config):
         self.name = name
         self.conf = config
         if group is not None:
@@ -31,8 +31,7 @@ class Group(object):
         while parent:
             names.append(parent.name)
             parent = parent.group
-        names.reverse()
-        return ':'.join(names)
+        return '/'.join(reversed(names))
 
 
     def get_patterns(self):
@@ -52,8 +51,8 @@ class Group(object):
         pass
 
 
-    def __call__(self, file_in=None, file_out=None, token_in=None,
-            token_out=None, depend_in=None, extra_out=None, **config):
+    def __call__(self, file_in=None, file_out=None, depend_in=None,
+            extra_out=None):
 
         bld = self.group.context
         try:
@@ -64,10 +63,8 @@ class Group(object):
         conf = {}
         data_merge(conf, self.conf)
         data_merge(conf, task_class.conf)
-        data_merge(conf, config)
 
-        self.rule = Rule(self, conf, file_in, file_out, token_in, token_out,
-                depend_in, extra_out)
+        self.rule = Rule(self, conf, file_in, file_out, depend_in, extra_out)
         for r in self.rule.rules:
             task = task_class(self.group, conf, env=bld.env)
             task_uid = task._id
@@ -132,20 +129,6 @@ class Group(object):
                 setattr(node, 'is_virtual_out_' + task_uid, True)
 
                 debug('%s:%s: %s', 'output', 'extra_out', str(node))
-                task.set_outputs(node)
-
-            for f in r.get('token_in', []):
-                node = bld.path.find_or_declare(f)
-                setattr(node, 'is_virtual_in_' + task_uid, True)
-
-                debug('%s:%s: %s', 'input', 'token_in', str(node))
-                task.set_inputs(node)
-
-            for f in  r.get('token_out', []):
-                node = bld.path.find_or_declare(f)
-                setattr(node, 'is_virtual_out_' + task_uid, True)
-
-                debug('%s:%s: %s', 'output', 'token_out', str(node))
                 task.set_outputs(node)
 
             bld.add_to_group(task)

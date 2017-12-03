@@ -5,19 +5,15 @@ pybuildtool:
     addons:
         pylint:
             raw_file_in: "{_1}/{_2}/*.py"
-            token_out: "{_1}:{_2}:{_3}"
 
     core:
         pylint:
             raw_file_in: "{_1}/{_2}/*.py"
-            token_out: "{_1}:{_2}:{_3}"
 
     misc:
         pylint:
             raw_file_in: "{_1}/{_2}/*.py"
-            token_out: "{_1}:{_2}:{_3}"
 
     tools:
         pylint:
             raw_file_in: "{_1}/{_2}/*.py"
-            token_out: "{_1}:{_2}:{_3}"

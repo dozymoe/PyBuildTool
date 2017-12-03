@@ -1,57 +1,51 @@
 import os
 import re
-from pybuildtool.core.group import Group
-from pybuildtool.misc.collections_utils import make_list
+from ..core.group import Group
+from ..core.rule import token_to_filename
+from .collections_utils import make_list
 
 def get_source_files(conf, bld):
     """Collect raw file inputs."""
 
-    files = []
     groups = {}
     constant_regex = re.compile(r'^[A-Z_]+$')
 
-    def parse_group(group_name, group, level):
+    def parse_group(group_name, config, level):
         groups['_%s' % level] = group_name
 
-        if group_is_leaf(group):
+        if group_is_leaf(config):
+            group_files = make_list(config.get('raw_file_in')) +\
+                    make_list(config.get('raw_depend_in'))
 
-            group_files = make_list(group.get('raw_file_in')) +\
-                    make_list(group.get('raw_depend_in'))
             for f in group_files:
-                f = f.format(**groups)
                 if f.startswith('@'):
                     continue
-                if not ('*' in f or '?' in f):
-                    files.append(os.path.realpath(f))
-                    continue
-                # expands wildcards (using ant_glob)
-                if os.path.isabs(f):
-                    paths = bld.root.ant_glob(f.lstrip('/'))
-                else:
-                    paths = bld.path.ant_glob(f)
-                files.extend(node.abspath() for node in paths)
+
+                yield f.format(**groups)
 
             return
 
-        for subgroup in group:
+        for subgroup in config:
             if subgroup == 'options':
                 continue
-            parse_group(subgroup, group[subgroup], level + 1)
+
+            for f in parse_group(subgroup, config[subgroup], level + 1):
+                yield f
 
     for group in conf:
         if constant_regex.match(group):
             continue
-        parse_group(group, conf[group], 1)
 
-    return files
+        for f in parse_group(group, conf[group], 1):
+            yield f
 
 
 def group_is_leaf(group):
     """The lowests in the group tree are the tools."""
 
     return any(x in group for x in ('file_in', 'raw_file_in', 'file_out',
-            'raw_file_out', 'token_in', 'token_out', 'depend_in',
-            'raw_depend_in', 'extra_out', 'raw_extra_out'))
+            'raw_file_out', 'depend_in', 'raw_depend_in', 'extra_out',
+            'raw_extra_out', 'rule_in'))
 
 
 def prepare_targets(conf, bld):
@@ -93,62 +87,55 @@ def prepare_targets(conf, bld):
                     yield node.relpath()
 
 
-    def parse_group(group_name, group, level, parent_group):
-        if 'options' in group:
-            options = group['options']
-            del group['options']
-        else:
-            options = {}
+    def parse_group(group_name, config, level, parent_group):
+        try:
+            options = config.pop('options', {})
+        except Exception as e:
+            print(config)
+            print(parent_group.get_name())
+            raise e
 
-        g = Group(group_name, parent_group, **options)
+        g = Group(group_name, parent_group, options)
         if parent_group is None:
             g.context = bld
 
         groups[g.get_name()] = g
         pattern = g.get_patterns()
 
-        if group_is_leaf(group):
-            original_file_in = make_list(group.get('file_in'))
+        if group_is_leaf(config):
+            original_file_in = make_list(config.get('file_in'))
             file_in = [x for x in _parse_input_listing(original_file_in,
                     pattern)]
-            _add_raw_files(make_list(group.get('raw_file_in')), file_in,
+            _add_raw_files(make_list(config.get('raw_file_in')), file_in,
                     pattern)
 
-            original_depend_in = make_list(group.get('depend_in'))
+            original_depend_in = make_list(config.get('depend_in'))
             depend_in = [x for x in _parse_input_listing(original_depend_in,
                     pattern)]
-            _add_raw_files(make_list(group.get('raw_depend_in')), depend_in,
+            _add_raw_files(make_list(config.get('raw_depend_in')), depend_in,
                     pattern)
 
-            original_file_out = make_list(group.get('file_out'))
+            original_file_out = make_list(config.get('file_out'))
             file_out = [x.format(**pattern) for x in original_file_out]
-            _add_raw_files(make_list(group.get('raw_file_out')), file_out,
+            _add_raw_files(make_list(config.get('raw_file_out')), file_out,
                     pattern)
 
-            original_extra_out = make_list(group.get('extra_out'))
+            original_extra_out = make_list(config.get('extra_out'))
             extra_out = [x.format(**pattern) for x in original_extra_out]
-            _add_raw_files(make_list(group.get('raw_extra_out')), extra_out,
+            _add_raw_files(make_list(config.get('raw_extra_out')), extra_out,
                     pattern)
 
-            original_token_in = make_list(group.get('token_in'))
-            token_in = []
-            for f in original_token_in:
+            original_task_in = make_list(config.get('rule_in'))
+            for f in original_task_in:
                 f = f.format(**pattern)
-                if f.startswith('@'):
-                    token_in += groups[f[1:]].rule.tokens
-                else:
-                    token_in.append(f)
+                depend_in.append(token_to_filename(f) + '*')
 
-            original_token_out = make_list(group.get('token_out'))
-            token_out = [x.format(**pattern) for x in original_token_out]
-
-            g(file_in=file_in, file_out=file_out, token_in=token_in,
-                    token_out=token_out, depend_in=depend_in,
+            g(file_in=file_in, file_out=file_out, depend_in=depend_in,
                     extra_out=extra_out)
             return
 
-        for subgroup in group:
-            parse_group(subgroup, group[subgroup], level + 1, g)
+        for subgroup in config:
+            parse_group(subgroup, config[subgroup], level + 1, g)
 
     for group in conf:
         if constant_regex.match(group):
