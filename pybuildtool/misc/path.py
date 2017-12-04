@@ -58,8 +58,8 @@ def expand_wildcard(group, path):
 
 
 def PATH(path):
-    if sys.platform != 'msys':
-        return path
+    if sys.platform in ('cygwin', 'msys'):
+        unix_path = subprocess.check_output(['cygpath', '-u', path])
+        return unix_path.decode().rstrip()
 
-    msys_path = subprocess.check_output(['cygpath', '-u', path])
-    return msys_path.decode().rstrip()
+    return path

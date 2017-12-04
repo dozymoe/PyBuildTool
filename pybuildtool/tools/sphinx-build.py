@@ -32,9 +32,7 @@ Requirements:
       to install, run `pip install sphinx`
 
 """
-
-from pybuildtool.core.task import Task as BaseTask
-from pybuildtool.misc.path import expand_resource
+from pybuildtool import BaseTask, expand_resource
 
 tool_name = __name__
 

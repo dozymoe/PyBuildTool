@@ -13,6 +13,7 @@ class Application(object):
     observer = None
 
     rebuild = True
+    reload = True
     running = True
 
     config_file = None
@@ -21,7 +22,8 @@ class Application(object):
     def __init__(self, bld):
         self.bld = bld
         self.watchers = {}
-        self.config_file = os.path.join(bld.path.abspath(), 'build.yml')
+        self.config_file = os.path.realpath(os.path.join(bld.path.abspath(),
+                'build.yml'))
 
         self.sysargs = sys.argv[:]
         # Something from [fireh_runner](https://github.com/dozymoe/fireh_runner],
@@ -42,9 +44,10 @@ class Application(object):
 
 
     def run(self):
-        self.reload()
-
         while self.running:
+            if self.reload:
+                self.do_reload()
+
             if self.rebuild:
                 self.rebuild = False
                 # On windows we'd be using waf.bat
@@ -56,10 +59,12 @@ class Application(object):
                 count += 1
                 sleep(1)
 
+        print('Closing files observers..')
         self.observer.close()
 
 
-    def reload(self):
+    def do_reload(self):
+        self.reload = False
         self.observer.close()
 
         with open(self.config_file, 'r') as f:

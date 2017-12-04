@@ -46,11 +46,8 @@ Requirements:
       to install, ??
 
 """
-
 import os
-from pybuildtool.core.task import Task as BaseTask
-from pybuildtool.misc.collections_utils import make_list
-from pybuildtool.misc.path import expand_resource
+from pybuildtool import BaseTask, expand_resource, make_list
 
 tool_name = __name__
 

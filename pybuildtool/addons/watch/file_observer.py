@@ -21,7 +21,7 @@ class FileChangeHandler(FileSystemEventHandler):
             return
 
         if event.src_path == self.app.config_file:
-            self.app.reload()
+            self.app.reload = True
 
         else:
             filters = self.file_patterns
@@ -79,10 +79,12 @@ class FileChangeHandler(FileSystemEventHandler):
 
 class FileObserver(object):
 
+    app = None
     observers = None
     handler = None
 
     def __init__(self, app):
+        self.app = app
         self.observers = []
         self.handler = FileChangeHandler(app)
 
@@ -91,6 +93,8 @@ class FileObserver(object):
         self.handler.set_files(files)
 
         dirnames = set()
+        dirnames.add(os.path.dirname(self.app.config_file))
+
         for filename in files:
             while True:
                 filename = os.path.dirname(filename)
@@ -111,6 +115,8 @@ class FileObserver(object):
     def close(self):
         for observer in self.observers:
             observer.stop()
+
+        for observer in self.observers:
             observer.join()
 
         self.observers = []

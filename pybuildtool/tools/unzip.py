@@ -14,8 +14,7 @@ Requirements:
 """
 
 import os
-from pybuildtool.core.task import Task as BaseTask
-from pybuildtool.misc.path import expand_resource
+from pybuildtool import BaseTask, expand_resource
 
 tool_name = __name__
 

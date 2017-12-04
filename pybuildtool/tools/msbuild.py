@@ -238,9 +238,7 @@ Requirements:
 '''
 # pylint:enable=line-too-long
 import os
-from pybuildtool.core.task import Task as BaseTask
-from pybuildtool.misc.collections_utils import make_list
-from pybuildtool.misc.path import PATH
+from pybuildtool import BaseTask, make_list, PATH
 
 tool_name = __name__
 

@@ -18,7 +18,7 @@ Requirements:
 """
 
 import os
-from pybuildtool.core.task import Task as BaseTask
+from pybuildtool import BaseTask
 
 tool_name = __name__
 

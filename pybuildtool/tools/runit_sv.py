@@ -23,8 +23,7 @@ Requirements:
     * runit
       to install, for example run `apt-get install runit`
 """
-from pybuildtool.core.task import Task as BaseTask
-from pybuildtool.misc.path import expand_resource
+from pybuildtool import BaseTask, expand_resource
 
 tool_name = __name__
 

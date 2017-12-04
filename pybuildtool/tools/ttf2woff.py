@@ -8,9 +8,8 @@ Requirements:
       to install, download/compile from http://people.mozilla.org/~jkew/woff/
 
 """
-
 import re
-from pybuildtool.core.task import Task as BaseTask
+from pybuildtool import BaseTask
 
 tool_name = __name__
 

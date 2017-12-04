@@ -22,10 +22,8 @@ Requirements:
 """
 import os
 import sys
-from pybuildtool.core.task import Task as BaseTask
-from pybuildtool.misc.path import expand_resource
-from pybuildtool.misc.collections_utils import is_non_string_iterable
 from yaml import safe_load as yaml_load
+from pybuildtool import BaseTask, expand_resource, is_non_string_iterable
 
 tool_name = __name__
 

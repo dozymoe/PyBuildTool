@@ -16,8 +16,7 @@ Requirements:
       to install, run `pip install html-linter`
 
 """
-from pybuildtool.core.task import Task as BaseTask
-from pybuildtool.misc.collections_utils import make_list
+from pybuildtool import BaseTask, make_list
 
 tool_name = __name__
 
