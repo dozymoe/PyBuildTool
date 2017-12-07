@@ -195,6 +195,9 @@ Warning
 ``waf`` does not like it if the source and target existed in the same directory,
 see: `Files are always built`_.
 
+If you used `rule_in` you may need to run `waf build` multiple times until there
+was nothing to build, when the system is first initialize with `waf configure`
+or by `waf clean`.
 
 Install
 -------

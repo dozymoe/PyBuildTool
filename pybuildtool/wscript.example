@@ -81,27 +81,16 @@ def configure(ctx):
     #ctx.load('ttf2woff', tooldir=tools_dir)
     #ctx.load('uglify-js', tooldir=tools_dir)
     #ctx.load('unzip', tooldir=tools_dir)
+    #ctx.load('webpack', tooldir=tools_dir)
 
 
-from waflib.Build import BuildContext, CleanContext, InstallContext
-from waflib.Build import UninstallContext
-from waflib.Context import Context
-
-class WatchContext(Context):
-    cmd = 'watch'
-    fun = 'watch'
-    variant = ''
+from waflib.Build import BuildContext, CleanContext
+from pybuildtool.core.context import WatchContext
 
 for index, stage in enumerate(STAGES):
-    for build_class in (BuildContext, CleanContext, InstallContext,
-            UninstallContext, WatchContext):
-
+    for build_class in (BuildContext, CleanContext, WatchContext):
         if index == 0:
-            BuildContext.variant = stage
-            CleanContext.variant = stage
-            InstallContext.variant = stage
-            UninstallContext.variant = stage
-            WatchContext.variant = stage
+            build_class.variant = stage
             continue
 
         name = build_class.__name__.replace('Context', '').lower()

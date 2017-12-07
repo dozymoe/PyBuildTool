@@ -51,9 +51,7 @@ class Group(object):
         pass
 
 
-    def __call__(self, file_in=None, file_out=None, depend_in=None,
-            extra_out=None):
-
+    def __call__(self, file_in, file_out, depend_in, extra_out):
         bld = self.group.context
         try:
             task_class = bld.tools[self.name].Task

@@ -1,12 +1,10 @@
 import os
 import re
 from ..core.group import Group
-from ..core.rule import token_to_filename
 from .collections_utils import make_list
 
 def get_source_files(conf, bld):
     """Collect raw file inputs."""
-
     groups = {}
     constant_regex = re.compile(r'^[A-Z_]+$')
 
@@ -18,10 +16,15 @@ def get_source_files(conf, bld):
                     make_list(config.get('raw_depend_in'))
 
             for f in group_files:
-                if f.startswith('@'):
-                    continue
+                f = f.format(**groups)
+                if os.path.isabs(f):
+                    yield f
+                else:
+                    yield os.path.join(bld.top_dir, f)
 
-                yield f.format(**groups)
+            #for f in make_list(config.get('rule_in')):
+            #    f = token_to_filename(f.format(**groups), bld)
+            #    yield os.path.join(bld.variant_dir, f)
 
             return
 
@@ -125,10 +128,16 @@ def prepare_targets(conf, bld):
             _add_raw_files(make_list(config.get('raw_extra_out')), extra_out,
                     pattern)
 
-            original_task_in = make_list(config.get('rule_in'))
-            for f in original_task_in:
-                f = f.format(**pattern)
-                depend_in.append(token_to_filename(f) + '*')
+            rules_in = [x.format(**pattern) for x in make_list(
+                    config.get('rule_in'))]
+
+            for rule_in in rules_in:
+                try:
+                    token_names = bld._token_names[rule_in]
+                    for f in token_names:
+                        depend_in.append(f)
+                except (KeyError, AttributeError):
+                    print('rule not found.')
 
             g(file_in=file_in, file_out=file_out, depend_in=depend_in,
                     extra_out=extra_out)

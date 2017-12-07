@@ -6,8 +6,9 @@ from ..misc.collections_utils import make_list
 from ..misc.path import expand_resource
 
 
-def token_to_filename(token_name):
-    return os.path.join('.tokens', token_name.replace('/', '__'))
+def token_to_filename(token_name, bld):
+    return os.path.join(bld.variant_dir, '.tokens',
+            token_name.replace('/', '__'))
 
 
 class Rule(object):
@@ -52,14 +53,25 @@ class Rule(object):
         for f in self.extra_out:
             yield f
 
-        token_out = token_to_filename(self.group.get_name())
+        token_out = token_to_filename(self.group.get_name(), self.bld)
         if file_out:
             if hasattr(file_out, 'encode'):
-                yield token_out + '-' + md5(file_out.encode()).hexdigest()
+                token_out += '-' + md5(file_out.encode()).hexdigest()
             else:
-                yield token_out + '-' + md5(file_out).hexdigest()
-        else:
-            yield token_out
+                token_out += '-' + md5(file_out).hexdigest()
+
+        group_name = self.group.get_name()
+        try:
+            token_names = self.bld._token_names[group_name]
+        except KeyError:
+            token_names = []
+            self.bld._token_names[group_name] = token_names
+        except AttributeError:
+            token_names = []
+            self.bld._token_names = {group_name: token_names}
+        token_names.append(token_out)
+
+        yield token_out
 
 
     @property
