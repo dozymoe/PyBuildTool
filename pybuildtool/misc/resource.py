@@ -22,10 +22,6 @@ def get_source_files(conf, bld):
                 else:
                     yield os.path.join(bld.top_dir, f)
 
-            #for f in make_list(config.get('rule_in')):
-            #    f = token_to_filename(f.format(**groups), bld)
-            #    yield os.path.join(bld.variant_dir, f)
-
             return
 
         for subgroup in config:

@@ -97,16 +97,18 @@ class FileObserver(object):
 
         for filename in files:
             while True:
-                filename = os.path.dirname(filename)
+                filename = os.path.dirname(os.path.realpath(filename))
                 if os.path.exists(filename) or not filename:
                     break
 
             if filename:
-                dirnames.add(filename)
+                for dirname in dirnames:
+                    if os.path.commonprefix([filename, dirname]) != dirname:
+                        dirnames.add(filename)
 
         for dirname in dirnames:
             observer = Observer()
-            observer.schedule(self.handler, dirname)
+            observer.schedule(self.handler, dirname, recursive=True)
             observer.start()
 
             self.observers.append(observer)
