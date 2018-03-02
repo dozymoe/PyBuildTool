@@ -90,8 +90,7 @@ def prepare_targets(conf, bld):
         try:
             options = config.pop('options', {})
         except Exception as e:
-            print(config)
-            print(parent_group.get_name())
+            print((parent_group.get_name(), group_name, dict(config), level))
             raise e
 
         g = Group(group_name, parent_group, options)
@@ -132,8 +131,12 @@ def prepare_targets(conf, bld):
                     token_names = bld._token_names[rule_in]
                     for f in token_names:
                         depend_in.append(f)
-                except (KeyError, AttributeError):
-                    print('rule not found.')
+                except (KeyError, AttributeError) as e:
+                    print((parent_group.get_name(), group_name, dict(config),
+                            level))
+
+                    bld.fatal('rule "%s" not found in: %s' % (rule_in, ', '.join(
+                            bld._token_names.keys())))
 
             g(file_in=file_in, file_out=file_out, depend_in=depend_in,
                     extra_out=extra_out)

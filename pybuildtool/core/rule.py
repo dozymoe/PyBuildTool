@@ -116,6 +116,17 @@ class Rule(object):
             self.bld.fatal('Cannot use extra_out with multiple file_out')
 
         for fo in self.file_out:
+            if not self.file_in:
+                # okay this is weird, no file_in but there is a file_out
+                # it is possible though, but shouldn't you use extra_out?
+                result.append({
+                    'file_in': self.file_in,
+                    'file_out': [fo],
+                    'depend_in': self.depend_in,
+                    'extra_out': self._extra_plus_token(fo),
+                })
+                continue
+
             if self.conf.get('_source_grouped_', False):
                 result.append({
                     'file_in': self.file_in,
