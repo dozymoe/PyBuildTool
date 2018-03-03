@@ -192,6 +192,8 @@ Several things to keep in mind:
 Warning
 -------
 
+Apparently doesn't work with waf version 2, the build order is a mess.
+
 ``waf`` does not like it if the source and target existed in the same directory,
 see: `Files are always built`_.
 
