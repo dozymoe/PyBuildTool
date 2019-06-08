@@ -251,16 +251,16 @@ class Task(BaseTask):
         arg = self.args
 
         targets = make_list(cfg.get('target'))
-        if len(targets):
+        if targets:
             arg.append('/target:' + ';'.join(targets))
 
         properties = make_list(cfg.get('property'))
-        if len(properties):
+        if properties:
             arg.append('/property:' + ';'.join(properties))
 
         c = cfg.get('max_cpu_count')
         if c is not None:
-            if len(c) == 0:
+            if not c:
                 arg.append('/maxcpucount')
             else:
                 arg.append('/maxcpucount:%i' % int(c))
@@ -274,7 +274,7 @@ class Task(BaseTask):
             arg.append('/verbosity:' + c)
 
         params = make_list(cfg.get('console_logger_parameters'))
-        if len(params):
+        if params:
             arg.append('/consoleloggerparameters:' + ';'.join(params))
 
         c = cfg.get('no_console_logger')
@@ -291,12 +291,12 @@ class Task(BaseTask):
                 arg.append('/fileLogger%i' % n)
 
         params = make_list(cfg.get('file_logger_parameters'))
-        if len(params):
+        if params:
             arg.append('/fileloggerparameters:' + ';'.join(params))
 
         for n in range(1, 10):
             params = make_list(cfg.get('file_logger_parameters%i' % n))
-            if len(params):
+            if params:
                 arg.append('/fileloggerparameters%i:%s' % (n, ';'.join(params)))
 
         loggers = make_list(cfg.get('distributed_logger'))
@@ -313,7 +313,7 @@ class Task(BaseTask):
 
         c = cfg.get('validate')
         if c is not None:
-            if len(c):
+            if c:
                 arg.append('/validate:' + c)
             else:
                 arg.append('/validate')

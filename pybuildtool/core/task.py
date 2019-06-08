@@ -157,7 +157,7 @@ class Task(BaseTask):
 
         for option in options:
             values = make_list(self.conf.get(option))
-            if len(values) == 0:
+            if not values:
                 continue
 
             option = '--' + option.replace('_', '-')
@@ -172,7 +172,7 @@ class Task(BaseTask):
 
         for option in options:
             values = make_list(self.conf.get(option))
-            if len(values) == 0:
+            if not values:
                 continue
 
             option = '--' + option.replace('_', '-')
@@ -200,7 +200,7 @@ class Task(BaseTask):
 
         for option in options:
             values = make_list(self.conf.get(option))
-            if len(values) == 0:
+            if not values:
                 continue
 
             option = '--' + option.replace('_', '-')
@@ -215,7 +215,7 @@ class Task(BaseTask):
 
         for option in options:
             values = make_list(self.conf.get(option))
-            if len(values) == 0:
+            if not values:
                 continue
 
             option = '--' + option.replace('_', '-')

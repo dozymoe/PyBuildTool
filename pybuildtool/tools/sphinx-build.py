@@ -92,7 +92,7 @@ class Task(BaseTask):
 
 
     def perform(self):
-        if len(self.file_out) != 0:
+        if self.file_out:
             self.bld.fatal('%s produces no output' % tool_name.capitalize())
 
         kwargs = {}

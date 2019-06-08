@@ -41,7 +41,7 @@ class Task(BaseTask):
 
         # Ignore unknown directives
         unknown = make_list(cfg.get('ignore_directives'))
-        if len(unknown):
+        if unknown:
             self.regex_ignores.append(re.compile('^Unknown directive type "(' +\
                     '|'.join(unknown) + ')".*'))
 
@@ -50,7 +50,7 @@ class Task(BaseTask):
 
         # Ignore unknown roles
         unknown = make_list(cfg.get('ignore_roles'))
-        if len(unknown):
+        if unknown:
             self.regex_ignores.append(re.compile('^Unknown interpreted text ' +\
                     'role "(' + '|'.join(unknown) + ')".*'))
 
@@ -64,7 +64,7 @@ class Task(BaseTask):
         result = 0
         for filename in self.file_in:
             errors = lint_file(filename, encoding=self.encoding)
-            if len(errors) == 0:
+            if not errors:
                 continue
 
             relpath = os.path.relpath(filename)

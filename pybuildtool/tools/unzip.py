@@ -46,7 +46,7 @@ class Task(BaseTask):
     def perform(self):
         if len(self.file_in) != 1:
             self.bld.fatal('%s only need one input' % tool_name.capitalize())
-        if len(self.file_out) != 0:
+        if self.file_out:
             self.bld.fatal('%s does not need output' % tool_name.capitalize())
 
         executable = self.env['%s_BIN' % tool_name.upper()]

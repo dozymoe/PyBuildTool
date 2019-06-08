@@ -48,7 +48,7 @@ class Task(BaseTask):
             args.append('--force')
 
         c = make_list(cfg.get('filters'))
-        if len(c):
+        if c:
             args.append('--filters="%s"' % ','.join(c))
 
         c_basedir = cfg.get('basedir', None)

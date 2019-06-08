@@ -3,7 +3,7 @@ from waflib.Logs import debug # pylint:disable=import-error
 from .rule import Rule
 from ..misc.collections_utils import data_merge
 
-class Group(object):
+class Group():
 
     name = None
     conf = None

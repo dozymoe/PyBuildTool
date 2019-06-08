@@ -31,9 +31,10 @@ Requirements:
 import os
 import sys
 import six
-from waflib import Logs # pylint:disable=import-error
 from yaml import safe_load as yaml_load
 from pybuildtool import BaseTask, expand_resource, make_list
+from pybuildtool.misc.python import load_module_from_filename
+from waflib import Logs # pylint:disable=import-error
 
 tool_name = __name__
 
@@ -123,14 +124,8 @@ class Task(BaseTask):
                 sys.path.append(dirname)
                 mod = __import__(filebase)
             else:
-                try:
-                    from importlib.machinery import SourceFileLoader
-                    mod = SourceFileLoader('context_python',
-                            python_file).load_module()
-                except ImportError:
-                    import imp
-                    mod = imp.load_source('context_python', python_file)
-                python_export = mod.export
+                mod = load_module_from_filename(python_file, filebase)
+            python_export = mod.export
             self.context.update(python_export)
 
         self.context.update(self.conf.get('context', {}))
@@ -180,7 +175,7 @@ class Task(BaseTask):
 
         success = True
         changed = False
-        if len(self.items):
+        if self.items:
             args = dict(self.args)
             kwargs = args['complex_args']
             for item in self.items:
@@ -211,13 +206,12 @@ class Task(BaseTask):
 
         if success:
             return 0
-        else:
-            return 1
+        return 1
 
 
 def configure(conf):
     conf.start_msg("Checking for python module '%s'" % tool_name)
     try:
-        import ansible # pylint: disable=unused-variable
+        import ansible # pylint: disable=unused-import
     except ImportError:
         conf.end_msg('not found', color='YELLOW')

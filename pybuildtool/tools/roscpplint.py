@@ -74,7 +74,7 @@ class Task(BaseTask):
 
         # Filters
         c = make_list(cfg.get('filter'))
-        if len(c):
+        if c:
             args.append('--filter=' + ','.join(c))
 
         # Counting
@@ -98,7 +98,7 @@ class Task(BaseTask):
 
 
     def perform(self):
-        if len(self.file_out) != 0:
+        if self.file_out:
             self.bld.fatal("%s doesn't produce files" % tool_name.capitalize())
 
         kwargs = {}

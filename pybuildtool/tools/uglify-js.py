@@ -154,7 +154,7 @@ class Task(BaseTask):
                 continue
 
             c = cfg[config]
-            if len(c):
+            if c:
                 args.append("--%s='%s'" % (config, c))
             else:
                 args.append('--' + config)

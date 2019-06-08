@@ -1,1 +1,9 @@
 include pybuildtool/README.rst pybuildtool/wscript.example
+exclude run
+exclude wscript*
+exclude requirements-*
+exclude build-*
+exclude .git*
+exclude MANIFEST.in
+prune etc
+prune lib

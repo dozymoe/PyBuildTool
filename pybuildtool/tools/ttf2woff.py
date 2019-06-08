@@ -51,7 +51,7 @@ class Task(BaseTask):
 
 
 def configure(conf):
-    if len(conf.env.MV_BIN) == 0:
+    if not conf.env.MV_BIN:
         conf.env.MV_BIN = conf.find_program('mv')[0]
 
     bin_path = conf.find_program('sfnt2woff')[0]

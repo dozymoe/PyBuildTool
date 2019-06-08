@@ -457,9 +457,9 @@ class Task(BaseTask):
 
 
     def perform(self):
-        if len(self.file_in) == 0:
+        if not self.file_in:
             self.bld.fatal('%s needs input' % tool_name.capitalize())
-        if len(self.file_out) != 0:
+        if self.file_out:
             self.bld.fatal("%s doesn't produce output" % tool_name.capitalize())
 
         if self.conf.get('relative') and self.workdir:

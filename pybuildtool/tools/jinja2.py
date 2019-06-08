@@ -24,6 +24,7 @@ import os
 import sys
 from yaml import safe_load as yaml_load
 from pybuildtool import BaseTask, expand_resource, is_non_string_iterable
+from pybuildtool.misc.python import load_module_from_filename
 
 tool_name = __name__
 
@@ -75,14 +76,8 @@ class Task(BaseTask):
                 sys.path.append(dirname)
                 mod = __import__(filebase)
             else:
-                try:
-                    from importlib.machinery import SourceFileLoader
-                    mod = SourceFileLoader('context_python',
-                            python_file).load_module()
-                except ImportError:
-                    import imp
-                    mod = imp.load_source('context_python', python_file)
-                python_export = mod.export
+                mod = load_module_from_filename(python_file, filebase)
+            python_export = mod.export
             self.context.update(python_export)
 
         self.context.update(cfg.get('context', {}))

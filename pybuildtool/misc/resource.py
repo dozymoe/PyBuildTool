@@ -135,8 +135,8 @@ def prepare_targets(conf, bld):
                     print((parent_group.get_name(), group_name, dict(config),
                             level))
 
-                    bld.fatal('rule "%s" not found in: %s' % (rule_in, ', '.join(
-                            bld._token_names.keys())))
+                    bld.fatal('rule "%s" not found in: %s' % (rule_in,
+                            ', '.join(bld._token_names.keys())))
 
             g(file_in=file_in, file_out=file_out, depend_in=depend_in,
                     extra_out=extra_out)

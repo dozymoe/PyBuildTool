@@ -67,16 +67,16 @@ class Task(BaseTask):
 
         # Plugins
         plugins = make_list(cfg.get('plugins'))
-        if len(plugins):
+        if plugins:
             args.append('--load-plugins=%s' % ','.join(plugins))
 
 
     def perform(self):
-        if len(self.file_in) == 0:
+        if not self.file_in:
             self.bld.fatal('%s for %s needs input' % (tool_name.capitalize(),
                     self.token_out[0]))
 
-        if len(self.file_out) != 0:
+        if self.file_out:
             self.bld.fatal('%s produces no output' % tool_name.capitalize())
 
         kwargs = {}

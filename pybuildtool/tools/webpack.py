@@ -3,6 +3,10 @@ webpack is a module bundler for modern JavaScript applications.
 
 Options:
 
+    * mode : str, None
+           : Enable production optimizations or development hints.
+           : values: development, production, none
+
     * config_file : str, None
                   : path to the config file
                   : default: webpack.config.js or webpackfile.js
@@ -247,7 +251,7 @@ class Task(BaseTask):
 
         self.add_path_list_args_multi('prefetch')
 
-        self.add_str_args('output_path', 'output_filename',
+        self.add_str_args('mode', 'output_path', 'output_filename',
                 'output_chunk_filename', 'output_source_map_filename',
                 'output_public_path', 'output_jsonp_function', 'output_library',
                 'output_library_target', 'records_output_path', 'records_path',

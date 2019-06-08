@@ -12,6 +12,8 @@
 
 *.pyc
 /*.egg-info/
+/.eggs/
+/build/
 /dist/
 /.virtualenv/
 /requirements.txt

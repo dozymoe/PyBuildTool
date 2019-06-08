@@ -37,7 +37,7 @@ class Task(BaseTask):
 
         # Flags
         c = make_list(cfg.get('flags'))
-        if len(c) == 0:
+        if not c:
             # see:
             # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=498809;msg=10
             c = [
@@ -53,7 +53,7 @@ class Task(BaseTask):
 
 
     def perform(self):
-        if len(self.file_out) != 0:
+        if self.file_out:
             self.bld.fatal('%s produces no output' % tool_name.capitalize())
 
         kwargs = {}

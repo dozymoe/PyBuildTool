@@ -3,19 +3,19 @@
     "default_project": "pybuildtool",
     "default_variant": "development",
 
-    "python_version": "3.5",
+    "python_version": "3.6",
     "virtualenv_dir": ".virtualenv",
-    "waf_version": "1.9.9",
+    "waf_version": "2.0.17",
 
     "modules": [
-        "fireh_runner.modules.setup",
-        "fireh_runner.modules.pip",
-        "fireh_runner.modules.python",
-        "fireh_runner.modules.waf"
+        "lib.fireh_runner.modules.setup",
+        "lib.fireh_runner.modules.pip",
+        "lib.fireh_runner.modules.python",
+        "lib.fireh_runner.modules.waf"
     ],
     "setup_modules": [
-        "fireh_runner.setup_modules.python",
-        "fireh_runner.setup_modules.pybuildtool"
+        "lib.fireh_runner.setup_modules.python",
+        "lib.fireh_runner.setup_modules.pybuildtool"
     ],
 
     "configuration": {

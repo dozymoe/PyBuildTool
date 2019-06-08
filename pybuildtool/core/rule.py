@@ -11,7 +11,7 @@ def token_to_filename(token_name, bld):
             token_name.replace('/', '__'))
 
 
-class Rule(object):
+class Rule():
 
     def __init__(self, group, config, file_in, file_out, depend_in, extra_out):
         self.conf = config or {}
@@ -109,8 +109,8 @@ class Rule(object):
     def rules(self):
         result = []
 
-        if len(self.extra_out) and (len(self.file_out) > 1 or\
-                (len(self.file_out) and self.file_out[0].endswith(
+        if self.extra_out and (len(self.file_out) > 1 or\
+                (self.file_out and self.file_out[0].endswith(
                 os.path.sep))):
 
             self.bld.fatal('Cannot use extra_out with multiple file_out')

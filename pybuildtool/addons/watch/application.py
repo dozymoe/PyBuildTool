@@ -3,7 +3,7 @@ from pybuildtool.misc.resource import get_source_files
 from subprocess import call
 import sys
 from time import sleep
-from yaml import load as yaml_load
+import yaml
 
 from .file_observer import FileObserver
 
@@ -68,7 +68,7 @@ class Application(object):
         self.observer.close()
 
         with open(self.config_file, 'r') as f:
-            config = yaml_load(f)
+            config = yaml.load(f, Loader=yaml.SafeLoader)
 
         self.observer.open(list(os.path.realpath(f) for f in\
                 get_source_files(config, self.bld)))

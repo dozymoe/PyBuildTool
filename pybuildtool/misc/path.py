@@ -22,6 +22,7 @@ def expand_resource(group, path):
             node = bld.path.find_resource(path)
         if node:
             return node.abspath()
+    return None
 
 
 def expand_wildcard(group, path):
@@ -34,11 +35,9 @@ def expand_wildcard(group, path):
         if os.path.isabs(path):
             return [node.abspath() for node in\
                     bld.root.ant_glob(path.lstrip('/'))]
+        return [node.abspath() for node in bld.path.ant_glob(path)]
 
-        else:
-            return [node.abspath() for node in bld.path.ant_glob(path)]
-
-    elif os.path.isabs(path):
+    if os.path.isabs(path):
         if path.endswith(os.path.sep):
             node = bld.root.find_dir(path.lstrip('/'))
         else:

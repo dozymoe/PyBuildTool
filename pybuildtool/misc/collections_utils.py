@@ -14,9 +14,7 @@ def data_merge(a, b):
         #if a is None or isinstance(a, str) or isinstance(a, unicode) or
         #isinstance(a, int) or isinstance(a, long) or isinstance(a, float):
 
-        if a is None or isinstance(a, str) or isinstance(a, int) or\
-                isinstance(a, float):
-
+        if a is None or isinstance(a, (str, int, float)):
             # border case for first run or if a is a primitive
             a = b
         elif isinstance(a, list):
@@ -55,7 +53,7 @@ def is_non_string_iterable(data):
     """Check if data was iterable but not a string."""
     # http://stackoverflow.com/a/17222092
     try:
-        if isinstance(data, unicode) or isinstance(data, str):
+        if isinstance(data, (unicode, str)):
             return False
     except NameError:
         pass
@@ -76,9 +74,9 @@ def make_list(items, nodict=False):
     """If items was not a list, create a list with it as a member."""
     if items is None:
         return []
-    elif not is_non_string_iterable(items):
+    if not is_non_string_iterable(items):
         return [items]
-    elif nodict and isinstance(items, dict):
+    if nodict and isinstance(items, dict):
         return [items]
-    else:
-        return items
+
+    return items

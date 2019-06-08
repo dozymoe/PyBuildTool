@@ -39,9 +39,9 @@ class Task(BaseTask):
         args = self.args
 
         c = make_list(cfg.get('disable'))
-        if len(c):
+        if c:
             invalid_disable_items = set(c) - self.DISABLE_LIST
-            if len(invalid_disable_items):
+            if invalid_disable_items:
                 self.bld.fatal('invalid disable configuration items: ' +\
                         ', '.join(invalid_disable_items))
             args.append('--disable=' + ','.join(c))

@@ -215,7 +215,7 @@ class Task(BaseTask):
 
         # Enable additional checks
         c = make_list(cfg.get('enable_check'))
-        if len(c):
+        if c:
             args.append('--enable=' + ','.join(c))
 
         # Exit code suppressions
@@ -287,7 +287,7 @@ class Task(BaseTask):
 
         # Relative paths
         c = make_list(cfg.get('relative_paths'))
-        if len(c):
+        if c:
             args.append('--relative-paths=' + ';'.join(c))
 
         # Rule
@@ -336,7 +336,7 @@ class Task(BaseTask):
 
 
     def perform(self):
-        if len(self.file_out) != 0:
+        if self.file_out:
             self.bld.fatal('%s produces no output' % tool_name.capitalize())
 
         kwargs = {}

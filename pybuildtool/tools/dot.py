@@ -214,7 +214,7 @@ class Task(BaseTask):
 
 
     def perform(self):
-        if len(self.file_in) == 0:
+        if not self.file_in:
             self.bld.fatal('%s needs input' % tool_name)
         if len(self.file_out) != 1:
             self.bld.fatal('%s produces one output' % tool_name)
