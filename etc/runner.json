@@ -11,7 +11,8 @@
         "lib.fireh_runner.modules.setup",
         "lib.fireh_runner.modules.pip",
         "lib.fireh_runner.modules.python",
-        "lib.fireh_runner.modules.waf"
+        "lib.fireh_runner.modules.waf",
+        "lib.fireh_runner.modules.virtualenv"
     ],
     "setup_modules": [
         "lib.fireh_runner.setup_modules.python",

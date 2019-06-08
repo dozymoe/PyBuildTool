@@ -96,7 +96,7 @@ class UploadCommand(Command):
 
     def run(self):
         self.status('Uploading the package to PyPI via Twine…')
-        os.system(here + '/run bin twine upload ' + here + '/dist/*')
+        os.system(here + '/run pybin twine upload ' + here + '/dist/*')
 
         self.status('Pushing git tags…')
         os.system('git tag v{0}'.format(about['__version__']))
