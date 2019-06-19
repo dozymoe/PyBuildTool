@@ -43,7 +43,6 @@ def configure(ctx):
     pybuildtool_dir = find_module('pybuildtool')[1]
     tools_dir = os.path.join(pybuildtool_dir, 'tools')
     #ctx.load('ansibleplay', tooldir=tools_dir)
-    #ctx.load('autoprefixer', tooldir=tools_dir)
     #ctx.load('browserify', tooldir=tools_dir)
     #ctx.load('clean-css', tooldir=tools_dir)
     #ctx.load('concat', tooldir=tools_dir)
@@ -66,6 +65,7 @@ def configure(ctx):
     #ctx.load('nunjucks', tooldir=tools_dir)
     #ctx.load('patch', tooldir=tools_dir)
     #ctx.load('pngcrush', tooldir=tools_dir)
+    #ctx.load('postcss', tooldir=tools_dir)
     ctx.load('pylint', tooldir=tools_dir)
     #ctx.load('requirejs', tooldir=tools_dir)
     #ctx.load('restructuredtext-lint', tooldir=tools_dir)
@@ -76,6 +76,7 @@ def configure(ctx):
     #ctx.load('sphinx-apidoc', tooldir=tools_dir)
     #ctx.load('sphinx-build', tooldir=tools_dir)
     #ctx.load('splint', tooldir=tools_dir)
+    #ctx.load('stylelint', tooldir=tools_dir)
     #ctx.load('stylus', tooldir=tools_dir)
     #ctx.load('ttf2eot', tooldir=tools_dir)
     #ctx.load('ttf2svg', tooldir=tools_dir)

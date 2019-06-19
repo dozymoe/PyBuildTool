@@ -122,6 +122,7 @@ Requirements:
 
 """
 import os
+from shutil import copyfile, Error
 from pybuildtool import BaseTask
 
 tool_name = __name__
@@ -165,6 +166,14 @@ class Task(BaseTask):
             self.bld.fatal('%s only need one input' % tool_name.capitalize())
         if len(self.file_out) != 1:
             self.bld.fatal('%s only have one output' % tool_name.capitalize())
+
+        if self.bld.variant in ('dev', 'devel', 'development'):
+            try:
+                copyfile(self.file_in[0], self.file_out[0])
+                return 0
+            except (IOError, Error):
+                self.bld.fatal('cannot copy file to ' + self.file_out[0])
+            return -1
 
         executable = self.env['%s_BIN' % tool_name.upper()]
         return self.exec_command(
