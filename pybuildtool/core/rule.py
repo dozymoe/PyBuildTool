@@ -78,8 +78,8 @@ class Rule():
     def files(self):
         # returns the output files after being processes by this tool
         result = []
-        if not self.file_out:
-            return result
+        #if not self.file_out:
+        #    return result
 
         for fo in self.file_out:
             is_dir = fo.endswith(os.path.sep)
