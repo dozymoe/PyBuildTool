@@ -6,6 +6,7 @@ Options:
     * mode : str, None
            : Enable production optimizations or development hints.
            : values: development, production, none
+           : If not set it'd be inferred from environment variables.
 
     * config_file : str, None
                   : path to the config file
@@ -205,8 +206,8 @@ Options:
 
 Requirements:
 
-    * webpack
-      to install, `npm install webpack`
+    * webpack, webpack-cli
+      to install, `npm install webpack webpack-cli`
 
 """
 import os
@@ -226,6 +227,12 @@ class Task(BaseTask):
         c = cfg.get('work_dir')
         if c:
             self.workdir = expand_resource(self.group, c)
+
+        c = cfg.get('mode', os.environ.get('NODE_ENV'))
+        if not c and self.bld.variant in ('prod', 'production'):
+            c = 'production'
+        if c:
+            args.append('--mode=' + c)
 
         self.add_bool_args('debug', 'verbose', 'progress', 'output_pathinfo',
                 'cache', 'watch_stdin', 'watch_poll', 'hot', 'labeled_modules',
@@ -251,7 +258,7 @@ class Task(BaseTask):
 
         self.add_path_list_args_multi('prefetch')
 
-        self.add_str_args('mode', 'output_path', 'output_filename',
+        self.add_str_args('output_path', 'output_filename',
                 'output_chunk_filename', 'output_source_map_filename',
                 'output_public_path', 'output_jsonp_function', 'output_library',
                 'output_library_target', 'records_output_path', 'records_path',
@@ -289,7 +296,7 @@ class Task(BaseTask):
 
 
 def configure(conf):
-    bin_path = 'node_modules/webpack/bin/webpack.js'
+    bin_path = 'node_modules/webpack-cli/bin/cli.js'
     conf.start_msg("Checking for program '%s'" % tool_name)
     if os.path.exists(bin_path):
         bin_path = os.path.realpath(bin_path)
