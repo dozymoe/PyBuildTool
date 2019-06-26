@@ -229,10 +229,12 @@ class Task(BaseTask):
             self.workdir = expand_resource(self.group, c)
 
         c = cfg.get('mode', os.environ.get('NODE_ENV'))
-        if not c and self.bld.variant in ('prod', 'production'):
-            c = 'production'
-        if c:
-            args.append('--mode=' + c)
+        if not c:
+            if self.bld.variant in ('prod', 'production'):
+                c = 'production'
+            else:
+                c = 'development'
+        args.append('--mode=' + c)
 
         self.add_bool_args('debug', 'verbose', 'progress', 'output_pathinfo',
                 'cache', 'watch_stdin', 'watch_poll', 'hot', 'labeled_modules',
