@@ -16,7 +16,7 @@ class Group():
 
     def __init__(self, name, group, config):
         self.name = name
-        self.conf = config
+        self.conf = {}
         if group is not None:
             self.group = group
             self.level = group.level + 1
