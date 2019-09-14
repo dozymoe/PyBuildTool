@@ -23,7 +23,7 @@ Requirements:
 import os
 import sys
 from yaml import safe_load as yaml_load
-from pybuildtool import BaseTask, expand_resource, is_non_string_iterable
+from pybuildtool import BaseTask, expand_resource, make_list
 from pybuildtool.misc.python import load_module_from_filename
 
 tool_name = __name__
@@ -34,17 +34,15 @@ class Task(BaseTask):
         '_source_grouped_': True,
     }
     name = tool_name
-    search_dir = ['.']
+    search_dir = None
     context = {}
 
     def prepare(self):
         cfg = self.conf
 
         # Change current directory
-        c = cfg.get('search_dir', [])
+        c = make_list(cfg.get('search_dir'))
         if c:
-            if not is_non_string_iterable(c):
-                c = [c]
             c = [x for x in (expand_resource(self.group, f) for f\
                     in c) if x]
         if c:

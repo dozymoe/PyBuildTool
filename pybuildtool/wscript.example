@@ -53,7 +53,7 @@ def configure(ctx):
     #ctx.load('gzip', tooldir=tools_dir)
     #ctx.load('handlebars', tooldir=tools_dir)
     #ctx.load('html-linter', tooldir=tools_dir)
-    #ctx.load('jinja2', tooldir=tools_dir)
+    #ctx.load('jinja', tooldir=tools_dir)
     #ctx.load('jscs', tooldir=tools_dir)
     #ctx.load('jshint', tooldir=tools_dir)
     #ctx.load('less', tooldir=tools_dir)
