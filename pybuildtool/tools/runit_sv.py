@@ -37,7 +37,7 @@ class Task(BaseTask):
 
         c = cfg.get('wait_sec', None)
         if c is not None:
-            args.append('-w' + c)
+            args.append('-w%s' % c)
 
         command = cfg.get('command', None)
         if command is None:

@@ -7,11 +7,12 @@ processed, the others are treated as dependency.
 Options:
 
     * search_dir    : str, [], directories to search for templates
-    * context_python: str, None, python scripts containing context for template
+    * context_python: str, [], python scripts containing context for template
                       if it has __init__.py in the same directory it will be
                       added to sys.path
                       it must have variable type dict named: `export`
-    * context_yaml  : str, None, yaml file containing context for template
+    * context_yaml  : str, [], yaml file containing context for template
+    * context_json  : str, [], json file containing context for template
     * context       : any, {}, context to be used in template
 
 Requirements:
@@ -20,6 +21,11 @@ Requirements:
       to install, run `pip install jinja2`
 
 """
+try:
+    from collections.abc import Mapping, Sequence
+except ImportError:
+    from collections import Mapping, Sequence
+from json import load as json_load
 import os
 import sys
 from yaml import safe_load as yaml_load
@@ -27,6 +33,19 @@ from pybuildtool import BaseTask, expand_resource, make_list
 from pybuildtool.misc.python import load_module_from_filename
 
 tool_name = __name__
+
+
+def dict_merge(destination, source):
+    for k, v in source.items():
+        if k not in destination:
+            destination[k] = v
+        elif isinstance(v, Mapping)\
+                and isinstance(destination[k], Mapping):
+            _dict_merge(destination[k], v)
+        elif isinstance(v, Sequence)\
+                and isinstance(destination[k], Sequence):
+            destination[k].extend(v)
+
 
 class Task(BaseTask):
 
@@ -51,23 +70,30 @@ class Task(BaseTask):
             self.bld.fatal(('"search_dir" is required configuration '
                 'for %s') % tool_name.capitalize())
 
+        # Json context
+        files = make_list(cfg.get('context_json'))
+        if files:
+            files = [x for x in (expand_resource(self.group, f) for f\
+                    in files) if x]
+        for json_file in files:
+            with open(json_file, 'r') as f:
+                dict_merge(self.context, json_load(f))
+
         # Yaml context
-        c = cfg.get('context_yaml')
-        if c:
-            yaml_file = expand_resource(self.group, c)
-            if yaml_file is None:
-                self.bld.fatal('"context_yaml" for %s has invalid value' %\
-                        tool_name.capitalize())
+        files = make_list(cfg.get('context_yaml'))
+        if files:
+            files = [x for x in (expand_resource(self.group, f) for f\
+                    in files) if x]
+        for yaml_file in files:
             with open(yaml_file, 'r') as f:
-                self.context.update(yaml_load(f))
+                dict_merge(self.context, yaml_load(f))
 
         # Python context
-        c = cfg.get('context_python')
-        if c:
-            python_file = expand_resource(self.group, c)
-            if python_file is None:
-                self.bld.fatal('"context_python" for %s has invalid value' %\
-                        tool_name.capitalize())
+        files = make_list(cfg.get('context_python'))
+        if files:
+            files = [x for x in (expand_resource(self.group, f) for f\
+                    in files) if x]
+        for python_file in files:
             dirname, filename = os.path.split(python_file)
             filebase, _ = os.path.splitext(filename)
             if os.path.exists(os.path.join(dirname, '__init__.py')):
@@ -75,10 +101,9 @@ class Task(BaseTask):
                 mod = __import__(filebase)
             else:
                 mod = load_module_from_filename(python_file, filebase)
-            python_export = mod.export
-            self.context.update(python_export)
+            dict_merge(self.context, mod.export)
 
-        self.context.update(cfg.get('context', {}))
+        dict_merge(self.context, cfg.get('context', {}))
 
 
     def perform(self):
