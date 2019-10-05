@@ -66,6 +66,7 @@ def configure(ctx):
     #ctx.load('patch', tooldir=tools_dir)
     #ctx.load('pngcrush', tooldir=tools_dir)
     #ctx.load('postcss', tooldir=tools_dir)
+    #ctx.load('protoc', tooldir=tools_dir)
     ctx.load('pylint', tooldir=tools_dir)
     #ctx.load('requirejs', tooldir=tools_dir)
     #ctx.load('restructuredtext-lint', tooldir=tools_dir)

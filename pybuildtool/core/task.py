@@ -1,5 +1,6 @@
 import os
 from copy import deepcopy
+import stringcase
 from time import time
 from uuid import uuid4
 from waflib.Task import Task as BaseTask # pylint:disable=import-error
@@ -10,6 +11,7 @@ from ..misc.path import expand_resource
 class Task(BaseTask):
 
     args = None
+    args_case = 'spinal'
     conf = None
     group = None
     file_in = None
@@ -107,6 +109,10 @@ class Task(BaseTask):
         return ret
 
 
+    def stringcase_arg(self, option):
+        return getattr(stringcase, self.args_case + 'case')(option)
+
+
     def _add_arg(self, option, value, sep):
         if sep == ' ':
             self.args.append(option)
@@ -121,7 +127,7 @@ class Task(BaseTask):
             if not value:
                 continue
 
-            option = '--' + option.replace('_', '-')
+            option = '--' + self.stringcase_arg(option)
             self.args.append(option)
 
 
@@ -148,7 +154,7 @@ class Task(BaseTask):
             except (TypeError, ValueError):
                 continue
 
-            option = '--' + option.replace('_', '-')
+            option = '--' + self.stringcase_arg(option)
             self._add_arg(option, str(value), opt_val_sep)
 
 
@@ -160,7 +166,7 @@ class Task(BaseTask):
             if not values:
                 continue
 
-            option = '--' + option.replace('_', '-')
+            option = '--' + self.stringcase_arg(option)
             value = separator.join(x.format(**self.group.get_patterns())\
                     for x in values)
 
@@ -175,7 +181,7 @@ class Task(BaseTask):
             if not values:
                 continue
 
-            option = '--' + option.replace('_', '-')
+            option = '--' + self.stringcase_arg(option)
             for value in values:
                 value = value.format(**self.group.get_patterns())
 
@@ -190,7 +196,7 @@ class Task(BaseTask):
             if value is None:
                 continue
 
-            option = '--' + option.replace('_', '-')
+            option = '--' + self.stringcase_arg(option)
             value = expand_resource(self.group, value)
             self._add_arg(option, value, opt_val_sep)
 
@@ -203,7 +209,7 @@ class Task(BaseTask):
             if not values:
                 continue
 
-            option = '--' + option.replace('_', '-')
+            option = '--' + self.stringcase_arg(option)
             value = separator.join(expand_resource(self.group, x)\
                     for x in values)
 
@@ -218,7 +224,7 @@ class Task(BaseTask):
             if not values:
                 continue
 
-            option = '--' + option.replace('_', '-')
+            option = '--' + self.stringcase_arg(option)
             for value in values:
                 value = expand_resource(self.group, value)
                 self._add_arg(option, value, opt_val_sep)
@@ -232,6 +238,6 @@ class Task(BaseTask):
             if value is None:
                 continue
 
-            option = '--' + option.replace('_', '-')
+            option = '--' + self.stringcase_arg(option)
             value = value.format(**self.group.get_patterns())
             self._add_arg(option, value, opt_val_sep)
