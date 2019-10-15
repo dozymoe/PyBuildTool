@@ -124,8 +124,7 @@ def configure(conf):
     conf.start_msg("Checking for program '%s'" % tool_name)
     if os.path.exists(bin_path):
         bin_path = os.path.abspath(bin_path)
-        conf.end_msg(bin_path)
     else:
-        conf.end_msg("not found", color='YELLOW')
         bin_path = conf.find_program('node-sass')[0]
+    conf.end_msg(bin_path)
     conf.env['%s_BIN' % tool_name.upper()] = bin_path

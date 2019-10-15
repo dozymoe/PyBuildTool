@@ -31,7 +31,17 @@ Options:
                  : write the raw tag/value pairs in text format to standard
                  : output. No PROTO_FILES should be given when using this flag.
 
-    * descriptor_set_in : str, []
+    * protobuf_in : str, None
+                  : Absolute path to the protobuf file from which input of
+                  : encoding/decoding operation will be read. If omitted, input
+                  : will be read from standard input.
+
+    * protobuf_out : str, None
+                   : Absolute path to the protobuf file to which output of
+                   : encoding/decoding operation will be written. If omitted,
+                   : output will be written to standard output.
+
+    * descriptor_set_in : str, None
                         : Specifies a delimited list of FILES each containing
                         : a FileDescriptorSet (a protocol buffer defined in
                         : descriptor.proto).
@@ -86,13 +96,34 @@ Options:
     * grpc_python_out : str, None
                       : Generate Python source file
 
+    * cpp_out : str, None
+              : Generate C++ header and source
+
+    * csharp_out : str, None
+                 : Generate C# source file
+
+    * java_out : str, None
+               : Generate Java source file
+
+    * js_out : str, None
+             : Generate Javascript source file
+
+    * objc_out : str, None
+               : Generate Objective C header and source
+
+    * php_out : str, None
+              : Generate PHP source file
+
     * python_out : str, None
                  : Generate Python source file
 
+    * ruby_out : str, None
+               : Generate Ruby source file
+
 Requirements:
 
-    * protobuf
-      to install, run `pip install protobuf`
+    * protoc
+      to install, run `apt install protobuf-compiler`
 
     * grpcio-tools
       to install, run `pip install grcpio-tools`
@@ -113,8 +144,6 @@ class Task(BaseTask):
 
         cfg = self.conf
 
-        self.args.append(__file__)
-
         self.add_path_list_args_multi('proto_path')
 
         self.add_str_args('encode', 'decode', 'error_format', 'plugin')
@@ -122,28 +151,29 @@ class Task(BaseTask):
         self.add_bool_args('decode_raw', 'include_imports',
                 'include_source_info', 'print_free_field_numbers')
 
-        self.add_path_args('descriptor_set_in', 'descriptor_set_out',
-                'dependency_out', 'grpc_python_out', 'python_out')
+        self.add_path_args('protobuf_in', 'protobuf_out', 'descriptor_set_in',
+                'descriptor_set_out', 'dependency_out', 'cpp_out', 'csharp_out',
+                'java_out', 'js_out', 'objc_out', 'php_out', 'python_out',
+                'ruby_out')
 
         proto_include = pkg_resources.resource_filename('grpc_tools', '_proto')
         self.args.append('-I{}'.format(proto_include))
 
 
     def perform(self):
-        from grpc_tools import _protoc_compiler
-
         if self.file_out:
             self.bld.fatal('%s produces no output' % tool_name.capitalize())
 
-        args = [arg.encode() for arg in self.args + self.file_in]
-        print(args)
-        return _protoc_compiler.run_main(args)
+        executable = self.env['%s_BIN' % tool_name.upper()]
+        return self.exec_command(
+            '{exe} {arg}'.format(
+            exe=executable,
+            arg=' '.join(self.args + self.file_in),
+        ))
 
 
 def configure(conf):
     conf.start_msg("Checking for program '%s'" % tool_name)
-    try:
-        import grpc_tools
-        conf.end_msg('grpc_tools')
-    except ImportError:
-        conf.end_msg('not found', color='YELLOW')
+    bin_path = conf.find_program('protoc')[0]
+    conf.end_msg(bin_path)
+    conf.env['%s_BIN' % tool_name.upper()] = bin_path
