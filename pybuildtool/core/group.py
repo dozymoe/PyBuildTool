@@ -82,11 +82,9 @@ class Group():
 
             for f in r.get('depend_in', []):
                 if os.path.isabs(f):
-                    if not os.path.exists(f):
-                        continue
-                    node = bld.root.find_resource(f.lstrip('/'))
+                    node = bld.root.find_or_declare(f)
                 else:
-                    node = bld.path.find_resource(f)
+                    node = bld.path.find_or_declare(f)
                 if node is None:
                     bld.fatal('"%s" does not exists' % f)
                 setattr(node, 'is_virtual_in_' + task_uid, True)
