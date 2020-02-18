@@ -130,7 +130,7 @@ Requirements:
       you might need to specify the version
 
 """
-from pybuildtool import BaseTask
+from pybuildtool import BaseTask, expand_resource
 
 tool_name = __name__
 
@@ -153,8 +153,19 @@ class Task(BaseTask):
 
         self.add_path_args('protobuf_in', 'protobuf_out', 'descriptor_set_in',
                 'descriptor_set_out', 'dependency_out', 'cpp_out', 'csharp_out',
-                'java_out', 'js_out', 'objc_out', 'php_out', 'python_out',
-                'ruby_out')
+                'java_out', 'objc_out', 'php_out', 'python_out', 'ruby_out')
+
+        c = cfg.get('js_out', None)
+        if c:
+            if c.startswith('library='):
+                c = c[:c.index('=') + 1] + expand_resource(self.group,
+                        c[c.index('=') + 1:c.index(',')]) + c[c.index(','):]
+            elif c.startswith('import_style='):
+                c = c[:c.index(':') + 1] + expand_resource(self.group,
+                        c[c.index(':') + 1:])
+            else:
+                c = expand_resource(self.group, c)
+            self.args.append('--js_out=' + c)
 
         proto_include = pkg_resources.resource_filename('grpc_tools', '_proto')
         self.args.append('-I{}'.format(proto_include))
