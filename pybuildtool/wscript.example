@@ -85,6 +85,8 @@ def configure(ctx):
     #ctx.load('uglify-js', tooldir=tools_dir)
     #ctx.load('unzip', tooldir=tools_dir)
     #ctx.load('webpack', tooldir=tools_dir)
+    #ctx.load('woff2svg', tooldir=tools_dir)
+    #ctx.load('woff2ttf', tooldir=tools_dir)
 
 
 from waflib.Build import BuildContext, CleanContext

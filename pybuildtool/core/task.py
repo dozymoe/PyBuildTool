@@ -109,6 +109,10 @@ class Task(BaseTask):
         return ret
 
 
+    def is_production(self):
+        return os.environ.get('PROJECT_VARIANT_IS_PRODUCTION') == '1'
+
+
     def stringcase_arg(self, option):
         return getattr(stringcase, self.args_case + 'case')(option)
 

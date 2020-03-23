@@ -104,7 +104,7 @@ class Task(BaseTask):
         if len(self.file_out) != 1:
             self.bld.fatal('%s only have one output' % tool_name.capitalize())
 
-        if self.bld.variant in ('dev', 'devel', 'development'):
+        if not self.is_production():
             try:
                 copyfile(self.file_in[0], self.file_out[0])
                 return 0
