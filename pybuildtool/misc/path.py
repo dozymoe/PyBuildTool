@@ -8,6 +8,7 @@ def expand_resource(group, path):
     bld = group.context
     # replacement pattern, {_N} will be replaced with group name of level N
     path = path.format(**group.get_patterns())
+    path = os.path.expanduser(path)
     if os.path.isabs(path):
         if path.endswith(os.path.sep):
             node = bld.root.find_dir(path.lstrip('/'))
@@ -37,6 +38,7 @@ def expand_wildcard(group, path):
                     bld.root.ant_glob(path.lstrip('/'))]
         return [node.abspath() for node in bld.path.ant_glob(path)]
 
+    path = os.path.expanduser(path)
     if os.path.isabs(path):
         if path.endswith(os.path.sep):
             node = bld.root.find_dir(path.lstrip('/'))

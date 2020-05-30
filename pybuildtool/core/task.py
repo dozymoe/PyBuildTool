@@ -1,8 +1,8 @@
 import os
 from copy import deepcopy
-import stringcase
 from time import time
 from uuid import uuid4
+import stringcase
 from waflib.Task import Task as BaseTask # pylint:disable=import-error
 
 from ..misc.collections_utils import make_list

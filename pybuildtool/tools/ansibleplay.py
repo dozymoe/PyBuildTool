@@ -152,7 +152,7 @@ class Task(BaseTask):
 
 
     def perform(self):
-        import ansible.runner # pylint:disable=import-error
+        import ansible.runner # pylint:disable=import-error,import-outside-toplevel
 
         def log_error(data):
             Logs.error('Got "{msg}" from {host}'.format(
@@ -212,6 +212,6 @@ class Task(BaseTask):
 def configure(conf):
     conf.start_msg("Checking for python module '%s'" % tool_name)
     try:
-        import ansible # pylint: disable=unused-import
+        import ansible # pylint: disable=unused-import,import-outside-toplevel
     except ImportError:
         conf.end_msg('not found', color='YELLOW')

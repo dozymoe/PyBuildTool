@@ -59,7 +59,7 @@ class Task(BaseTask):
 
 
     def perform(self):
-        from restructuredtext_lint import lint_file # pylint:disable=import-error
+        from restructuredtext_lint import lint_file # pylint:disable=import-error,import-outside-toplevel
 
         result = 0
         for filename in self.file_in:
@@ -98,6 +98,6 @@ class Task(BaseTask):
 def configure(conf):
     conf.start_msg("Checking for python module '%s'" % tool_name)
     try:
-        import restructuredtext_lint # pylint:disable=unused-import,unused-variable
+        import restructuredtext_lint # pylint:disable=unused-import,unused-variable,import-outside-toplevel
     except ImportError:
         conf.end_msg('not found', color='YELLOW')

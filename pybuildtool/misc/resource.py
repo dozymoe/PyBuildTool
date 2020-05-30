@@ -102,14 +102,12 @@ def prepare_targets(conf, bld):
 
         if group_is_leaf(config):
             original_file_in = make_list(config.get('file_in'))
-            file_in = [x for x in _parse_input_listing(original_file_in,
-                    pattern)]
+            file_in = list(_parse_input_listing(original_file_in, pattern))
             _add_raw_files(make_list(config.get('raw_file_in')), file_in,
                     pattern)
 
             original_depend_in = make_list(config.get('depend_in'))
-            depend_in = [x for x in _parse_input_listing(original_depend_in,
-                    pattern)]
+            depend_in = list(_parse_input_listing(original_depend_in, pattern))
             _add_raw_files(make_list(config.get('raw_depend_in')), depend_in,
                     pattern)
 

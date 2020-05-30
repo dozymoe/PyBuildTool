@@ -41,7 +41,7 @@ def dict_merge(destination, source):
             destination[k] = v
         elif isinstance(v, Mapping)\
                 and isinstance(destination[k], Mapping):
-            _dict_merge(destination[k], v)
+            dict_merge(destination[k], v)
         elif isinstance(v, Sequence)\
                 and isinstance(destination[k], Sequence):
             destination[k].extend(v)
@@ -107,7 +107,7 @@ class Task(BaseTask):
 
 
     def perform(self):
-        from jinja2 import Environment, FileSystemLoader # pylint:disable=import-error
+        from jinja2 import Environment, FileSystemLoader # pylint:disable=import-error,import-outside-toplevel
 
         if len(self.file_in) != 1:
             self.bld.fatal('%s only need one input' % tool_name.capitalize())
