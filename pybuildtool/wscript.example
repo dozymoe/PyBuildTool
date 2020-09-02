@@ -16,12 +16,13 @@ else:
 
 def build(bld):
     # load main configuration file
-    import yaml
+    import pystache, yaml
     from pybuildtool.misc.resource import prepare_targets
     from pybuildtool.misc.yaml_utils import OrderedDictYAMLLoader
     conf_file = os.path.join(bld.path.abspath(), 'build.yml')
     with open(conf_file) as f:
-        conf = yaml.load(f, Loader=OrderedDictYAMLLoader)
+        tasks = pystache.render(f.read(), dict(os.environ))
+        conf = yaml.load(tasks, Loader=OrderedDictYAMLLoader)
     # parse data as waf tasks
     prepare_targets(conf, bld)
 
@@ -60,6 +61,7 @@ def configure(ctx):
     #ctx.load('lftp', tooldir=tools_dir)
     #ctx.load('metadata2fontface', tooldir=tools_dir)
     #ctx.load('msbuild', tooldir=tools_dir)
+    #ctx.load('mustache', tooldir=tools_dir)
     #ctx.load('node-sass', tooldir=tools_dir)
     #ctx.load('nuget_restore', tooldir=tools_dir)
     #ctx.load('nunjucks', tooldir=tools_dir)

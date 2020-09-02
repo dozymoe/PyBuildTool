@@ -50,10 +50,11 @@ class Task(BaseTask):
             args.append(command)
 
         target = cfg.get('target', None)
+        if target:
+            target = expand_resource(self.group, target)
         if target is None:
             self.bld.fatal('target option is required.')
-
-        args.append(expand_resource(self.group, target))
+        args.append(target)
 
 
     def perform(self):

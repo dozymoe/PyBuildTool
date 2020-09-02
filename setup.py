@@ -12,10 +12,11 @@ URL = 'https://github.com/dozymoe/PyBuildTool'
 EMAIL = 'dozymoe@gmail.com'
 AUTHOR = 'Fahri Reza'
 REQUIRES_PYTHON = '>=2.7.0'
-VERSION = '2.0.33'
+VERSION = '2.0.34'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
+    'pystache',
     'pyyaml',
     'stringcase',
     'watchdog',

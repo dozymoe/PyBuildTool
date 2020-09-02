@@ -3,9 +3,9 @@
     "default_project": "pybuildtool",
     "default_variant": "development",
 
-    "python_version": "3.7",
+    "python_version": "3.8",
     "virtualenv_dir": ".virtualenv",
-    "waf_version": "2.0.19",
+    "waf_version": "2.0.20",
 
     "modules": [
         "lib.fireh_runner.modules.setup",
