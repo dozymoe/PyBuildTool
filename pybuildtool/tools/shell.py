@@ -12,6 +12,9 @@ Options:
     * environ  : dict, None
                : Key value pair of shell environment.
 
+    * fresh_environ : bool, False
+                    : Starts with empty environment
+
 """
 import os
 from pybuildtool import BaseTask, expand_resource
@@ -27,6 +30,7 @@ class Task(BaseTask):
     workdir = None
     cmd = None
     environ = None
+    fresh_environ = None
 
     def prepare(self):
         cfg = self.conf
@@ -55,12 +59,17 @@ class Task(BaseTask):
             for key, value in c.items():
                 self.environ[key] = value.format(**self.group.get_patterns())
 
+        self.fresh_environ = cfg.get('fresh_environ', False)
+
 
     def perform(self):
         if self.file_out:
             self.bld.fatal('%s produces no output' % tool_name.capitalize())
 
-        environ = os.environ.copy()
+        if self.fresh_environ:
+            environ = {k: v for k, v in os.environ.items() if k in ('PATH',)}
+        else:
+            environ = os.environ.copy()
         for key, value in self.environ.items():
             environ[key] = value
 
