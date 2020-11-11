@@ -1,7 +1,0 @@
-pylint
-pystache
-pyyaml
-stringcase
-twine
-watchdog
-wheel

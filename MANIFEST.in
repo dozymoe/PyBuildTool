@@ -1,8 +1,8 @@
 include pybuildtool/README.rst pybuildtool/wscript.example
 exclude run
-exclude wscript*
-exclude requirements-*
-exclude build-*
+exclude wscript
+exclude requirements.txt
+exclude build.yml
 exclude .git*
 exclude MANIFEST.in
 prune etc
