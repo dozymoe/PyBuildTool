@@ -1,0 +1,7 @@
+-r requirements-production.txt
+
+coverage
+pylint
+pytest
+twine
+wheel

@@ -75,7 +75,7 @@ def configure(ctx):
     #ctx.load('runit_sv', tooldir=tools_dir)
     #ctx.load('roscpplint', tooldir=tools_dir)
     #ctx.load('scp', tooldir=tools_dir)
-    #ctx.load('shell', tooldir=tools_dir)
+    ctx.load('shell', tooldir=tools_dir)
     #ctx.load('sphinx-apidoc', tooldir=tools_dir)
     #ctx.load('sphinx-build', tooldir=tools_dir)
     #ctx.load('splint', tooldir=tools_dir)

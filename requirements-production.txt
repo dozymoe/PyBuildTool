@@ -1,0 +1,4 @@
+pystache
+pyyaml
+stringcase
+watchdog
