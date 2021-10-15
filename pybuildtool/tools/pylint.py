@@ -23,6 +23,9 @@ tool_name = __name__
 
 class Task(BaseTask):
 
+    conf = {
+        '_noop_retcodes_': [4],
+    }
     name = tool_name
     workdir = None
 

@@ -1,8 +1,7 @@
 from hashlib import md5
 import os
 import re
-
-from ..misc.collections_utils import make_list
+#-
 from ..misc.path import expand_resource
 
 
@@ -26,9 +25,8 @@ class Rule():
         for fs in (self.file_in, self.depend_in):
             self._expand_input_wilcards(fs)
 
-        # normalize `replace_patterns`, must be a list
-        self.conf['replace_patterns'] = make_list(
-                self.conf.get('replace_patterns'))
+        # normalize `_replace_patterns_`, must be a list of list
+        self.conf.setdefault('_replace_patterns_', [])
 
 
     def _expand_input_wilcards(self, items):
@@ -86,10 +84,8 @@ class Rule():
             if is_dir:
                 for fi in self.file_in:
                     fofi = fi
-                    replace_patterns = self.conf.get('replace_patterns', False)
-                    if replace_patterns:
-                        for (pat, rep) in replace_patterns:
-                            fofi = re.sub(pat, rep, fofi)
+                    for (pat, rep) in self.conf['_replace_patterns_']:
+                        fofi = re.sub(pat, rep, fofi)
                     basedir = self.conf.get('_source_basedir_', False)
                     if basedir:
                         basedir = expand_resource(self.group, basedir)
@@ -148,10 +144,8 @@ class Rule():
                     continue
 
                 fofi = fi
-                replace_patterns = self.conf.get('replace_patterns', False)
-                if replace_patterns:
-                    for (pat, rep) in replace_patterns:
-                        fofi = re.sub(pat, rep, fofi)
+                for (pat, rep) in self.conf['_replace_patterns_']:
+                    fofi = re.sub(pat, rep, fofi)
                 # use basedir to produce file_out
                 basedir = self.conf.get('_source_basedir_', False)
                 if basedir:

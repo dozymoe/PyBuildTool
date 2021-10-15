@@ -44,7 +44,7 @@ def data_merge(a, b):
     except TypeError as e:
         raise Exception(
                 'TypeError "%s" in key "%s" when merging "%s" into "%s"' %\
-                (e, key, b, a))
+                (e, key, b, a)) from e
 
     return a
 

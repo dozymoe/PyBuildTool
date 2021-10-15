@@ -35,6 +35,7 @@ pybuildtool:
   unittest:
     shell:
       options:
+        _noop_retcodes_: [5]
         command: ./run pybin coverage run --include=./* -m py.test
       rule_in:
         - "{_1}/pylint"
@@ -48,6 +49,7 @@ pybuildtool:
   coverage:
     shell:
       options:
+        _noop_retcodes_: [1]
         command: ./run pybin coverage report -m --skip-covered
       rule_in:
         - "{_1}/unittest/shell"

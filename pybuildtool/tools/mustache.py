@@ -26,8 +26,8 @@ class Task(BaseTask):
 
         context = self.conf.get('context', {})
         os.makedirs(os.path.dirname(self.file_out[0]), exist_ok=True)
-        with open(self.file_out[0], 'w') as fout:
-            with open(self.file_in[0], 'r') as fin:
+        with open(self.file_out[0], 'w', encoding='utf-8') as fout:
+            with open(self.file_in[0], 'r', encoding='utf-8') as fin:
                 fout.write(render(fin.read(), dict(context)))
 
         return 0

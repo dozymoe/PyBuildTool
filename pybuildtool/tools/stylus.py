@@ -81,7 +81,7 @@ class Task(BaseTask):
 
     name = tool_name
     conf = {
-        'replace_patterns': ((r'\.styl$', '.css'),)
+        '_replace_patterns_': ((r'\.styl$', '.css'),)
     }
     workdir = None
 

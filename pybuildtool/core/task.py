@@ -1,3 +1,41 @@
+"""
+Base class for pybuildtools tools.
+
+Options:
+
+    * _source_excluded_ : list, None
+                        : Pretend source files (*_in values) don't exist.
+
+    * _source_basedir_ : str, None
+                       : Create files in output dir, relative path to source
+                       : base directory.
+
+    * _source_grouped_ : bool, None
+                       : Don't create separate tasks for every input files, have
+                       : them as input files of a single task.
+                       : Actually I'm not so sure what this does, something like
+                       : have them all as arguments to shell command?
+
+    * _noop_retcodes_ : list, None
+                      : If Task.perform() returns these, pretend nothing
+                      : happened.
+
+    * _success_retcodes_ : list, None
+                         : If Task.perform() returns these, pretend as if it
+                         : returns 0 or a success.
+
+    * _replace_patterns_ : list, None
+                         : If the output is a directory, you can rename the
+                         : output files based on the source files.
+                         : This is a list of list.
+                         : The list elements consist of two items: python regex
+                         : and replacement.
+
+    * _no_io_ : bool, False
+              : This task doesn't need inputs or outputs.
+              : Only works if written in build.yml.
+
+"""
 import os
 from copy import deepcopy
 from time import time
@@ -23,7 +61,7 @@ class Task(BaseTask):
     _id = None
 
     def __init__(self, group, config, *args, **kwargs):
-        super(Task, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._id = uuid4().hex
 
         # Task's configuration can be declared higher in the build tree,
@@ -57,7 +95,7 @@ class Task(BaseTask):
         pass
 
 
-    def prepare_args(self):
+    def prepare_args(self): # pylint:disable=no-self-use
         return []
 
 
@@ -90,13 +128,15 @@ class Task(BaseTask):
                 self.file_out.append(path)
 
 
-    def finalize_shadow_jutsu(self):
+    def finalize_shadow_jutsu(self, create_only=False):
         for filename in self.token_out:
+            if create_only and os.path.exists(filename):
+                continue
             try:
                 os.makedirs(os.path.dirname(filename))
             except OSError:
                 pass
-            with open(filename, 'w') as f:
+            with open(filename, 'w', encoding='utf-8') as f:
                 f.write(str(time()))
 
 
@@ -104,12 +144,20 @@ class Task(BaseTask):
         self.prepare_shadow_jutsu()
         self.prepare()
         ret = self.perform()
-        if ret == 0:
-            self.finalize_shadow_jutsu()
+
+        create_only = False
+        if ret in make_list(self.conf.get('_noop_retcodes_')):
+            create_only = True
+            ret = None
+        elif ret in make_list(self.conf.get('_success_retcodes_')):
+            ret = None
+        if not ret:
+            self.finalize_shadow_jutsu(create_only)
         return ret
 
 
-    def is_production(self):
+    @staticmethod
+    def is_production():
         return os.environ.get('PROJECT_VARIANT_IS_PRODUCTION') == '1'
 
 

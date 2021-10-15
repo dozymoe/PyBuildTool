@@ -21,10 +21,7 @@ Requirements:
       to install, run `pip install jinja2`
 
 """
-try:
-    from collections.abc import Mapping, Sequence
-except ImportError:
-    from collections import Mapping, Sequence
+from typing import Mapping, Sequence
 from json import load as json_load
 import os
 import sys
@@ -73,7 +70,7 @@ class Task(BaseTask):
             files = [x for x in (expand_resource(self.group, f) for f\
                     in files) if x]
         for json_file in files:
-            with open(json_file, 'r') as f:
+            with open(json_file, 'r', encoding='utf-8') as f:
                 dict_merge(self.context, json_load(f))
 
         # Yaml context
@@ -82,7 +79,7 @@ class Task(BaseTask):
             files = [x for x in (expand_resource(self.group, f) for f\
                     in files) if x]
         for yaml_file in files:
-            with open(yaml_file, 'r') as f:
+            with open(yaml_file, 'r', encoding='utf-8') as f:
                 dict_merge(self.context, yaml_load(f))
 
         # Python context
@@ -123,6 +120,6 @@ class Task(BaseTask):
         template = env.get_template(template_name)
         rendered = template.render(self.context)
         for out in self.file_out:
-            with open(out, 'w') as f:
+            with open(out, 'w', encoding='utf-8') as f:
                 f.write(rendered)
         return 0

@@ -56,14 +56,14 @@ class Task(BaseTask):
 
         filename = self.file_in[0]
         if filename.endswith('.json'):
-            with open(self.file_in[0], 'r') as f:
+            with open(self.file_in[0], 'r', encoding='utf-8') as f:
                 fonts = json.load(f)['fonts']
         elif filename.endswith('.pb'):
             fonts = self._get_fonts_from_protobuf(filename)
         else:
             self.bld.fatal('Unknown file format: ' + filename)
 
-        with open(self.file_out[0], 'w') as f:
+        with open(self.file_out[0], 'w', encoding='utf-8') as f:
             for font in fonts:
                 f.write('@font-face {\n')
                 f.write('    font-family: "%s";\n' % font['name'])
@@ -94,12 +94,13 @@ class Task(BaseTask):
                 f.write(';\n}\n')
 
 
-    def _get_fonts_from_protobuf(self, filename):
+    @staticmethod
+    def _get_fonts_from_protobuf(filename):
         from google.protobuf import text_format # pylint:disable=import-error,no-name-in-module,import-outside-toplevel
         from pybuildtool.vendor.fonts_public_pb2 import FamilyProto # pylint:disable=import-outside-toplevel
 
         message = FamilyProto()
-        with open(filename) as f:
+        with open(filename, encoding='utf-8') as f:
             text_format.Merge(f.read(), message)
 
         for font in message.fonts:

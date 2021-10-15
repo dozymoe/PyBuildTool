@@ -31,10 +31,11 @@ Requirements:
 import os
 import sys
 import six
+from waflib import Logs # pylint:disable=import-error
 from yaml import safe_load as yaml_load
+#-
 from pybuildtool import BaseTask, expand_resource, make_list
 from pybuildtool.misc.python import load_module_from_filename
-from waflib import Logs # pylint:disable=import-error
 
 tool_name = __name__
 
@@ -45,7 +46,7 @@ class Task(BaseTask):
     items = None
 
     def __init__(self, *args, **kwargs):
-        super(Task, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.context = {}
         self.items = []
 
@@ -108,7 +109,7 @@ class Task(BaseTask):
             if yaml_file is None:
                 self.bld.fatal('"context_yaml" for %s has invalid value' %\
                         tool_name.capitalize())
-            with open(yaml_file, 'r') as f:
+            with open(yaml_file, 'r', encoding='utf-8') as f:
                 self.context.update(yaml_load(f))
 
         # Python context

@@ -38,7 +38,7 @@ tool_name = __name__
 class Task(BaseTask):
 
     conf = {
-        'replace_patterns': ((r'\.handlebars$', '.js'),),
+        '_replace_patterns_': ((r'\.handlebars$', '.js'),),
     }
     name = tool_name
 

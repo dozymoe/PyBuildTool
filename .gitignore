@@ -13,6 +13,7 @@
 /.virtualenv/
 /requirements.txt
 /python_modules
+/pybuildtool/.coverage
 
 
 # waf

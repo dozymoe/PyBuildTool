@@ -3,6 +3,7 @@
 import os
 from shutil import copyfileobj
 from pybuildtool import BaseTask
+from pybuildtool.misc.resource import get_filehash
 
 tool_name = __name__
 
@@ -10,6 +11,7 @@ class Task(BaseTask):
 
     conf = {
         '_source_grouped_': True,
+        '_noop_retcodes_': 666,
     }
     name = tool_name
 
@@ -22,9 +24,14 @@ class Task(BaseTask):
             self.bld.fatal('cannot concat to a directory')
 
         try:
+            before_hash = get_filehash(self.file_out[0])
             with open(self.file_out[0], 'wb') as dest:
-                for src in self.file_in:
-                    copyfileobj(open(src, 'rb'), dest)
+                for src_name in self.file_in:
+                    with open(src_name, 'rb') as src:
+                        copyfileobj(src, dest)
+
+            if before_hash == get_filehash(self.file_out[0]):
+                return 666
             return 0
         except OSError:
             return 1

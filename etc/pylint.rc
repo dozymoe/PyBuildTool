@@ -139,7 +139,20 @@ disable=print-statement,
         deprecated-sys-function,
         exception-escape,
         comprehension-escape,
-        too-many-locals
+        too-many-locals,
+        duplicate-code,
+        missing-class-docstring,
+        missing-function-docstring,
+        missing-module-docstring,
+        too-many-arguments,
+        invalid-name,
+        protected-access,
+        consider-using-f-string,
+        too-many-branches,
+        too-many-statements,
+        too-few-public-methods,
+        too-many-instance-attributes,
+        too-many-ancestors
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

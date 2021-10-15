@@ -24,7 +24,7 @@ tool_name = __name__
 class Task(BaseTask):
 
     conf = {
-        'replace_patterns': ((r'\.less$', '.css'),)
+        '_replace_patterns_': ((r'\.less$', '.css'),)
     }
     name = tool_name
 

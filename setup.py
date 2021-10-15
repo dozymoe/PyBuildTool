@@ -11,8 +11,8 @@ DESCRIPTION = "Build utility to manage web resources."
 URL = 'https://github.com/dozymoe/PyBuildTool'
 EMAIL = 'dozymoe@gmail.com'
 AUTHOR = 'Fahri Reza'
-REQUIRES_PYTHON = '>=2.7.0'
-VERSION = '2.0.34'
+REQUIRES_PYTHON = '>=3.0.0'
+VERSION = '2.0.36'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
@@ -98,7 +98,8 @@ class UploadCommand(Command):
 
     def run(self):
         self.status('Uploading the package to PyPI via Twine…')
-        os.system(here + '/run pybin twine upload ' + here + '/dist/*')
+        os.system('%s pybin twine upload %s' % (os.path.join(here, 'run'),
+                os.path.join(here, 'dist', '*')))
 
         self.status('Pushing git tags…')
         os.system('git tag v{0}'.format(about['__version__']))

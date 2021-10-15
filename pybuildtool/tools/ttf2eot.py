@@ -16,7 +16,7 @@ tool_name = __name__
 class Task(BaseTask):
 
     conf = {
-        'replace_patterns': ((r'\.ttf$', '.eot'), (r'\.otf$', '.eot'))
+        '_replace_patterns_': ((r'\.ttf$', '.eot'), (r'\.otf$', '.eot'))
     }
     name = tool_name
 

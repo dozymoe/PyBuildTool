@@ -1,7 +1,19 @@
+import hashlib
+import mmap
 import os
 import re
 from ..core.group import Group
 from .collections_utils import make_list
+
+def get_filehash(filename):
+    if not os.path.exists(filename):
+        return None
+    hasher = hashlib.sha1()
+    with open(filename, 'rb') as f:
+        with mmap.mmap(f.fileno(), 0, prot=mmap.PROT_READ) as mm:
+            hasher.update(mm)
+    return hasher.digest()
+
 
 def get_source_files(conf, bld):
     """Collect raw file inputs."""
@@ -11,7 +23,8 @@ def get_source_files(conf, bld):
     def parse_group(group_name, config, level):
         groups['_%s' % level] = group_name
 
-        if group_is_leaf(config):
+        options = config.pop('options', {})
+        if group_is_leaf(config, options):
             group_files = make_list(config.get('raw_file_in')) +\
                     make_list(config.get('raw_depend_in'))
 
@@ -25,9 +38,6 @@ def get_source_files(conf, bld):
             return
 
         for subgroup in config:
-            if subgroup == 'options':
-                continue
-
             for f in parse_group(subgroup, config[subgroup], level + 1):
                 yield f
 
@@ -39,12 +49,13 @@ def get_source_files(conf, bld):
             yield f
 
 
-def group_is_leaf(group):
+def group_is_leaf(group, options):
     """The lowests in the group tree are the tools."""
 
     return any(x in group for x in ('file_in', 'raw_file_in', 'file_out',
             'raw_file_out', 'depend_in', 'raw_depend_in', 'extra_out',
-            'raw_extra_out', 'rule_in'))
+            'raw_extra_out', 'rule_in'))\
+            or options.get('_no_io_', False)
 
 
 def prepare_targets(conf, bld):
@@ -100,7 +111,7 @@ def prepare_targets(conf, bld):
         groups[g.get_name()] = g
         pattern = g.get_patterns()
 
-        if group_is_leaf(config):
+        if group_is_leaf(config, options):
             original_file_in = make_list(config.get('file_in'))
             file_in = list(_parse_input_listing(original_file_in, pattern))
             _add_raw_files(make_list(config.get('raw_file_in')), file_in,
@@ -129,12 +140,16 @@ def prepare_targets(conf, bld):
                     token_names = bld._token_names[rule_in]
                     for f in token_names:
                         depend_in.append(f)
-                except (KeyError, AttributeError) as e:
+                except (KeyError, AttributeError):
                     print((parent_group.get_name(), group_name, dict(config),
                             level))
 
-                    bld.fatal('rule "%s" not found in: %s' % (rule_in,
-                            ', '.join(bld._token_names.keys())))
+                    if hasattr(bld, '_token_names'):
+                        bld.fatal("rule '%s' not found in: %s" % (rule_in,
+                                ', '.join(bld._token_names.keys())))
+                    else:
+                        bld.fatal("rule '%s' not found" % rule_in +\
+                                ", does it have *_in or *_out?")
 
             g(file_in=file_in, file_out=file_out, depend_in=depend_in,
                     extra_out=extra_out)

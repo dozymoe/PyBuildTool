@@ -20,10 +20,10 @@ class OrderedDictYAMLLoader(yaml.Loader):
     def __init__(self, *args, **kwargs):
         yaml.Loader.__init__(self, *args, **kwargs)
 
-        self.add_constructor(u'tag:yaml.org,2002:map',
+        self.add_constructor('tag:yaml.org,2002:map',
                 type(self).construct_yaml_map)
 
-        self.add_constructor(u'tag:yaml.org,2002:omap',
+        self.add_constructor('tag:yaml.org,2002:omap',
                 type(self).construct_yaml_map)
 
     def construct_yaml_map(self, node):

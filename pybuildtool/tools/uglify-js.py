@@ -131,7 +131,7 @@ class Task(BaseTask):
 
     name = tool_name
     conf = {
-        'replace_patterns': ((r'\.js$', '.min.js'),),
+        '_replace_patterns_': ((r'\.js$', '.min.js'),),
     }
 
     def prepare(self):

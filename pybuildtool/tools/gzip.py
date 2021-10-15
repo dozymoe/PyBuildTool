@@ -13,7 +13,7 @@ tool_name = __name__
 class Task(BaseTask):
 
     conf = {
-        'replace_patterns': ((r'$', '.gz'),),
+        '_replace_patterns_': ((r'$', '.gz'),),
     }
     name = tool_name
 

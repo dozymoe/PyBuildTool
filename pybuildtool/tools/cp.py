@@ -2,11 +2,15 @@
 """
 from shutil import copyfile, Error
 from pybuildtool import BaseTask
+from pybuildtool.misc.resource import get_filehash
 
 tool_name = __name__
 
 class Task(BaseTask):
 
+    conf = {
+        '_noop_retcodes_': 666,
+    }
     name = tool_name
 
     def perform(self):
@@ -19,6 +23,9 @@ class Task(BaseTask):
                     tool_name.capitalize(), repr(self.file_out)))
 
         try:
+            source_hash = get_filehash(self.file_in[0])
+            if source_hash and source_hash == get_filehash(self.file_out[0]):
+                return 666
             copyfile(self.file_in[0], self.file_out[0])
             return 0
         except Error:

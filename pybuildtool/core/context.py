@@ -7,7 +7,7 @@ class WatchContext(Context.Context):
     variant = ''
 
     def __init__(self, **kw):
-        super(WatchContext, self).__init__(**kw)
+        super().__init__(**kw)
 
         self.top_dir = kw.get('top_dir', Context.top_dir)
         self.out_dir = kw.get('out_dir', Context.out_dir)

@@ -16,7 +16,7 @@ tool_name = __name__
 class Task(BaseTask):
 
     conf = {
-        'replace_patterns': ((r'\.ttf$', '.woff'), (r'\.otf$', '.woff'))
+        '_replace_patterns_': ((r'\.ttf$', '.woff'), (r'\.otf$', '.woff'))
     }
     name = tool_name
 
@@ -38,7 +38,7 @@ class Task(BaseTask):
             # success exit code
             move_executable = self.env['MV_BIN']
             converted_file = self.file_in[0]
-            for (pat, rep) in self.conf['replace_patterns']:
+            for (pat, rep) in self.conf['_replace_patterns_']:
                 converted_file = re.sub(pat, rep, converted_file)
             ret = self.exec_command(
                 '{exe} {in_} {out}'.format(

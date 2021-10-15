@@ -34,7 +34,7 @@ tool_name = __name__
 class Task(BaseTask):
 
     conf = {
-        'replace_patterns': ((r'\.html', '.js'),),
+        '_replace_patterns_': ((r'\.html', '.js'),),
     }
     name = tool_name
 
