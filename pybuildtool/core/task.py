@@ -194,7 +194,7 @@ class Task(BaseTask):
             for key, value in self.conf[option].items():
                 value = value.format(**self.group.get_patterns())
                 item = key + key_val_sep + value
-                self._add_arg(option, item, opt_val_sep)
+                self._add_arg('--' + option, item, opt_val_sep)
 
 
     def add_int_args(self, *options, **kwargs):

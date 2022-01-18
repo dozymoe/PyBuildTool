@@ -85,7 +85,7 @@ Options:
                                : message. Extension ranges are counted as
                                : occupied fields numbers.
 
-    * plugin : str, []
+    * plugin : dict, {}
              : Specifies a plugin executable to use.
              : Normally, protoc searches the PATH for plugins, but you may
              : specify additional executables not in the path using this flag.
@@ -93,32 +93,53 @@ Options:
              : case the given plugin name is mapped to the given executable even
              : if the executable's own name differs.
 
-    * grpc_python_out : str, None
-                      : Generate Python source file
-
     * cpp_out : str, None
               : Generate C++ header and source
+
+    * grpc_cpp_out : str, None
+              : Generate GRPC C++ header and source
 
     * csharp_out : str, None
                  : Generate C# source file
 
+    * grpc_csharp_out : str, None
+                 : Generate GRPC C# source file
+
     * java_out : str, None
                : Generate Java source file
+
+    * grpc_java_out : str, None
+               : Generate GRPC Java source file
 
     * js_out : str, None
              : Generate Javascript source file
 
+    * grpc_js_out : str, None
+             : Generate GRPC Javascript source file
+
     * objc_out : str, None
                : Generate Objective C header and source
+
+    * grpc_objc_out : str, None
+               : Generate GRPC Objective C header and source
 
     * php_out : str, None
               : Generate PHP source file
 
+    * grpc_php_out : str, None
+              : Generate GRPC PHP source file
+
     * python_out : str, None
                  : Generate Python source file
 
+    * grpc_python_out : str, None
+                      : Generate GRPC Python source file
+
     * ruby_out : str, None
                : Generate Ruby source file
+
+    * grpc_ruby_out : str, None
+               : Generate GRPC Ruby source file
 
 Requirements:
 
@@ -146,14 +167,22 @@ class Task(BaseTask):
 
         self.add_path_list_args_multi('proto_path')
 
-        self.add_str_args('encode', 'decode', 'error_format', 'plugin')
+        self.add_str_args('encode', 'decode', 'error_format')
 
         self.add_bool_args('decode_raw', 'include_imports',
                 'include_source_info', 'print_free_field_numbers')
 
-        self.add_path_args('protobuf_in', 'protobuf_out', 'descriptor_set_in',
-                'descriptor_set_out', 'dependency_out', 'cpp_out', 'csharp_out',
-                'java_out', 'objc_out', 'php_out', 'python_out', 'ruby_out')
+        self.add_dict_args('plugin')
+
+        self.add_path_args('protobuf_in', 'protobuf_out',
+                'descriptor_set_in', 'descriptor_set_out', 'dependency_out',
+                'cpp_out', 'grpc_cpp_out',
+                'csharp_out', 'grpc_csharp_out',
+                'java_out', 'grpc_java_out',
+                'objc_out', 'grpc_objc_out',
+                'php_out', 'grpc_php_out',
+                'python_out', 'grpc_python_out',
+                'ruby_out', 'grpc_ruby_out')
 
         c = cfg.get('js_out', None)
         if c:

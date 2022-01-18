@@ -12,7 +12,7 @@ URL = 'https://github.com/dozymoe/PyBuildTool'
 EMAIL = 'dozymoe@gmail.com'
 AUTHOR = 'Fahri Reza'
 REQUIRES_PYTHON = '>=3.0.0'
-VERSION = '2.0.36'
+VERSION = '2.0.37'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
