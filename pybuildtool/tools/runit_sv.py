@@ -10,7 +10,7 @@ Options:
                : - restart
 
     * target   : str, None
-               : servcie directory to operate
+               : service directory to operate, can be wildcard
 
     * wait_sec : int, None
                : wait for status changes before exit
@@ -23,13 +23,17 @@ Requirements:
     * runit
       to install, for example run `apt-get install runit`
 """
-from pybuildtool import BaseTask, expand_resource
+from subprocess import call
+#-
+from pybuildtool import BaseTask, expand_wildcard
 
 tool_name = __name__
 
 class Task(BaseTask):
 
     name = tool_name
+
+    targets = None
 
     def prepare(self):
         cfg = self.conf
@@ -51,10 +55,10 @@ class Task(BaseTask):
 
         target = cfg.get('target', None)
         if target:
-            target = expand_resource(self.group, target)
-        if target is None:
+            target = expand_wildcard(self.group, target, maxdepth=0)
+        if not target:
             self.bld.fatal('target option is required.')
-        args.append(target)
+        self.targets = target
 
 
     def perform(self):
@@ -64,7 +68,10 @@ class Task(BaseTask):
             self.bld.fatal('%s produces no output' % tool_name.capitalize())
 
         executable = self.env['%s_BIN' % tool_name.upper()]
-        return self.exec_command([executable] + self.args)
+        rets = []
+        for target in self.targets:
+            rets.append(call([executable] + self.args + [target]))
+        return sum(abs(x) for x in rets)
 
 
 def configure(conf):
