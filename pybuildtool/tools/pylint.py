@@ -17,9 +17,24 @@ Requirements:
       to install, run `pip install pylint`
 
 """
+from enum import Enum
 from pybuildtool import BaseTask, expand_resource, make_list
 
 tool_name = __name__
+
+
+class PylintExitCode(Enum):
+    """Exit codes for pylint
+
+    See: https://pylint.pycqa.org/en/latest/user_guide/usage/run.html#exit-codes
+    """
+    FATAL = 1
+    ERROR = 2
+    WARNING = 4
+    REFACTOR = 8
+    CONVENTION = 16
+    USAGE = 32
+
 
 class Task(BaseTask):
 
@@ -87,13 +102,18 @@ class Task(BaseTask):
             kwargs['cwd'] = self.workdir
 
         executable = self.env['%s_BIN' % tool_name.upper()]
-        return self.exec_command(
+        ret = self.exec_command(
             '{exe} {arg} {in_}'.format(
                 exe=executable,
                 arg=' '.join(self.args),
                 in_=' '.join(self.file_in),
             ),
             **kwargs)
+
+        real_error = ret & PylintExitCode.FATAL.value \
+                or ret & PylintExitCode.ERROR.value \
+                or ret & PylintExitCode.USAGE.value
+        return real_error
 
 
 def configure(conf):
