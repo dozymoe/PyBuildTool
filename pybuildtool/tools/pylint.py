@@ -10,6 +10,8 @@ Options:
     * plugins          : list:str, [] ,   plugins to load (ex. pylint_django)
     * reporter         : str,      None,  custom reporter
     * full_report      : bool,     False, full report or only the messages
+    * fail_cause       : list:str, [FATAL,ERROR,USAGE,CONVENTION], pylint exit
+                         code unacceptable values
 
 Requirements:
 
@@ -43,6 +45,8 @@ class Task(BaseTask):
     }
     name = tool_name
     workdir = None
+
+    fail_clause = None
 
     def prepare(self):
         cfg = self.conf
@@ -88,6 +92,12 @@ class Task(BaseTask):
         if plugins:
             args.append('--load-plugins=%s' % ','.join(plugins))
 
+        # Check pylint exit code
+        c = cfg.get('fail_cause', ['FATAL', 'ERROR', 'USAGE', 'CONVENTION'])
+        self.fail_clause = []
+        for clause in c:
+            self.fail_clause.append(getattr(PylintExitCode, clause).value)
+
 
     def perform(self):
         if not self.file_in:
@@ -110,9 +120,9 @@ class Task(BaseTask):
             ),
             **kwargs)
 
-        real_error = ret & PylintExitCode.FATAL.value \
-                or ret & PylintExitCode.ERROR.value \
-                or ret & PylintExitCode.USAGE.value
+        real_error = False
+        for clause in self.fail_clause:
+            real_error = real_error or (ret & clause)
         return real_error
 
 
