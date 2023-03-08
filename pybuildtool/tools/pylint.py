@@ -12,6 +12,7 @@ Options:
     * full_report      : bool,     False, full report or only the messages
     * fail_cause       : list:str, [FATAL,ERROR,USAGE,CONVENTION], pylint exit
                          code unacceptable values
+    * env              : dict:str, None,  shell environment variables
 
 Requirements:
 
@@ -20,6 +21,8 @@ Requirements:
 
 """
 from enum import Enum
+import os
+#-
 from pybuildtool import BaseTask, expand_resource, make_list
 
 tool_name = __name__
@@ -47,6 +50,7 @@ class Task(BaseTask):
     workdir = None
 
     fail_clause = None
+    envvars = None
 
     def prepare(self):
         cfg = self.conf
@@ -98,6 +102,8 @@ class Task(BaseTask):
         for clause in c:
             self.fail_clause.append(getattr(PylintExitCode, clause).value)
 
+        self.envvars = cfg.get('env')
+
 
     def perform(self):
         if not self.file_in:
@@ -110,6 +116,10 @@ class Task(BaseTask):
         kwargs = {}
         if self.workdir is not None:
             kwargs['cwd'] = self.workdir
+        if self.envvars:
+            env = os.environ.copy()
+            env.update(self.envvars)
+            kwargs['env'] = env
 
         executable = self.env['%s_BIN' % tool_name.upper()]
         ret = self.exec_command(
