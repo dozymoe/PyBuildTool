@@ -40,11 +40,14 @@ import os
 from copy import deepcopy
 from time import time
 from uuid import uuid4
+#-
+import locket
 import stringcase
 from waflib.Task import Task as BaseTask # pylint:disable=import-error
-
+#-
 from ..misc.collections_utils import make_list
 from ..misc.path import expand_resource
+from .rule import token_to_filename
 
 class Task(BaseTask):
 
@@ -143,7 +146,16 @@ class Task(BaseTask):
     def run(self):
         self.prepare_shadow_jutsu()
         self.prepare()
-        ret = self.perform()
+
+        lock_filename = '%s.lck' % token_to_filename(self.group.get_name(),
+                self.bld)
+        try:
+            with locket.lock_file(lock_filename, timeout=5):
+                ret = self.perform()
+        except locket.LockError:
+            self.bld.to_log("Task %s has already started.\n" %\
+                    self.group.get_name())
+            ret = -1
 
         create_only = False
         if ret in make_list(self.conf.get('_noop_retcodes_')):

@@ -2,7 +2,7 @@
 """
 import os
 import re
-from watchdog.events import FileSystemEventHandler
+from watchdog.events import FileOpenedEvent, FileSystemEventHandler
 from watchdog.observers import Observer
 
 class FileChangeHandler(FileSystemEventHandler):
@@ -18,6 +18,9 @@ class FileChangeHandler(FileSystemEventHandler):
 
     def on_any_event(self, event):
         if event.is_directory:
+            return
+        if isinstance(event, FileOpenedEvent):
+            # This is causing false rebuild
             return
 
         if event.src_path == self.app.config_file:

@@ -63,7 +63,6 @@ def configure(ctx):
     #ctx.load('jshint', tooldir=tools_dir)
     #ctx.load('less', tooldir=tools_dir)
     #ctx.load('lftp', tooldir=tools_dir)
-    #ctx.load('longshell', tooldir=tools_dir)
     #ctx.load('metadata2fontface', tooldir=tools_dir)
     #ctx.load('msbuild', tooldir=tools_dir)
     #ctx.load('mustache', tooldir=tools_dir)
