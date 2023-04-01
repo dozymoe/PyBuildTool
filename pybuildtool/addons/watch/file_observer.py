@@ -3,7 +3,7 @@
 import os
 import re
 from watchdog.events import FileOpenedEvent, FileSystemEventHandler
-from watchdog.observers import Observer
+from watchdog.observers.polling import PollingObserver
 
 class FileChangeHandler(FileSystemEventHandler):
 
@@ -16,6 +16,14 @@ class FileChangeHandler(FileSystemEventHandler):
         self.file_patterns = []
 
 
+    def app_reload(self):
+        self.app.reload = True
+
+
+    def app_rebuild(self):
+        self.app.rebuild = True
+
+
     def on_any_event(self, event):
         if event.is_directory:
             return
@@ -24,7 +32,7 @@ class FileChangeHandler(FileSystemEventHandler):
             return
 
         if event.src_path == self.app.config_file:
-            self.app.reload = True
+            self.app_reload()
 
         else:
             filters = self.file_patterns
@@ -33,7 +41,7 @@ class FileChangeHandler(FileSystemEventHandler):
 
             filters = [f for f in filters if len(f) == 0 or f[0] != '**']
             if len(filters):
-                self.app.rebuild = True
+                self.app_rebuild()
 
 
     def set_files(self, files):
@@ -110,7 +118,7 @@ class FileObserver(object):
                         dirnames.add(filename)
 
         for dirname in dirnames:
-            observer = Observer()
+            observer = PollingObserver()
             observer.schedule(self.handler, dirname, recursive=True)
             observer.start()
 
