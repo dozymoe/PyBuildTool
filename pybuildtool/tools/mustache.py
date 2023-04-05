@@ -7,7 +7,6 @@ Requirements:
 
 """
 import os
-from pystache import render
 #-
 from pybuildtool import BaseTask
 
@@ -23,6 +22,12 @@ class Task(BaseTask):
         if len(self.file_out) != 1:
             self.bld.fatal("%s can only have one output" %\
                     tool_name.capitalize())
+
+        # pylint:disable=import-outside-toplevel
+        try:
+            from chevron import render
+        except ImportError:
+            from pystache import render
 
         context = self.conf.get('context', {})
         os.makedirs(os.path.dirname(self.file_out[0]), exist_ok=True)
